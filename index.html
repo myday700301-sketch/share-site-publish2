@@ -1,0 +1,1199 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>所有個股共用版波段分析總覽儀表板</title>
+  <style>
+    :root {
+      --bg: #f4efe5;
+      --paper: rgba(255, 251, 244, 0.96);
+      --paper-strong: #fffdf8;
+      --ink: #162018;
+      --muted: #617065;
+      --forest: #1f4f40;
+      --line: rgba(22, 32, 24, 0.1);
+      --shadow: 0 20px 48px rgba(15, 28, 21, 0.08);
+      --sand: #efe4d1;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "PingFang TC", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(31,79,64,.14), transparent 22%),
+        linear-gradient(180deg, #faf7f1 0%, #f2ede3 100%);
+    }
+    a { color: var(--forest); text-decoration: none; font-weight: 800; }
+    .shell { max-width: 1560px; margin: 0 auto; padding: 24px 20px 40px; }
+    .hero, .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+    .hero { padding: 28px; margin-bottom: 18px; }
+    .eyebrow {
+      display: inline-flex;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: rgba(31,79,64,.08);
+      color: var(--forest);
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(40px, 6vw, 76px);
+      line-height: .96;
+      letter-spacing: -.04em;
+    }
+    .hero-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.7;
+      max-width: 920px;
+    }
+    .hero-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .meta-card {
+      background: var(--paper-strong);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 16px 18px;
+    }
+    .meta-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    .meta-card strong {
+      display: block;
+      font-size: 26px;
+      line-height: 1.25;
+    }
+    .nav-panel {
+      padding: 18px 20px;
+      margin-bottom: 18px;
+    }
+    .nav-panel h2 {
+      margin: 0 0 14px;
+      color: var(--forest);
+      font-size: 24px;
+    }
+    .stage-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .stage-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: #f4eee1;
+      border: 1px solid var(--line);
+    }
+    .stage-chip span { color: var(--ink); }
+    .stage-chip strong {
+      display: inline-flex;
+      min-width: 28px;
+      justify-content: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(31,79,64,.1);
+      color: var(--forest);
+    }
+    .stage-stack {
+      display: grid;
+      gap: 18px;
+    }
+    .stage-panel { padding: 22px; }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .section-kicker {
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .section-head h2 {
+      margin: 0;
+      color: var(--forest);
+      font-size: 32px;
+    }
+    .count-pill {
+      display: inline-flex;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: #f5efe3;
+      color: var(--forest);
+      font-weight: 800;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 14px;
+    }
+    .stock-card {
+      background: var(--paper-strong);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 18px;
+    }
+    .stock-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 14px;
+    }
+    .stock-head h3 {
+      margin: 0 0 6px;
+      font-size: 28px;
+      line-height: 1.05;
+    }
+    .stage-detail {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .confidence {
+      white-space: nowrap;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(31,79,64,.08);
+      color: var(--forest);
+      font-weight: 800;
+    }
+    .detail-grid {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .detail-grid span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .detail-grid strong {
+      display: block;
+      font-size: 18px;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+    .muted { color: var(--muted); font-weight: 700; }
+    @media (max-width: 860px) {
+      .stock-head {
+        flex-direction: column;
+      }
+      .section-head {
+        flex-direction: column;
+        align-items: start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="eyebrow">共用版波段分析總覽</div>
+      <h1>依當前階段分組的所有個股總覽</h1>
+      <p class="hero-copy">此頁依每個個股的「共用版波段分析儀表板 / markdown」中的【C.置頂結論】進行彙整，將標的按照「當前階段」分類，方便快速查看目前哪些股票位於突破、主升、延伸噴出、鈍化或轉弱區間。</p>
+      <div class="hero-meta">
+        <article class="meta-card">
+          <span>收錄標的</span>
+          <strong>31</strong>
+        </article>
+        <article class="meta-card">
+          <span>最新更新時間</span>
+          <strong>2026-04-16</strong>
+        </article>
+        <article class="meta-card">
+          <span>主要群組</span>
+          <strong>E. 高位震盪洗盤</strong>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel nav-panel">
+      <h2>快速跳轉</h2>
+      <div class="stage-nav"><a class='stage-chip' href='#stage-A'><span>A. 底部盤整 / 築底</span><strong>0</strong></a><a class='stage-chip' href='#stage-B'><span>B. 右側翻揚 / 初步轉強</span><strong>0</strong></a><a class='stage-chip' href='#stage-C'><span>C. 突破確認</span><strong>5</strong></a><a class='stage-chip' href='#stage-D'><span>D. 主升一波</span><strong>0</strong></a><a class='stage-chip' href='#stage-E'><span>E. 高位震盪洗盤</span><strong>17</strong></a><a class='stage-chip' href='#stage-F'><span>F. 主升二波</span><strong>1</strong></a><a class='stage-chip' href='#stage-G'><span>G. 延伸噴出</span><strong>4</strong></a><a class='stage-chip' href='#stage-H'><span>H. 派發 / 鈍化</span><strong>1</strong></a><a class='stage-chip' href='#stage-I'><span>I. 破位轉弱</span><strong>3</strong></a><a class='stage-chip' href='#stage-?'><span>未分類 / 待補資料</span><strong>0</strong></a></div>
+    </section>
+
+    <section class="stage-stack">
+      
+    <section class="panel stage-panel" id="stage-C">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">當前階段</p>
+          <h2>C. 突破確認</h2>
+        </div>
+        <span class="count-pill">5 檔</span>
+      </div>
+      <div class="card-grid">
+        
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>2405 輔信</h3>
+                  <p class="stage-detail">C. 突破確認 後的高位整理初段；若後續無法放量延伸，仍可能回到 E. 高位震盪洗盤。</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>日線轉強、週線修復中、月線尚未完全翻多的整理偏多格局。</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>以回踩守穩為主，不追價；若已有持股可續抱，但要嚴守 15.45 防守，若無持股則等待 15.45～15.55 附近較佳。</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/2405_輔信_dashboard.html'>個股儀表板</a>
+                <a href="analysis/2405_輔信_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>2419 仲琦</h3>
+                  <p class="stage-detail">C. 突破確認後的回測整理，偏向 D. 主升一波前段</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>中期多頭延續中的短線重整</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>以觀察與分批確認為主，不追價；若有持股可續抱，但需守住 34.0 附近與 33.2 失效線</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/2419_仲琦_dashboard.html'>個股儀表板</a>
+                <a href="analysis/2419_仲琦_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>4540 全球傳動</h3>
+                  <p class="stage-detail">C. 突破確認後的主升初段延伸，接近 D. 主升一波 的前段</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>波段續攻後的高檔整理 / 換手，偏多但短線過熱</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>可持續偏多觀察，但不追高；若回測守住 49 附近可分批布局，跌破 47.2 則轉防守</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/4540_全球傳動_dashboard.html'>個股儀表板</a>
+                <a href="analysis/4540_全球傳動_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>4960 誠美材</h3>
+                  <p class="stage-detail">C. 突破確認後的延伸段，偏向 D/G 之間</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位延伸，帶有高位震盪洗盤風險</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>偏多觀察，不追高；等待回測量縮止穩再評估分批</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/4960_誠美材_dashboard.html'>個股儀表板</a>
+                <a href="analysis/4960_誠美材_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>8215 明基材</h3>
+                  <p class="stage-detail">C. 突破確認後的高位整理，向 D. 主升一波過渡</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位整理偏多，屬突破後續強中的回測確認</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>可觀察性分批，不追價；若回測不破核心區，可視為續抱 / 觀察型布局</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/8215_明基材_dashboard.html'>個股儀表板</a>
+                <a href="analysis/8215_明基材_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+      </div>
+    </section>
+    
+    <section class="panel stage-panel" id="stage-E">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">當前階段</p>
+          <h2>E. 高位震盪洗盤</h2>
+        </div>
+        <span class="count-pill">17 檔</span>
+      </div>
+      <div class="card-grid">
+        
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>1582 信錦</h3>
+                  <p class="stage-detail">E. 高位震盪洗盤，偏向等待再確認</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位整理後的回測承接，短線偏弱但中期未破壞</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>先觀察，不追價；若回踩 102 附近止穩，可分批監控，若無量站回 106.5 再談偏多延伸</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/1582_信錦_dashboard.html'>個股儀表板</a>
+                <a href="analysis/1582_信錦_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>2313 華通</h3>
+                  <p class="stage-detail">E. 高位震盪洗盤，偏向向下修正後的反彈修復。</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位震盪後的修復反彈，機率 45%；其次仍是高位整理轉弱，機率 35%。</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>目前以觀察反彈是否能站穩 265 為主，未站穩前不宜直接認定進入新一波主升。</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/2313_華通_dashboard.html'>個股儀表板</a>
+                <a href="analysis/2313_華通_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>2317 鴻海</h3>
+                  <p class="stage-detail">E. 高位震盪洗盤</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>月週偏多延伸中的高檔整理</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>偏向守穩後分批持有或回測承接，不建議追高；若失守核心區則降低曝險</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/2317_鴻海_dashboard.html'>個股儀表板</a>
+                <a href="analysis/2317_鴻海_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>2367 燿華</h3>
+                  <p class="stage-detail">E. 高位震盪洗盤</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位整理中的支撐測試，偏向高位換手而非立即主升。</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>以觀察與等確認為主，不追價；若要操作，僅能在 72 附近守穩後偏向低接，並嚴守 70.7 失效線。</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/2367_燿華_dashboard.html'>個股儀表板</a>
+                <a href="analysis/2367_燿華_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>2449 京元</h3>
+                  <p class="stage-detail">E. 高位震盪洗盤，偏向 F 之前的過渡段</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位震盪偏弱，短線轉為回測整理，尚未正式翻空</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>先觀察，不追跌也不追突破，等待日線重新站穩 301～304 或明確失守 288 再處理</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/2449_京元_dashboard.html'>個股儀表板</a>
+                <a href="analysis/2449_京元_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>2455 全新</h3>
+                  <p class="stage-detail">E. 高位震盪洗盤</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位回檔中的週線整理，偏向洗盤後續測支撐</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>先觀察，不追價；若守住 275～280 並重新站回 280 上方，才考慮分批承接；若跌破 258 且收不回，應將波段結構改判為轉弱</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/2455_全新_dashboard.html'>個股儀表板</a>
+                <a href="analysis/2455_全新_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>2467 志聖</h3>
+                  <p class="stage-detail">E. 高位震盪洗盤</p>
+                </div>
+                <span class="confidence">中低</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位洗盤後轉入觀察，偏向強勢趨勢中的回測期</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>先等回測止穩再談布局，不追跌也不追價；若能重新站回 548 上方且量能回穩，才提高波段延伸的可信度</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/2467_志聖_dashboard.html'>個股儀表板</a>
+                <a href="analysis/2467_志聖_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>3138 耀登</h3>
+                  <p class="stage-detail">E. 高位震盪洗盤</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>中長週期偏多，但短線進入高檔整理吸收</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>以等回測、觀察是否能重新站穩 181 元作為主要策略，不宜追價，若失守 172 元則降低持有意願</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/3138_耀登_dashboard.html'>個股儀表板</a>
+                <a href="analysis/3138_耀登_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>3563 牧德</h3>
+                  <p class="stage-detail">E. 高位震盪洗盤 若後續放量突破 944～952，才較有機會升級到 F. 主升二波；若失守 904～895，則會降級為 I. 破位轉弱。</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高檔整理／高位延伸後換手，偏多但不適合追價。</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>以回測承接為主，不追高；若已有持股則以守 904～895 與觀察 944～952 的突破力道為核心。</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/3563_牧德_dashboard.html'>個股儀表板</a>
+                <a href="analysis/3563_牧德_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>4585 達明</h3>
+                  <p class="stage-detail">E. 高位震盪洗盤，略偏向 C. 突破確認後的回測驗證期。</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>日線強勢回檔中的高檔整理，仍偏右側回升，但未完成主升確認。</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>偏向觀察與分批確認，不追價，等回測止穩或放量再確認。</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/4585_達明_dashboard.html'>個股儀表板</a>
+                <a href="analysis/4585_達明_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>4906 正文</h3>
+                  <p class="stage-detail">E. 高位震盪洗盤</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位整理後的回測確認，偏多但未完成突破再加速</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>先觀察、不追價；若回測守住 38.8～39.0 可分批留意，若站回 40.6 再看續攻</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/4906_正文_dashboard.html'>個股儀表板</a>
+                <a href="analysis/4906_正文_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>5243 乙盛-KY</h3>
+                  <p class="stage-detail">E. 高位震盪洗盤</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位震盪整理，偏向回測確認</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>以觀察回測承接為主，未見明確站穩前不追價</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/5243_乙盛-KY_dashboard.html'>個股儀表板</a>
+                <a href="analysis/5243_乙盛-KY_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>6209 今國光</h3>
+                  <p class="stage-detail">E. 高位震盪洗盤</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位整理後的回檔洗盤</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>以等回測確認為主，不追高；若回到防守區且量縮止穩，再評估分批</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/6209_今國光_dashboard.html'>個股儀表板</a>
+                <a href="analysis/6209_今國光_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>6282 康舒</h3>
+                  <p class="stage-detail">E. 高位震盪洗盤</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>中期偏多、短線高位過熱後換手整理</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>不追價，等待回測守穩或確認續攻後再分批應對；若失守 45.2 則先防守</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/6282_康舒_dashboard.html'>個股儀表板</a>
+                <a href="analysis/6282_康舒_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>6426 統新</h3>
+                  <p class="stage-detail">E. 高位震盪洗盤，接近 F. 主升二波的前置觀察，但尚未成立。</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位震盪整理，偏洗盤後再確認。</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>目前以觀察與分批應對為主，不建議追價；若有持股，優先看 197～200 是否守住，再決定續抱或減碼。</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/6426_統新_dashboard.html'>個股儀表板</a>
+                <a href="analysis/6426_統新_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>6770 力積電</h3>
+                  <p class="stage-detail">E.高位震盪洗盤，偏向向下測試支撐。</p>
+                </div>
+                <span class="confidence">中低</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>中期偏多結構下的短線回檔整理，尚未確認趨勢反轉。</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>先觀望，等日線止跌與法人/量能同步改善後再評估。</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/6770_力積電_dashboard.html'>個股儀表板</a>
+                <a href="analysis/6770_力積電_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>6789 采鈺</h3>
+                  <p class="stage-detail">E. 高位震盪洗盤</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位延伸後進入高檔整理，偏多但短線鈍化</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>以觀察與回測承接為主，不追價；若站穩 410 上方並重新放量，才考慮偏多跟進</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/6789_采鈺_dashboard.html'>個股儀表板</a>
+                <a href="analysis/6789_采鈺_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+      </div>
+    </section>
+    
+    <section class="panel stage-panel" id="stage-F">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">當前階段</p>
+          <h2>F. 主升二波</h2>
+        </div>
+        <span class="count-pill">1 檔</span>
+      </div>
+      <div class="card-grid">
+        
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>1528 恩德</h3>
+                  <p class="stage-detail">F. 主升二波</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>主升延伸中，短線同時存在高位鈍化風險</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>偏多觀察，若回測守穩再加碼，若續強突破再順勢跟進，不宜在分K偏弱時追價</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/1528_恩德_dashboard.html'>個股儀表板</a>
+                <a href="analysis/1528_恩德_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+      </div>
+    </section>
+    
+    <section class="panel stage-panel" id="stage-G">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">當前階段</p>
+          <h2>G. 延伸噴出</h2>
+        </div>
+        <span class="count-pill">4 檔</span>
+      </div>
+      <div class="card-grid">
+        
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>2330 台積電</h3>
+                  <p class="stage-detail">G. 延伸噴出，接近 H. 派發 / 鈍化 的前段，但尚未正式轉弱。</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位延伸中的強勢整理，偏向多頭共振後的高檔換手。</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>若空手，偏向等回測 `2060~2050` 且量縮止穩再布局；若已持股，續抱為主但要嚴守 `2000` 失效線，並在 `2100` 上方留意鈍化與量價背離。</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/2330_台積電_dashboard.html'>個股儀表板</a>
+                <a href="analysis/2330_台積電_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>3714 富采</h3>
+                  <p class="stage-detail">G. 延伸噴出，並伴隨高位震盪風險</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>多頭延伸中，但已進入高位鈍化與過熱整理區</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>以續抱與回測承接為主，不建議在過熱長紅後直接追價；若已有持股，優先分批守住成本與關鍵支撐</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/3714_富采_dashboard.html'>個股儀表板</a>
+                <a href="analysis/3714_富采_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>6285 啟碁</h3>
+                  <p class="stage-detail">G.延伸噴出 與 E.高位震盪洗盤之間，現階段更偏向高位延伸後的整理</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位延伸後的再平衡整理，偏多但高檔敏感</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>偏多觀察、分批而非追價，等待回測不破或再突破確認後再處理</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/6285_啟碁_dashboard.html'>個股儀表板</a>
+                <a href="analysis/6285_啟碁_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>8027 鈦昇</h3>
+                  <p class="stage-detail">較接近 G.延伸噴出 與 H.派發 / 鈍化 之間，偏向延伸後段</p>
+                </div>
+                <span class="confidence">中</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>多週期偏多、短線高位延伸中，帶有過熱與追價風險</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>以等回測、確認量縮止穩後再分批處理為主，不宜以追價作為主要波段策略</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/8027_鈦昇_dashboard.html'>個股儀表板</a>
+                <a href="analysis/8027_鈦昇_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+      </div>
+    </section>
+    
+    <section class="panel stage-panel" id="stage-H">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">當前階段</p>
+          <h2>H. 派發 / 鈍化</h2>
+        </div>
+        <span class="count-pill">1 檔</span>
+      </div>
+      <div class="card-grid">
+        
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>2408 南亞科</h3>
+                  <p class="stage-detail">H. 派發 / 鈍化，且已逼近 I. 破位轉弱 的邊緣</p>
+                </div>
+                <span class="confidence">中低</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位震盪後轉弱，短線偏向假突破後回吐的情境</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>以觀察與控風險為主，不追價；若有持股，反彈接近前成本帶時以減碼或至少降低曝險為優先</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/2408_南亞科_dashboard.html'>個股儀表板</a>
+                <a href="analysis/2408_南亞科_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+      </div>
+    </section>
+    
+    <section class="panel stage-panel" id="stage-I">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">當前階段</p>
+          <h2>I. 破位轉弱</h2>
+        </div>
+        <span class="count-pill">3 檔</span>
+      </div>
+      <div class="card-grid">
+        
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>2344 華邦電</h3>
+                  <p class="stage-detail">I. 破位轉弱，若後續守穩可再觀察是否回到 E. 高位震盪洗盤。</p>
+                </div>
+                <span class="confidence">中低</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位整理失敗後轉入回測修正，短線偏弱，但月線仍未完全翻空。</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>先觀察是否能站回 90.0～93.5 區間並止穩，現階段不追價；若持股，應以防守為優先。</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/2344_華邦電_dashboard.html'>個股儀表板</a>
+                <a href="analysis/2344_華邦電_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>2382 廣達</h3>
+                  <p class="stage-detail">I. 破位轉弱（但長週期仍未完全翻空）</p>
+                </div>
+                <span class="confidence">中低</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位震盪後轉弱，短線偏向回測修正</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>暫不追價，已有持股者以風險控管為先，未持股者先觀察是否出現量縮止穩與法人回補</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/2382_廣達_dashboard.html'>個股儀表板</a>
+                <a href="analysis/2382_廣達_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+            <article class="stock-card">
+              <div class="stock-head">
+                <div>
+                  <h3>3376 新日興</h3>
+                  <p class="stage-detail">I. 破位轉弱</p>
+                </div>
+                <span class="confidence">中低</span>
+              </div>
+              <div class="detail-grid">
+                <div>
+                  <span>當前狀態</span>
+                  <strong>高位震盪轉弱</strong>
+                </div>
+                <div>
+                  <span>操作建議</span>
+                  <strong>暫不追價，等待止跌與量縮確認後再評估；若已持股，優先採取風險控管</strong>
+                </div>
+                <div>
+                  <span>更新時間</span>
+                  <strong>2026-04-16</strong>
+                </div>
+              </div>
+              <div class="links">
+                <a href='dashboards/3376_新日興_dashboard.html'>個股儀表板</a>
+                <a href="analysis/3376_新日興_analysis.html">文字分析</a>
+              </div>
+            </article>
+            
+      </div>
+    </section>
+    
+    </section>
+  </main>
+</body>
+</html>

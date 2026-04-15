@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>6426 統新波段整理</title>
+  <style>
+    :root {
+      --bg: #f3f0e8;
+      --panel: rgba(255, 251, 244, 0.94);
+      --panel-strong: #fffdf8;
+      --ink: #162018;
+      --ink-soft: #687068;
+      --forest: #1f4f40;
+      --line: rgba(22, 32, 24, 0.12);
+      --sand: #ece2d0;
+      --shadow: 0 20px 48px rgba(15, 28, 21, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "PingFang TC", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(31,79,64,.12), transparent 24%),
+        linear-gradient(180deg, #faf7f1 0%, #f3eee5 100%);
+    }
+    .shell {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 20px 20px 44px;
+    }
+    .hero, .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+    .hero {
+      padding: 24px;
+      margin-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(31,79,64,.08);
+      color: var(--forest);
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(46px, 7vw, 90px);
+      line-height: .96;
+      letter-spacing: -.04em;
+    }
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .meta-chip {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #f5efe3;
+      color: var(--ink-soft);
+      font-weight: 700;
+    }
+    .key-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .stat-card {
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 16px 18px;
+      min-height: 116px;
+    }
+    .stat-card span {
+      display: block;
+      color: var(--ink-soft);
+      font-size: 14px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .stat-card strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 18px;
+    }
+    .panel {
+      padding: 22px;
+    }
+    .panel h2 {
+      margin: 0 0 14px;
+      color: var(--forest);
+      font-size: 28px;
+    }
+    .score-row {
+      display: grid;
+      grid-template-columns: minmax(120px, 1fr) minmax(0, 4fr) 56px;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .score-row:last-child { border-bottom: 0; }
+    .score-label { font-weight: 700; }
+    .score-track {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: var(--sand);
+      overflow: hidden;
+    }
+    .score-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #1f4f40 0%, #6f8b7a 100%);
+      border-radius: inherit;
+    }
+    .score-value {
+      text-align: right;
+      font-size: 24px;
+      font-weight: 800;
+    }
+    p, li {
+      font-size: 18px;
+      line-height: 1.72;
+      color: #223022;
+      margin: 0;
+    }
+    p + p { margin-top: 12px; }
+    .bullet-list {
+      margin: 0;
+      padding-left: 22px;
+    }
+    .bullet-list li + li { margin-top: 8px; }
+    code {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #f3ecde;
+      font-family: "SFMono-Regular", "Menlo", monospace;
+      font-size: .92em;
+    }
+    .fold-card {
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .fold-card summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 20px;
+    }
+    .fold-card summary::-webkit-details-marker { display: none; }
+    .fold-card summary strong {
+      color: var(--forest);
+      font-size: 22px;
+    }
+    .fold-card summary span {
+      color: var(--ink-soft);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .fold-body {
+      border-top: 1px solid var(--line);
+      padding: 18px 20px 20px;
+    }
+    .section-stack {
+      display: grid;
+      gap: 18px;
+    }
+    @media (max-width: 980px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="eyebrow">6426 統新 ・ 波段分析儀表板</div>
+      <h1>6426 統新</h1>
+      <div class="meta-row"><div class='meta-chip'>更新時間：2026-04-16</div><div class='meta-chip'>分析定位：依波段共用提示詞進行回測校正與迭代分析</div></div>
+      <div class="key-grid">
+        
+            <article class="stat-card">
+              <span>當前最可能狀態</span>
+              <strong>高位震盪整理，偏洗盤後再確認。</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>當前階段</span>
+              <strong>E. 高位震盪洗盤，接近 F. 主升二波的前置觀察，但尚未成立。</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>進場訊號</span>
+              <strong>未完全成立，屬部分成立但仍需確認。</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>出場訊號</span>
+              <strong>尚未完全成立，但高檔鈍化與法人偏賣訊號已出現，需提高警戒。</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>主成本核心區</span>
+              <strong>197～200。</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>防守失效區</span>
+              <strong>194.5 下方，若再失守且無法快速收回，波段結構明顯轉弱。</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>1 週主情境</span>
+              <strong>高檔整理或回測洗盤。</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>1 月主情境</span>
+              <strong>箱體震盪整理，偏高位派發與續攻之間的選擇期。</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>操作建議</span>
+              <strong>目前以觀察與分批應對為主，不建議追價；若有持股，優先看 197～200 是否守住，再決定續抱或減碼。</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>把握度</span>
+              <strong>中</strong>
+            </article>
+            
+      </div>
+    </section>
+
+    <section class="content-grid">
+      <div class="section-stack">
+        <article class="panel">
+          <h2>置頂結論</h2>
+          <p>當前最可能狀態：</p>
+<ul class='bullet-list'>
+<li>高位震盪整理，偏洗盤後再確認。</li>
+</ul>
+<p>當前階段：</p>
+<ul class='bullet-list'>
+<li>E. 高位震盪洗盤，接近 F. 主升二波的前置觀察，但尚未成立。</li>
+</ul>
+<p>進場訊號是否成立：</p>
+<ul class='bullet-list'>
+<li>未完全成立，屬部分成立但仍需確認。</li>
+</ul>
+<p>出場訊號是否成立：</p>
+<ul class='bullet-list'>
+<li>尚未完全成立，但高檔鈍化與法人偏賣訊號已出現，需提高警戒。</li>
+</ul>
+<p>主成本核心區：</p>
+<ul class='bullet-list'>
+<li>197～200。</li>
+</ul>
+<p>波段加碼區：</p>
+<ul class='bullet-list'>
+<li>197 附近守穩後的回測量縮區，或重新站回 200 以上且法人轉正時。</li>
+</ul>
+<p>防守失效區：</p>
+<ul class='bullet-list'>
+<li>194.5 下方，若再失守且無法快速收回，波段結構明顯轉弱。</li>
+</ul>
+<p>未來 1 週主情境：</p>
+<ul class='bullet-list'>
+<li>高檔整理或回測洗盤。</li>
+</ul>
+<p>未來 1 月主情境：</p>
+<ul class='bullet-list'>
+<li>箱體震盪整理，偏高位派發與續攻之間的選擇期。</li>
+</ul>
+<p>操作建議：</p>
+<ul class='bullet-list'>
+<li>目前以觀察與分批應對為主，不建議追價；若有持股，優先看 197～200 是否守住，再決定續抱或減碼。</li>
+</ul>
+<p>把握度：中</p>
+        </article>
+        <article class="panel">
+          <h2>主力成本與關鍵價</h2>
+          <ul class='bullet-list'>
+<li>主成本核心區：197～200。</li>
+<li>波段加碼區：197 附近量縮守穩後，或重新站回 200 之上。</li>
+<li>防守失效區：194.5 下方。</li>
+<li>上方第一壓力：209～216.5。</li>
+<li>上方主目標帶：216.5 上方的前高延伸區。</li>
+<li>下方關鍵支撐：197，其次 194.5，再往下才是更深層風險區。</li>
+</ul>
+        </article>
+        <article class="panel">
+          <h2>交易計畫</h2>
+          <p>1~4 週：</p>
+<ul class='bullet-list'>
+<li>以 197～200 守穩與否作為主要觀察點。</li>
+<li>若守穩，可等待回測量縮後的分批布局機會。</li>
+<li>若跌破 194.5 且收不回，偏向不持有或減碼。</li>
+<li>若放量站回 209，才提高對 216.5 突破的期待。</li>
+</ul>
+<p>1~3 月：</p>
+<ul class='bullet-list'>
+<li>以 216.5 是否被有效突破作為波段主軸。</li>
+<li>若突破成立，才重新評估主升延續。</li>
+<li>若持續在 194.5～216.5 間震盪，則視為箱體整理或高位派發前置。</li>
+</ul>
+<p>不交易條件：</p>
+<ul class='bullet-list'>
+<li>未確認最新事件窗。</li>
+<li>194.5 失守後未收回。</li>
+<li>法人連續賣超且短周期動能持續轉弱。</li>
+<li>只有分K反彈、但日週結構未改善。</li>
+</ul>
+        </article>
+        <article class="panel">
+          <h2>監控清單</h2>
+          <ul class='bullet-list'>
+<li>197～200 是否守穩。</li>
+<li>法人是否由連賣轉為回補。</li>
+<li>週K是否仍維持強勢而不失真。</li>
+<li>216.5 是否再次被有效突破或只是前高測試。</li>
+<li>是否出現最新月營收 / 法說 / 重大訊息作為波段催化。</li>
+</ul>
+<p>補充說明：</p>
+<ul class='bullet-list'>
+<li>本輪相較前版，結論沒有大翻轉，但更偏向「高位震盪整理」而非「即將續攻」。</li>
+<li>前版失準點不在主支撐判斷，而在對短線整理與法人偏賣的速度估計仍偏樂觀。</li>
+<li>由於本輪未提供完整回測資料，L 章只能誠實列出缺口，不能假裝已完成校正。</li>
+</ul>
+        </article>
+      </div>
+      <div class="section-stack">
+        <article class="panel">
+          <h2>7 個核心分數</h2>
+          
+            <div class="score-row">
+              <div class="score-label">題材溫度 T</div>
+              <div class="score-track"><div class="score-fill" style="width:82%;"></div></div>
+              <div class="score-value">82</div>
+            </div>
+            
+
+            <div class="score-row">
+              <div class="score-label">基本面修正 F</div>
+              <div class="score-track"><div class="score-fill" style="width:52%;"></div></div>
+              <div class="score-value">52</div>
+            </div>
+            
+
+            <div class="score-row">
+              <div class="score-label">籌碼強度 C</div>
+              <div class="score-track"><div class="score-fill" style="width:54%;"></div></div>
+              <div class="score-value">54</div>
+            </div>
+            
+
+            <div class="score-row">
+              <div class="score-label">價量結構 P</div>
+              <div class="score-track"><div class="score-fill" style="width:61%;"></div></div>
+              <div class="score-value">61</div>
+            </div>
+            
+
+            <div class="score-row">
+              <div class="score-label">多週期趨勢一致性 S</div>
+              <div class="score-track"><div class="score-fill" style="width:69%;"></div></div>
+              <div class="score-value">69</div>
+            </div>
+            
+
+            <div class="score-row">
+              <div class="score-label">主力操作強度 M</div>
+              <div class="score-track"><div class="score-fill" style="width:57%;"></div></div>
+              <div class="score-value">57</div>
+            </div>
+            
+
+            <div class="score-row">
+              <div class="score-label">散戶擁擠度 R</div>
+              <div class="score-track"><div class="score-fill" style="width:72%;"></div></div>
+              <div class="score-value">72</div>
+            </div>
+            
+        </article>
+        <article class="panel">
+          <h2>未來 1 週情境預測</h2>
+          <ul class='bullet-list'>
+<li>高檔整理：40%</li>
+<li>觸發條件：197～200 守住，但量能不擴大，法人偏賣減緩。</li>
+<li>目標區：197～206 區間震盪。</li>
+<li>失效條件：跌破 194.5 或快速站上 209 後放量延伸。</li>
+</ul>
+<ul class='bullet-list'>
+<li>回測洗盤：30%</li>
+<li>觸發條件：短線反彈無力，15m / 30m 動能仍弱，回測 197 附近反覆測試。</li>
+<li>目標區：194.5～199。</li>
+<li>失效條件：回測後迅速收復 200 並轉強。</li>
+</ul>
+<ul class='bullet-list'>
+<li>強勢續攻：20%</li>
+<li>觸發條件：放量收復 209，且法人轉買、週線維持強勢。</li>
+<li>目標區：209～216.5。</li>
+<li>失效條件：量價不配合、長上影、隔日失守。</li>
+</ul>
+<ul class='bullet-list'>
+<li>轉弱下破：10%</li>
+<li>觸發條件：194.5 失守且無法收回。</li>
+<li>目標區：回看更低支撐帶。</li>
+<li>失效條件：快速收復 197。</li>
+</ul>
+        </article>
+        <article class="panel">
+          <h2>未來 1 月情境預測</h2>
+          <ul class='bullet-list'>
+<li>箱體震盪整理：38%</li>
+<li>驅動因子：純籌碼 + 題材高溫後的消化。</li>
+<li>可能目標區：194.5～216.5。</li>
+<li>需要觀察的事件窗：月營收、法說、產業展會、重大訊息。</li>
+</ul>
+<ul class='bullet-list'>
+<li>主升延續：27%</li>
+<li>驅動因子：題材 + 法人回補 + 週月線趨勢延伸。</li>
+<li>可能目標區：有效突破 216.5 後往上延伸。</li>
+<li>需要觀察的事件窗：營收成長、法說釋出訂單或出貨訊息。</li>
+</ul>
+<ul class='bullet-list'>
+<li>高位派發轉弱：23%</li>
+<li>驅動因子：籌碼鬆動、法人連賣、追價買盤退潮。</li>
+<li>可能目標區：跌回 197 下方，並往 194.5 甚至更低修正。</li>
+<li>需要觀察的事件窗：若無新利多，最容易在整理中逐步發生。</li>
+</ul>
+<ul class='bullet-list'>
+<li>破位進入修正：12%</li>
+<li>驅動因子：技術結構破壞、短中期支撐失守。</li>
+<li>可能目標區：先看 194.5，再看更深支撐。</li>
+<li>需要觀察的事件窗：財報不如預期、法人持續賣超。</li>
+</ul>
+        </article>
+        <article class="panel">
+          <h2>延伸內容</h2>
+          
+            <details class="fold-card">
+              <summary>
+                <strong>影像事實擷取</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <p>圖中時點資料：</p>
+<ul class='bullet-list'>
+<li>股票名稱 / 代號：6426 統新。</li>
+<li>圖表週期：日K、週K、月K、季K、年K皆有。</li>
+<li>日K圖中可辨識日期範圍約至 2026/04/15。</li>
+<li>日K最新可讀值：收盤 197.50、開盤 199.00、最高 209.00、最低 194.50、漲跌 -1.50、漲跌幅 -0.75%、成交量 4,148.25 張。</li>
+<li>週K最新可讀值：收盤 197.50、開盤 211.00、最高 216.50、最低 194.50、漲跌 +0.50、漲跌幅 +0.25%、成交量約 1.42 萬張。</li>
+<li>月K最新可讀值：收盤 197.50、開盤 143.00、最高 216.50、最低 143.00、漲跌 +61.50、漲跌幅 +45.22%、成交量約 3.1 萬張。</li>
+<li>季K最新可讀值：收盤 197.50、開盤 143.00、最高 216.50、最低 143.00、漲跌 +61.50、漲跌幅 +45.22%、成交量約 3.1 萬張。</li>
+<li>年K最新可讀值：收盤 197.50、開盤 101.50、最高 216.50、最低 86.80、漲跌 +99.60、漲跌幅 +101.7%、成交量約 18.35 萬張。</li>
+<li>日K指標圖可辨識：RSI6 63.61、RSI12 61.99、MACD DIF 14.7、MACD 10.17、OSC 9.06、+DI 32.3、-DI 22.33、ADX 18.69、ADXR 20.46、布林帶寬 0.5。</li>
+<li>週K指標圖可辨識：RSI6 73.01、RSI12 70.38、MACD DIF 26.47、MACD 19.91、OSC 13.12、+DI 47.52、-DI 14.67、ADX 36.75、ADXR 28.51、布林帶寬 0.94。</li>
+<li>月K指標圖可辨識：RSI6 72.86、RSI12 70.93、MACD DIF 20.58、MACD 8.92、OSC 23.32、+DI 37.18、-DI 4.77、ADX 43.05、ADXR 37.44、布林帶寬 1.68。</li>
+<li>季K指標圖可辨識：RSI6 88.62、RSI12 74.4、MACD DIF 12.09、MACD 1.89、OSC 20.4、+DI 37.71、-DI 10.27、ADX 26.47、ADXR 24.42、布林帶寬 1.68。</li>
+<li>年K指標圖可辨識：RSI6 77.68、RSI12 72.23、MACD DIF 16.65、MACD 10.52、OSC 12.26、布林帶寬 1.65。</li>
+</ul>
+<p>最新市場資料：</p>
+<ul class='bullet-list'>
+<li>Goodinfo 報表最新為 2026/04/15，收盤 197.5，跌幅 -0.75%。</li>
+<li>2026/04/15 成交量 4,148 張。</li>
+<li>2026/04/15 成交額 83,606 萬元。</li>
+<li>2026/04/15 外資買賣超 -297 張。</li>
+<li>2026/04/15 投信買賣超 0 張。</li>
+<li>2026/04/15 自營商買賣超 -11 張。</li>
+<li>2026/04/15 三大法人合計 -308 張。</li>
+<li>2026/04/15 融資餘額 4,187 張，日增 +27。</li>
+<li>2026/04/15 融券餘額 85 張，日減 -6。</li>
+<li>2026/04/15 券資比 2.03%。</li>
+<li>2026/04/15 現股當沖率 53.8%。</li>
+<li>2026/04/15 外資持股 3,158 張，持股比率 8.2%。</li>
+<li>2026/04/15 借券賣出餘額 553 張，次日限額 698 張。</li>
+<li>fubon_csv 最新日期 2026-04-15，60m / 30m / 15m / 5m / 1m 的最新收盤皆落在 199 附近，屬短周期背景補充。</li>
+<li>60m 技術值：RSI 56.39、KDJ K 20.93 / D 17.31 / J 28.17、MACD Line 8.20、Signal 10.20。</li>
+<li>30m 技術值：RSI 48.40、KDJ K 35.36 / D 24.32 / J 57.44、MACD Line 0.91、Signal 2.94。</li>
+<li>15m 技術值：RSI 43.47、KDJ K 50.00 / D 61.42 / J 27.16、MACD Line -1.68、Signal -1.95。</li>
+<li>5m 技術值：RSI 48.61、KDJ K 22.35 / D 38.65 / J -10.24、MACD Line 0.51、Signal 0.36。</li>
+<li>1m 技術值：RSI 37.48、KDJ K 16.67 / D 16.67 / J 16.67、MACD Line -0.20、Signal -0.10。</li>
+</ul>
+<p>高 / 中 / 低信心欄位：</p>
+<ul class='bullet-list'>
+<li>高信心：2026/04/15 報表收盤、量、法人、融資融券、借券賣出餘額。</li>
+<li>高信心：日 / 週 / 月 / 季 / 年K圖可讀出的主要價格與指標數值。</li>
+<li>中信心：fubon_csv 60m / 30m / 15m / 5m / 1m 的短周期判讀。</li>
+<li>低信心：若要推估完整回測績效、樣本內外表現、成本後績效，因本輪未提供回測資料，只能保持低信心。</li>
+<li>低信心：月營收、財報、法說、事件窗，因本輪未提供明確資料。</li>
+</ul>
+<p>無法確認欄位：</p>
+<ul class='bullet-list'>
+<li>月營收、季報、EPS、毛利率、營益率。</li>
+<li>事件窗是否存在最新法說、財報、展會、重大訊息。</li>
+<li>完整回測期間、進出場規則、停損停利、成本、滑價、流動性限制。</li>
+<li>是否完成 look-ahead bias、data leakage、樣本內外切分、walk-forward。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>已知事實 / 需確認 / 推論</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <p>已知事實：</p>
+<ul class='bullet-list'>
+<li>2026/04/15 收盤 197.5，較前一日小跌，成交量維持在 4,148 張。</li>
+<li>2026/04/15 三大法人合計賣超 308 張，外資單日賣超 297 張。</li>
+<li>融資餘額小增，融券小減，未見明顯軋空結構。</li>
+<li>日線 RSI 仍在 60 上方，週 / 月線 RSI 也在 70 附近或以上，代表中長期仍屬偏強區，但短線不弱不代表不會整理。</li>
+<li>日線 ADX 約 18.69，週線 ADX 約 36.75，月線 ADX 約 43.05，表示日線趨勢強度已降，但週月線仍具趨勢性。</li>
+<li>fubon_csv 的 60m 仍在相對中性偏強，15m / 1m 偏弱，短周期內有拉回整理的味道。</li>
+</ul>
+<p>需確認：</p>
+<ul class='bullet-list'>
+<li>是否有最新月營收、財報、法說或產業事件支撐估值。</li>
+<li>是否存在最新的樣本內 / 樣本外回測與交易明細。</li>
+<li>是否有更完整的均線數值、ATR、布林上下軌與缺口位置。</li>
+<li>是否有 20D / 60D / 10W / 20W 的精確位置供校正。</li>
+</ul>
+<p>推論：</p>
+<ul class='bullet-list'>
+<li>統新目前仍偏向高位整理，而不是全面轉空。</li>
+<li>前版把 197～199 視為關鍵支撐，這一輪最新收盤仍在 197.5，代表前版的支撐判定大致有效，但短線籌碼壓力仍未解除。</li>
+<li>由於法人連兩日偏賣、短周期動能分歧，本輪較像是高位震盪中的再確認，而非立即再攻。</li>
+<li>若沒有新的題材事件窗，估值與題材熱度可能更多依賴籌碼與技術面延伸。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>市場快照</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <ul class='bullet-list'>
+<li>最新收盤：197.5。</li>
+<li>最新漲跌：-1.5，-0.75%。</li>
+<li>最新成交量：4,148 張。</li>
+<li>最新成交額：83,606 萬元。</li>
+<li>近 5 日、10 日、20 日、60 日量能完整序列未提供，無法做精確比較，只能確認 2026/04/14 為 5,968 張、2026/04/15 為 4,148 張，短線量能是下降的。</li>
+<li>價格位置：仍在前高 216.5 下方，且靠近 197～200 的短中期共識成本區。</li>
+<li>MA20 / MA60 / MA120 / MA240：本輪未提供精確數值，無法嚴格落點。</li>
+<li>事件窗：本輪未提供，需確認。</li>
+<li>相對大盤與同族群強弱：本輪未提供族群相對強弱資料，只能保守列為需確認。</li>
+<li>市場快照綜合判讀：短線量縮、法人偏賣、價格仍守在 197 附近，屬高位整理而非立即破壞。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>多週期技術判讀</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <p>年 / 季：</p>
+<ul class='bullet-list'>
+<li>年K收盤 197.5，年漲幅約 +101.7%，屬長線大波段明顯走強後的位置。</li>
+<li>季K RSI 偏高，MACD 仍正向，ADX 也在趨勢區，表示長周期仍在多頭延伸，但已非低位起漲期。</li>
+<li>年季週結構顯示並非底部反轉，而是已經走過一段大波段後的高位區。</li>
+</ul>
+<p>月：</p>
+<ul class='bullet-list'>
+<li>月K收盤 197.5，月漲幅 +45.22%。</li>
+<li>月RSI 約 72.86 / 70.93，已接近高檔強勢區。</li>
+<li>月MACD 仍正，ADX 約 43.05，趨勢性強。</li>
+<li>月線結構偏多，但因 RSI 偏高，代表容易進入高檔鈍化與整理。</li>
+</ul>
+<p>週：</p>
+<ul class='bullet-list'>
+<li>週K收盤 197.5，週RSI 約 73.01 / 70.38，屬強勢偏熱。</li>
+<li>週MACD 與 ADX 仍強，代表中期趨勢未壞。</li>
+<li>週K最高曾到 216.5，顯示前高壓力已被摸到，但尚未形成穩定突破後續攻。</li>
+<li>週線更像主升後的整理，而不是剛開始起漲。</li>
+</ul>
+<p>日：</p>
+<ul class='bullet-list'>
+<li>日K收盤 197.5，位於前高 216.5 下方，且回落至 197～200 一帶。</li>
+<li>日RSI 63.61 / 61.99，仍強但比週月線更低，表示短線有降溫。</li>
+<li>日MACD 仍正，+DI 大於 -DI，但 ADX 僅 18.69，日線趨勢強度不足，較像高位整理。</li>
+<li>日線目前未見明確破壞，但也未見再度強勢擴張。</li>
+</ul>
+<p>分K補充：</p>
+<ul class='bullet-list'>
+<li>60m RSI 56.39，MACD Line 低於 Signal，短周期偏中性。</li>
+<li>30m RSI 48.40，動能接近中軸，偏整理。</li>
+<li>15m RSI 43.47、MACD 仍略弱，短線回檔味道較明顯。</li>
+<li>5m RSI 48.61，1m RSI 37.48，代表更短周期偏弱，但僅能作為波段背景補充，不可當作當沖策略依據。</li>
+<li>分K綜合看，短線承接尚可，但動能不夠一致。</li>
+</ul>
+<p>多週期最終分類：</p>
+<ul class='bullet-list'>
+<li>多頭鈍化。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>進場訊號</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <ul class='bullet-list'>
+<li>突破型進場訊號</li>
+<li>是否成立：未成立。</li>
+<li>強度：弱。</li>
+<li>觸發價或區間：需收盤有效站上 216.5。</li>
+<li>失效條件：站上後隔日無法守穩，或放量但收長上影。</li>
+</ul>
+<ul class='bullet-list'>
+<li>回測型進場訊號</li>
+<li>是否成立：部分成立。</li>
+<li>強度：中。</li>
+<li>觸發價或區間：197～200 守穩，且回測量縮、短周期不再破底。</li>
+<li>失效條件：跌破 194.5 且無法快速收回。</li>
+</ul>
+<ul class='bullet-list'>
+<li>吸籌轉發動型進場訊號</li>
+<li>是否成立：未完全成立。</li>
+<li>強度：弱到中。</li>
+<li>觸發條件：OBV 不再走弱、法人由賣轉買、週線維持強勢。</li>
+<li>失效條件：法人續賣且反彈量縮。</li>
+</ul>
+<ul class='bullet-list'>
+<li>事件窗型進場訊號</li>
+<li>是否成立：無法確認。</li>
+<li>強度：低。</li>
+<li>觸發條件：需有月營收、法說、展會、重大訊息等催化。</li>
+<li>失效條件：無事件支撐時，單靠技術面續攻成功率下降。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>出場訊號</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <ul class='bullet-list'>
+<li>失守主成本區</li>
+<li>是否成立：尚未成立。</li>
+<li>強度：中。</li>
+<li>觸發區間：197 下方轉弱，尤其 194.5 失守。</li>
+<li>失效條件：快速收回 197 上方且量縮止跌。</li>
+</ul>
+<ul class='bullet-list'>
+<li>失守 MA20 / AVWAP / 突破點</li>
+<li>是否成立：資料不足，無法精確確認。</li>
+<li>強度：低到中。</li>
+<li>觸發條件：若後續補得出均線與 AVWAP，可進一步校正。</li>
+<li>失效條件：缺乏完整資料時，不宜過度下結論。</li>
+</ul>
+<ul class='bullet-list'>
+<li>價創高但 OBV / RSI / MACD 不跟</li>
+<li>是否成立：目前需警戒，尚未完全確認。</li>
+<li>強度：中。</li>
+<li>觸發區間：若再挑戰 216.5，但量能與動能不配合。</li>
+<li>失效條件：價量指標同步擴張。</li>
+</ul>
+<ul class='bullet-list'>
+<li>融資續增、借券不降、法人轉賣</li>
+<li>是否成立：部分成立。</li>
+<li>強度：中。</li>
+<li>觸發條件：融資小增、外資連賣、借券餘額偏高。</li>
+<li>失效條件：法人轉買且融資回落。</li>
+</ul>
+<ul class='bullet-list'>
+<li>週線結構轉弱</li>
+<li>是否成立：尚未成立。</li>
+<li>強度：中低。</li>
+<li>觸發條件：週K失守關鍵支撐且週指標同步轉弱。</li>
+<li>失效條件：週線仍守住 197～200 並維持多頭結構。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>回測校正審計</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <ul class='bullet-list'>
+<li>回測資料不足：本輪未提供回測期間、進場規則、出場規則、停損停利、成本、滑價、流動性限制、樣本內外切分、walk-forward、回測績效。</li>
+<li>因此，本輪無法做嚴格的「校正前 vs 校正後」績效比較。</li>
+<li>也無法驗證是否存在過度擬合、是否只在特定年份有效、是否只靠少數大賺交易撐績效。</li>
+<li>也無法檢查 signal bar 與 execution bar 是否錯位，或是否有 look-ahead bias / data leakage。</li>
+<li>目前可做的只有「結構性審計」：前版把 197～199 定位為主防守區，這一輪最新收盤 197.5 仍在其上，代表前版支撐判讀未明顯失準；但前版對「續攻」仍偏保守，主因是本輪看到法人連賣、短周期偏弱，因此更接近高位整理，而非立即突破。</li>
+<li>前版若有失準，主要原因不是方向完全錯，而是低估了短線整理時間與法人轉賣對速度的影響。</li>
+<li>本輪資料缺口仍大，故結論信心只能維持中等，不能假裝已完成完整回測。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>下一輪迭代假設</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <ul class='bullet-list'>
+<li>假設名稱：197～200 是否仍是有效主成本帶</li>
+<li>為何值得驗證：前版與本輪都把它視為關鍵區，若失效，階段判定會明顯改變。</li>
+<li>要改哪 1~2 個核心變數：加入 20D / 60D 與 AVWAP。</li>
+<li>驗證方法：觀察後續 5～10 日是否守住該帶，並比對量價與法人。</li>
+<li>成功判準：守住後能再度轉強，且回測縮量。</li>
+<li>失敗判準：跌破後反彈無法站回。</li>
+<li>預期影響：提升防守區判定精度，降低假支撐誤判。</li>
+</ul>
+<ul class='bullet-list'>
+<li>假設名稱：法人偏賣是否只是短線調節</li>
+<li>為何值得驗證：本輪外資連賣，但週月線仍強，可能只是高檔調節。</li>
+<li>要改哪 1~2 個核心變數：加入 5 / 10 / 20 日累積法人淨買賣超。</li>
+<li>驗證方法：觀察法人是否在 1 週內止賣轉買。</li>
+<li>成功判準：法人回補後價格重新站上 209。</li>
+<li>失敗判準：法人持續賣超且價格跌破 194.5。</li>
+<li>預期影響：提升籌碼面解讀穩健性。</li>
+</ul>
+<ul class='bullet-list'>
+<li>假設名稱：216.5 是否為真正突破門檻而非前高測試</li>
+<li>為何值得驗證：前高已被摸到，但是否真突破仍未明朗。</li>
+<li>要改哪 1~2 個核心變數：加入突破後隔日量價確認與週線收盤確認。</li>
+<li>驗證方法：以收盤站穩 216.5 作為主條件。</li>
+<li>成功判準：突破後可延伸。</li>
+<li>失敗判準：僅盤中刺穿、收盤回落。</li>
+<li>預期影響：減少假突破追價風險。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>若我有持股</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <p>持股張數 / 均價：</p>
+<ul class='bullet-list'>
+<li>無持股。</li>
+</ul>
+<p>續抱條件：</p>
+<ul class='bullet-list'>
+<li>不適用。</li>
+</ul>
+<p>分批減碼價位：</p>
+<ul class='bullet-list'>
+<li>若跌破 194.5 且無法快速收回，或反彈至 209～216.5 卻量價不配合。</li>
+</ul>
+<p>防守價：</p>
+<ul class='bullet-list'>
+<li>197；更關鍵為 194.5。</li>
+</ul>
+              </div>
+            </details>
+            
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
