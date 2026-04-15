@@ -178,7 +178,7 @@
     }
     .filter-grid {
       display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr) auto;
+      grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr) minmax(220px, 260px);
       gap: 12px;
       margin-top: 12px;
     }
@@ -225,16 +225,18 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      min-height: 52px;
-      padding: 0 16px;
-      border-radius: 16px;
+      min-height: 68px;
+      padding: 0 24px;
+      border-radius: 28px;
       border: 1px solid rgba(39,72,63,.12);
-      background: rgba(255, 252, 246, 0.82);
+      background: linear-gradient(180deg, rgba(255, 252, 246, 0.96), rgba(248, 238, 224, 0.92));
       color: var(--forest-deep);
       font: inherit;
       font-weight: 800;
+      font-size: 22px;
       cursor: pointer;
-      transition: transform .2s ease, background .2s ease, border-color .2s ease;
+      box-shadow: 0 14px 32px rgba(35, 26, 17, 0.08);
+      transition: transform .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
     }
     .favorite-filter.active {
       background: linear-gradient(135deg, rgba(39,72,63,.14), rgba(180,123,63,.18));
@@ -242,6 +244,12 @@
     }
     .favorite-filter:hover {
       transform: translateY(-1px);
+      box-shadow: 0 20px 40px rgba(35, 26, 17, 0.12);
+    }
+    .favorite-filter .star {
+      color: var(--forest);
+      font-size: 28px;
+      line-height: 1;
     }
     .stage-nav {
       display: flex;
@@ -284,7 +292,7 @@
       position: absolute;
       inset: 0 auto 0 0;
       width: 6px;
-      background: linear-gradient(180deg, var(--gold), var(--forest));
+      background: linear-gradient(180deg, color-mix(in srgb, var(--stage-tone) 70%, white), var(--stage-tone));
       opacity: .92;
     }
     .section-head {
@@ -303,15 +311,15 @@
     }
     .section-head h2 {
       margin: 0;
-      color: var(--forest);
+      color: var(--stage-tone);
       font-size: 32px;
     }
     .count-pill {
       display: inline-flex;
       padding: 10px 14px;
       border-radius: 999px;
-      background: linear-gradient(135deg, rgba(39,72,63,.14), rgba(180,123,63,.18));
-      color: var(--forest-deep);
+      background: linear-gradient(135deg, color-mix(in srgb, var(--stage-soft) 82%, white), color-mix(in srgb, var(--stage-tone) 18%, white));
+      color: var(--stage-tone);
       font-weight: 800;
     }
     .card-grid {
@@ -350,6 +358,20 @@
       margin: 0 0 6px;
       font-size: 28px;
       line-height: 1.05;
+    }
+    .stage-badge {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--stage-soft) 84%, white), color-mix(in srgb, var(--stage-tone) 12%, white));
+      color: var(--stage-tone);
+      border: 1px solid color-mix(in srgb, var(--stage-tone) 18%, transparent);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
     }
     .stage-detail {
       margin: 0;
@@ -429,6 +451,37 @@
       background: rgba(180,123,63,.12);
     }
     .muted { color: var(--muted); font-weight: 700; }
+    .favorite-spotlight {
+      display: block;
+      padding: 22px;
+      margin-bottom: 18px;
+      background: linear-gradient(180deg, rgba(255,252,246,.98), rgba(247,238,225,.92));
+    }
+    .spotlight-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .spotlight-head h2 {
+      margin: 0;
+      color: var(--forest-deep);
+      font-size: 30px;
+    }
+    .spotlight-copy {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .spotlight-empty {
+      padding: 18px;
+      border-radius: 20px;
+      border: 1px dashed rgba(39,72,63,.18);
+      color: var(--muted);
+      background: rgba(255,255,255,.42);
+      line-height: 1.8;
+    }
     .site-footer {
       padding: 18px 6px 0;
       color: var(--muted);
@@ -499,8 +552,11 @@
           <strong>2026-04-16</strong>
         </article>
         <article class="meta-card">
-          <span>市場主節奏</span>
-          <strong>E. 高位震盪洗盤</strong>
+          <span>收藏檢視</span>
+          <button class="favorite-filter" id="hero-favorite-filter" type="button" aria-pressed="false">
+            <span class="star">★</span>
+            <span>只看收藏</span>
+          </button>
         </article>
       </div>
     </section>
@@ -529,7 +585,7 @@
         <div class="toggle-field">
           <label for="favorite-filter">收藏檢視</label>
           <button class="favorite-filter" id="favorite-filter" type="button" aria-pressed="false">
-            <span>★</span>
+            <span class="star">★</span>
             <span>只看收藏</span>
           </button>
         </div>
@@ -537,9 +593,22 @@
       <div class="filter-status" id="filter-status">目前顯示全部標的。</div>
     </section>
 
+    <section class="panel favorite-spotlight" id="favorite-spotlight">
+      <div class="spotlight-head">
+        <div>
+          <p class="section-kicker">我的觀察清單</p>
+          <h2>收藏個股快速總覽</h2>
+          <p class="spotlight-copy">你在首頁按下收藏的標的，會固定整理在這一區，方便每天先看自己真正在追的名單。</p>
+        </div>
+        <span class="count-pill" id="favorite-spotlight-count">0 檔</span>
+      </div>
+      <div class="spotlight-empty" id="favorite-spotlight-empty">目前還沒有收藏個股。你可以在各張個股卡片按下「收藏」，這裡就會自動建立你的觀察清單。</div>
+      <div class="card-grid" id="favorite-spotlight-grid"></div>
+    </section>
+
     <section class="stage-stack">
       
-    <section class="panel stage-panel" id="stage-C">
+    <section class="panel stage-panel" id="stage-C" style="--stage-tone: #0f5c52; --stage-soft: #d7efe9;">
       <div class="section-head">
         <div>
           <p class="section-kicker">當前階段</p>
@@ -552,6 +621,7 @@
             <article class="stock-card" data-stock="2405 輔信" data-stage="C" data-stage-label="c. 突破確認 後的高位整理初段；若後續無法放量延伸，仍可能回到 e. 高位震盪洗盤。" data-state="日線轉強、週線修復中、月線尚未完全翻多的整理偏多格局。" data-action="以回踩守穩為主，不追價；若已有持股可續抱，但要嚴守 15.45 防守，若無持股則等待 15.45～15.55 附近較佳。" data-stock-id="2405 輔信">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #0f5c52; --stage-soft: #d7efe9;">C 階段</span>
                   <h3>2405 輔信</h3>
                   <p class="stage-detail">C. 突破確認 後的高位整理初段；若後續無法放量延伸，仍可能回到 E. 高位震盪洗盤。</p>
                 </div>
@@ -586,6 +656,7 @@
             <article class="stock-card" data-stock="2419 仲琦" data-stage="C" data-stage-label="c. 突破確認後的回測整理，偏向 d. 主升一波前段" data-state="中期多頭延續中的短線重整" data-action="以觀察與分批確認為主，不追價；若有持股可續抱，但需守住 34.0 附近與 33.2 失效線" data-stock-id="2419 仲琦">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #0f5c52; --stage-soft: #d7efe9;">C 階段</span>
                   <h3>2419 仲琦</h3>
                   <p class="stage-detail">C. 突破確認後的回測整理，偏向 D. 主升一波前段</p>
                 </div>
@@ -620,6 +691,7 @@
             <article class="stock-card" data-stock="4540 全球傳動" data-stage="C" data-stage-label="c. 突破確認後的主升初段延伸，接近 d. 主升一波 的前段" data-state="波段續攻後的高檔整理 / 換手，偏多但短線過熱" data-action="可持續偏多觀察，但不追高；若回測守住 49 附近可分批布局，跌破 47.2 則轉防守" data-stock-id="4540 全球傳動">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #0f5c52; --stage-soft: #d7efe9;">C 階段</span>
                   <h3>4540 全球傳動</h3>
                   <p class="stage-detail">C. 突破確認後的主升初段延伸，接近 D. 主升一波 的前段</p>
                 </div>
@@ -654,6 +726,7 @@
             <article class="stock-card" data-stock="4960 誠美材" data-stage="C" data-stage-label="c. 突破確認後的延伸段，偏向 d/g 之間" data-state="高位延伸，帶有高位震盪洗盤風險" data-action="偏多觀察，不追高；等待回測量縮止穩再評估分批" data-stock-id="4960 誠美材">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #0f5c52; --stage-soft: #d7efe9;">C 階段</span>
                   <h3>4960 誠美材</h3>
                   <p class="stage-detail">C. 突破確認後的延伸段，偏向 D/G 之間</p>
                 </div>
@@ -688,6 +761,7 @@
             <article class="stock-card" data-stock="8215 明基材" data-stage="C" data-stage-label="c. 突破確認後的高位整理，向 d. 主升一波過渡" data-state="高位整理偏多，屬突破後續強中的回測確認" data-action="可觀察性分批，不追價；若回測不破核心區，可視為續抱 / 觀察型布局" data-stock-id="8215 明基材">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #0f5c52; --stage-soft: #d7efe9;">C 階段</span>
                   <h3>8215 明基材</h3>
                   <p class="stage-detail">C. 突破確認後的高位整理，向 D. 主升一波過渡</p>
                 </div>
@@ -722,7 +796,7 @@
       </div>
     </section>
     
-    <section class="panel stage-panel" id="stage-E">
+    <section class="panel stage-panel" id="stage-E" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">
       <div class="section-head">
         <div>
           <p class="section-kicker">當前階段</p>
@@ -735,6 +809,7 @@
             <article class="stock-card" data-stock="1582 信錦" data-stage="E" data-stage-label="e. 高位震盪洗盤，偏向等待再確認" data-state="高位整理後的回測承接，短線偏弱但中期未破壞" data-action="先觀察，不追價；若回踩 102 附近止穩，可分批監控，若無量站回 106.5 再談偏多延伸" data-stock-id="1582 信錦">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 階段</span>
                   <h3>1582 信錦</h3>
                   <p class="stage-detail">E. 高位震盪洗盤，偏向等待再確認</p>
                 </div>
@@ -769,6 +844,7 @@
             <article class="stock-card" data-stock="2313 華通" data-stage="E" data-stage-label="e. 高位震盪洗盤，偏向向下修正後的反彈修復。" data-state="高位震盪後的修復反彈，機率 45%；其次仍是高位整理轉弱，機率 35%。" data-action="目前以觀察反彈是否能站穩 265 為主，未站穩前不宜直接認定進入新一波主升。" data-stock-id="2313 華通">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 階段</span>
                   <h3>2313 華通</h3>
                   <p class="stage-detail">E. 高位震盪洗盤，偏向向下修正後的反彈修復。</p>
                 </div>
@@ -803,6 +879,7 @@
             <article class="stock-card" data-stock="2317 鴻海" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="月週偏多延伸中的高檔整理" data-action="偏向守穩後分批持有或回測承接，不建議追高；若失守核心區則降低曝險" data-stock-id="2317 鴻海">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 階段</span>
                   <h3>2317 鴻海</h3>
                   <p class="stage-detail">E. 高位震盪洗盤</p>
                 </div>
@@ -837,6 +914,7 @@
             <article class="stock-card" data-stock="2367 燿華" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="高位整理中的支撐測試，偏向高位換手而非立即主升。" data-action="以觀察與等確認為主，不追價；若要操作，僅能在 72 附近守穩後偏向低接，並嚴守 70.7 失效線。" data-stock-id="2367 燿華">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 階段</span>
                   <h3>2367 燿華</h3>
                   <p class="stage-detail">E. 高位震盪洗盤</p>
                 </div>
@@ -871,6 +949,7 @@
             <article class="stock-card" data-stock="2449 京元" data-stage="E" data-stage-label="e. 高位震盪洗盤，偏向 f 之前的過渡段" data-state="高位震盪偏弱，短線轉為回測整理，尚未正式翻空" data-action="先觀察，不追跌也不追突破，等待日線重新站穩 301～304 或明確失守 288 再處理" data-stock-id="2449 京元">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 階段</span>
                   <h3>2449 京元</h3>
                   <p class="stage-detail">E. 高位震盪洗盤，偏向 F 之前的過渡段</p>
                 </div>
@@ -905,6 +984,7 @@
             <article class="stock-card" data-stock="2455 全新" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="高位回檔中的週線整理，偏向洗盤後續測支撐" data-action="先觀察，不追價；若守住 275～280 並重新站回 280 上方，才考慮分批承接；若跌破 258 且收不回，應將波段結構改判為轉弱" data-stock-id="2455 全新">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 階段</span>
                   <h3>2455 全新</h3>
                   <p class="stage-detail">E. 高位震盪洗盤</p>
                 </div>
@@ -939,6 +1019,7 @@
             <article class="stock-card" data-stock="2467 志聖" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="高位洗盤後轉入觀察，偏向強勢趨勢中的回測期" data-action="先等回測止穩再談布局，不追跌也不追價；若能重新站回 548 上方且量能回穩，才提高波段延伸的可信度" data-stock-id="2467 志聖">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 階段</span>
                   <h3>2467 志聖</h3>
                   <p class="stage-detail">E. 高位震盪洗盤</p>
                 </div>
@@ -973,6 +1054,7 @@
             <article class="stock-card" data-stock="3138 耀登" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="中長週期偏多，但短線進入高檔整理吸收" data-action="以等回測、觀察是否能重新站穩 181 元作為主要策略，不宜追價，若失守 172 元則降低持有意願" data-stock-id="3138 耀登">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 階段</span>
                   <h3>3138 耀登</h3>
                   <p class="stage-detail">E. 高位震盪洗盤</p>
                 </div>
@@ -1007,6 +1089,7 @@
             <article class="stock-card" data-stock="3563 牧德" data-stage="E" data-stage-label="e. 高位震盪洗盤 若後續放量突破 944～952，才較有機會升級到 f. 主升二波；若失守 904～895，則會降級為 i. 破位轉弱。" data-state="高檔整理／高位延伸後換手，偏多但不適合追價。" data-action="以回測承接為主，不追高；若已有持股則以守 904～895 與觀察 944～952 的突破力道為核心。" data-stock-id="3563 牧德">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 階段</span>
                   <h3>3563 牧德</h3>
                   <p class="stage-detail">E. 高位震盪洗盤 若後續放量突破 944～952，才較有機會升級到 F. 主升二波；若失守 904～895，則會降級為 I. 破位轉弱。</p>
                 </div>
@@ -1041,6 +1124,7 @@
             <article class="stock-card" data-stock="4585 達明" data-stage="E" data-stage-label="e. 高位震盪洗盤，略偏向 c. 突破確認後的回測驗證期。" data-state="日線強勢回檔中的高檔整理，仍偏右側回升，但未完成主升確認。" data-action="偏向觀察與分批確認，不追價，等回測止穩或放量再確認。" data-stock-id="4585 達明">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 階段</span>
                   <h3>4585 達明</h3>
                   <p class="stage-detail">E. 高位震盪洗盤，略偏向 C. 突破確認後的回測驗證期。</p>
                 </div>
@@ -1075,6 +1159,7 @@
             <article class="stock-card" data-stock="4906 正文" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="高位整理後的回測確認，偏多但未完成突破再加速" data-action="先觀察、不追價；若回測守住 38.8～39.0 可分批留意，若站回 40.6 再看續攻" data-stock-id="4906 正文">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 階段</span>
                   <h3>4906 正文</h3>
                   <p class="stage-detail">E. 高位震盪洗盤</p>
                 </div>
@@ -1109,6 +1194,7 @@
             <article class="stock-card" data-stock="5243 乙盛-ky" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="高位震盪整理，偏向回測確認" data-action="以觀察回測承接為主，未見明確站穩前不追價" data-stock-id="5243 乙盛-KY">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 階段</span>
                   <h3>5243 乙盛-KY</h3>
                   <p class="stage-detail">E. 高位震盪洗盤</p>
                 </div>
@@ -1143,6 +1229,7 @@
             <article class="stock-card" data-stock="6209 今國光" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="高位整理後的回檔洗盤" data-action="以等回測確認為主，不追高；若回到防守區且量縮止穩，再評估分批" data-stock-id="6209 今國光">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 階段</span>
                   <h3>6209 今國光</h3>
                   <p class="stage-detail">E. 高位震盪洗盤</p>
                 </div>
@@ -1177,6 +1264,7 @@
             <article class="stock-card" data-stock="6282 康舒" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="中期偏多、短線高位過熱後換手整理" data-action="不追價，等待回測守穩或確認續攻後再分批應對；若失守 45.2 則先防守" data-stock-id="6282 康舒">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 階段</span>
                   <h3>6282 康舒</h3>
                   <p class="stage-detail">E. 高位震盪洗盤</p>
                 </div>
@@ -1211,6 +1299,7 @@
             <article class="stock-card" data-stock="6426 統新" data-stage="E" data-stage-label="e. 高位震盪洗盤，接近 f. 主升二波的前置觀察，但尚未成立。" data-state="高位震盪整理，偏洗盤後再確認。" data-action="目前以觀察與分批應對為主，不建議追價；若有持股，優先看 197～200 是否守住，再決定續抱或減碼。" data-stock-id="6426 統新">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 階段</span>
                   <h3>6426 統新</h3>
                   <p class="stage-detail">E. 高位震盪洗盤，接近 F. 主升二波的前置觀察，但尚未成立。</p>
                 </div>
@@ -1245,6 +1334,7 @@
             <article class="stock-card" data-stock="6770 力積電" data-stage="E" data-stage-label="e.高位震盪洗盤，偏向向下測試支撐。" data-state="中期偏多結構下的短線回檔整理，尚未確認趨勢反轉。" data-action="先觀望，等日線止跌與法人/量能同步改善後再評估。" data-stock-id="6770 力積電">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 階段</span>
                   <h3>6770 力積電</h3>
                   <p class="stage-detail">E.高位震盪洗盤，偏向向下測試支撐。</p>
                 </div>
@@ -1279,6 +1369,7 @@
             <article class="stock-card" data-stock="6789 采鈺" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="高位延伸後進入高檔整理，偏多但短線鈍化" data-action="以觀察與回測承接為主，不追價；若站穩 410 上方並重新放量，才考慮偏多跟進" data-stock-id="6789 采鈺">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 階段</span>
                   <h3>6789 采鈺</h3>
                   <p class="stage-detail">E. 高位震盪洗盤</p>
                 </div>
@@ -1313,7 +1404,7 @@
       </div>
     </section>
     
-    <section class="panel stage-panel" id="stage-F">
+    <section class="panel stage-panel" id="stage-F" style="--stage-tone: #8a4f14; --stage-soft: #f3d7ac;">
       <div class="section-head">
         <div>
           <p class="section-kicker">當前階段</p>
@@ -1326,6 +1417,7 @@
             <article class="stock-card" data-stock="1528 恩德" data-stage="F" data-stage-label="f. 主升二波" data-state="主升延伸中，短線同時存在高位鈍化風險" data-action="偏多觀察，若回測守穩再加碼，若續強突破再順勢跟進，不宜在分k偏弱時追價" data-stock-id="1528 恩德">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #8a4f14; --stage-soft: #f3d7ac;">F 階段</span>
                   <h3>1528 恩德</h3>
                   <p class="stage-detail">F. 主升二波</p>
                 </div>
@@ -1360,7 +1452,7 @@
       </div>
     </section>
     
-    <section class="panel stage-panel" id="stage-G">
+    <section class="panel stage-panel" id="stage-G" style="--stage-tone: #a44823; --stage-soft: #f7c9b8;">
       <div class="section-head">
         <div>
           <p class="section-kicker">當前階段</p>
@@ -1373,6 +1465,7 @@
             <article class="stock-card" data-stock="2330 台積電" data-stage="G" data-stage-label="g. 延伸噴出，接近 h. 派發 / 鈍化 的前段，但尚未正式轉弱。" data-state="高位延伸中的強勢整理，偏向多頭共振後的高檔換手。" data-action="若空手，偏向等回測 `2060~2050` 且量縮止穩再布局；若已持股，續抱為主但要嚴守 `2000` 失效線，並在 `2100` 上方留意鈍化與量價背離。" data-stock-id="2330 台積電">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #a44823; --stage-soft: #f7c9b8;">G 階段</span>
                   <h3>2330 台積電</h3>
                   <p class="stage-detail">G. 延伸噴出，接近 H. 派發 / 鈍化 的前段，但尚未正式轉弱。</p>
                 </div>
@@ -1407,6 +1500,7 @@
             <article class="stock-card" data-stock="3714 富采" data-stage="G" data-stage-label="g. 延伸噴出，並伴隨高位震盪風險" data-state="多頭延伸中，但已進入高位鈍化與過熱整理區" data-action="以續抱與回測承接為主，不建議在過熱長紅後直接追價；若已有持股，優先分批守住成本與關鍵支撐" data-stock-id="3714 富采">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #a44823; --stage-soft: #f7c9b8;">G 階段</span>
                   <h3>3714 富采</h3>
                   <p class="stage-detail">G. 延伸噴出，並伴隨高位震盪風險</p>
                 </div>
@@ -1441,6 +1535,7 @@
             <article class="stock-card" data-stock="6285 啟碁" data-stage="G" data-stage-label="g.延伸噴出 與 e.高位震盪洗盤之間，現階段更偏向高位延伸後的整理" data-state="高位延伸後的再平衡整理，偏多但高檔敏感" data-action="偏多觀察、分批而非追價，等待回測不破或再突破確認後再處理" data-stock-id="6285 啟碁">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #a44823; --stage-soft: #f7c9b8;">G 階段</span>
                   <h3>6285 啟碁</h3>
                   <p class="stage-detail">G.延伸噴出 與 E.高位震盪洗盤之間，現階段更偏向高位延伸後的整理</p>
                 </div>
@@ -1475,6 +1570,7 @@
             <article class="stock-card" data-stock="8027 鈦昇" data-stage="G" data-stage-label="較接近 g.延伸噴出 與 h.派發 / 鈍化 之間，偏向延伸後段" data-state="多週期偏多、短線高位延伸中，帶有過熱與追價風險" data-action="以等回測、確認量縮止穩後再分批處理為主，不宜以追價作為主要波段策略" data-stock-id="8027 鈦昇">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #a44823; --stage-soft: #f7c9b8;">G 階段</span>
                   <h3>8027 鈦昇</h3>
                   <p class="stage-detail">較接近 G.延伸噴出 與 H.派發 / 鈍化 之間，偏向延伸後段</p>
                 </div>
@@ -1509,7 +1605,7 @@
       </div>
     </section>
     
-    <section class="panel stage-panel" id="stage-H">
+    <section class="panel stage-panel" id="stage-H" style="--stage-tone: #7f3f37; --stage-soft: #efc9c3;">
       <div class="section-head">
         <div>
           <p class="section-kicker">當前階段</p>
@@ -1522,6 +1618,7 @@
             <article class="stock-card" data-stock="2408 南亞科" data-stage="H" data-stage-label="h. 派發 / 鈍化，且已逼近 i. 破位轉弱 的邊緣" data-state="高位震盪後轉弱，短線偏向假突破後回吐的情境" data-action="以觀察與控風險為主，不追價；若有持股，反彈接近前成本帶時以減碼或至少降低曝險為優先" data-stock-id="2408 南亞科">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #7f3f37; --stage-soft: #efc9c3;">H 階段</span>
                   <h3>2408 南亞科</h3>
                   <p class="stage-detail">H. 派發 / 鈍化，且已逼近 I. 破位轉弱 的邊緣</p>
                 </div>
@@ -1556,7 +1653,7 @@
       </div>
     </section>
     
-    <section class="panel stage-panel" id="stage-I">
+    <section class="panel stage-panel" id="stage-I" style="--stage-tone: #6a2a2a; --stage-soft: #eabcbc;">
       <div class="section-head">
         <div>
           <p class="section-kicker">當前階段</p>
@@ -1569,6 +1666,7 @@
             <article class="stock-card" data-stock="2344 華邦電" data-stage="I" data-stage-label="i. 破位轉弱，若後續守穩可再觀察是否回到 e. 高位震盪洗盤。" data-state="高位整理失敗後轉入回測修正，短線偏弱，但月線仍未完全翻空。" data-action="先觀察是否能站回 90.0～93.5 區間並止穩，現階段不追價；若持股，應以防守為優先。" data-stock-id="2344 華邦電">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #6a2a2a; --stage-soft: #eabcbc;">I 階段</span>
                   <h3>2344 華邦電</h3>
                   <p class="stage-detail">I. 破位轉弱，若後續守穩可再觀察是否回到 E. 高位震盪洗盤。</p>
                 </div>
@@ -1603,6 +1701,7 @@
             <article class="stock-card" data-stock="2382 廣達" data-stage="I" data-stage-label="i. 破位轉弱（但長週期仍未完全翻空）" data-state="高位震盪後轉弱，短線偏向回測修正" data-action="暫不追價，已有持股者以風險控管為先，未持股者先觀察是否出現量縮止穩與法人回補" data-stock-id="2382 廣達">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #6a2a2a; --stage-soft: #eabcbc;">I 階段</span>
                   <h3>2382 廣達</h3>
                   <p class="stage-detail">I. 破位轉弱（但長週期仍未完全翻空）</p>
                 </div>
@@ -1637,6 +1736,7 @@
             <article class="stock-card" data-stock="3376 新日興" data-stage="I" data-stage-label="i. 破位轉弱" data-state="高位震盪轉弱" data-action="暫不追價，等待止跌與量縮確認後再評估；若已持股，優先採取風險控管" data-stock-id="3376 新日興">
               <div class="stock-head">
                 <div>
+                  <span class="stage-badge" style="--stage-tone: #6a2a2a; --stage-soft: #eabcbc;">I 階段</span>
                   <h3>3376 新日興</h3>
                   <p class="stage-detail">I. 破位轉弱</p>
                 </div>
@@ -1682,10 +1782,19 @@
     const searchInput = document.getElementById('stock-search');
     const stageFilter = document.getElementById('stage-filter');
     const favoriteFilter = document.getElementById('favorite-filter');
+    const heroFavoriteFilter = document.getElementById('hero-favorite-filter');
     const statusText = document.getElementById('filter-status');
     const panels = Array.from(document.querySelectorAll('.stage-panel'));
+    const allCards = Array.from(document.querySelectorAll('.stock-card'));
     const favoriteStorageKey = 'swing-observer-favorites';
-    const favoriteButtons = Array.from(document.querySelectorAll('[data-favorite-toggle]'));
+    const favoriteSpotlight = document.getElementById('favorite-spotlight');
+    const favoriteSpotlightGrid = document.getElementById('favorite-spotlight-grid');
+    const favoriteSpotlightEmpty = document.getElementById('favorite-spotlight-empty');
+    const favoriteSpotlightCount = document.getElementById('favorite-spotlight-count');
+
+    function getFavoriteButtons() {
+      return Array.from(document.querySelectorAll('[data-favorite-toggle]'));
+    }
 
     function loadFavorites() {
       try {
@@ -1702,7 +1811,7 @@
     }
 
     function syncFavoriteButtons() {
-      favoriteButtons.forEach((button) => {
+      getFavoriteButtons().forEach((button) => {
         const stockId = button.dataset.stockId || '';
         const isActive = favorites.has(stockId);
         button.classList.toggle('active', isActive);
@@ -1711,6 +1820,47 @@
         const label = button.querySelector('.favorite-text');
         if (label) label.textContent = isActive ? '已收藏' : '收藏';
       });
+    }
+
+    function syncFavoriteFilterButtons() {
+      const active = favoriteFilter?.classList.contains('active');
+      [favoriteFilter, heroFavoriteFilter].forEach((button) => {
+        if (!button) return;
+        button.classList.toggle('active', !!active);
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+    }
+
+    function renderFavoriteSpotlight() {
+      if (!favoriteSpotlight || !favoriteSpotlightGrid || !favoriteSpotlightEmpty || !favoriteSpotlightCount) return;
+      const favoriteCards = allCards
+        .filter((card) => favorites.has(card.dataset.stockId || ''))
+        .map((card) => card.cloneNode(true));
+
+      favoriteSpotlightGrid.innerHTML = '';
+      favoriteCards.forEach((card) => favoriteSpotlightGrid.appendChild(card));
+
+      const hasFavorites = favoriteCards.length > 0;
+      favoriteSpotlightEmpty.style.display = hasFavorites ? 'none' : '';
+      favoriteSpotlightGrid.style.display = hasFavorites ? '' : 'none';
+      favoriteSpotlightCount.textContent = `${favoriteCards.length} 檔`;
+
+      favoriteSpotlightGrid.querySelectorAll('[data-favorite-toggle]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const stockId = button.dataset.stockId || '';
+          if (!stockId) return;
+          if (favorites.has(stockId)) {
+            favorites.delete(stockId);
+          } else {
+            favorites.add(stockId);
+          }
+          saveFavorites();
+          syncFavoriteButtons();
+          renderFavoriteSpotlight();
+          applyFilters();
+        });
+      });
+      syncFavoriteButtons();
     }
 
     function applyFilters() {
@@ -1759,14 +1909,15 @@
 
     searchInput?.addEventListener('input', applyFilters);
     stageFilter?.addEventListener('change', applyFilters);
-    favoriteFilter?.addEventListener('click', () => {
-      favoriteFilter.classList.toggle('active');
-      const active = favoriteFilter.classList.contains('active');
-      favoriteFilter.setAttribute('aria-pressed', active ? 'true' : 'false');
-      applyFilters();
+    [favoriteFilter, heroFavoriteFilter].forEach((button) => {
+      button?.addEventListener('click', () => {
+        favoriteFilter?.classList.toggle('active');
+        syncFavoriteFilterButtons();
+        applyFilters();
+      });
     });
 
-    favoriteButtons.forEach((button) => {
+    getFavoriteButtons().forEach((button) => {
       button.addEventListener('click', () => {
         const stockId = button.dataset.stockId || '';
         if (!stockId) return;
@@ -1777,11 +1928,14 @@
         }
         saveFavorites();
         syncFavoriteButtons();
+        renderFavoriteSpotlight();
         applyFilters();
       });
     });
 
     syncFavoriteButtons();
+    syncFavoriteFilterButtons();
+    renderFavoriteSpotlight();
     applyFilters();
   </script>
 </body>
