@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>波段觀測站 | 4562 穎漢 個股儀表板</title>
+  <style>
+    :root {
+      --bg: #efe7db;
+      --panel: rgba(253, 248, 241, 0.94);
+      --panel-strong: rgba(255, 252, 246, 0.98);
+      --ink: #1d1710;
+      --ink-soft: #706459;
+      --forest: #27483f;
+      --forest-deep: #173129;
+      --gold: #b47b3f;
+      --clay: #c76d42;
+      --line: rgba(29, 23, 16, 0.12);
+      --sand: #e9dbc4;
+      --shadow: 0 24px 70px rgba(35, 26, 17, 0.11);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Avenir Next", "PingFang TC", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at 10% 12%, rgba(183,122,63,.18), transparent 24%),
+        radial-gradient(circle at 86% 14%, rgba(39,72,63,.14), transparent 28%),
+        linear-gradient(180deg, #fbf6ef 0%, #f0e6d9 58%, #eadfce 100%);
+    }
+    .shell {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 20px 20px 44px;
+    }
+    .hero, .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 24px;
+      margin-bottom: 18px;
+      background:
+        linear-gradient(135deg, rgba(255,252,246,.98) 0%, rgba(247,238,226,.9) 60%, rgba(236,223,206,.92) 100%);
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      left: -70px;
+      top: -80px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(199,109,66,.18) 0%, rgba(199,109,66,0) 68%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -60px;
+      top: -30px;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(39,72,63,.16) 0%, rgba(39,72,63,0) 68%);
+      pointer-events: none;
+    }
+    .hero > * {
+      position: relative;
+      z-index: 1;
+    }
+    .site-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .nav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 250, 242, 0.78);
+      border: 1px solid rgba(39,72,63,.12);
+      color: var(--forest-deep);
+      font-weight: 800;
+      backdrop-filter: blur(8px);
+    }
+    .nav-pill.current {
+      background: linear-gradient(135deg, rgba(39,72,63,.14), rgba(180,123,63,.16));
+    }
+    .brand-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(31,79,64,.08);
+      color: var(--forest-deep);
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+    .brand-copy {
+      color: var(--ink-soft);
+      font-size: 14px;
+      font-weight: 700;
+      text-align: right;
+      line-height: 1.6;
+    }
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(46px, 7vw, 90px);
+      line-height: .96;
+      letter-spacing: -.04em;
+      font-family: "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+    }
+    .hero-copy {
+      margin: 0 0 18px;
+      max-width: 720px;
+      color: var(--ink-soft);
+      font-size: 18px;
+      line-height: 1.72;
+    }
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .meta-chip {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255, 251, 244, 0.76);
+      color: var(--ink-soft);
+      font-weight: 700;
+      border: 1px solid rgba(39,72,63,.08);
+    }
+    .key-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .stat-card {
+      background: linear-gradient(180deg, rgba(255,252,246,.98), rgba(250,244,236,.92));
+      border: 1px solid rgba(39,72,63,.1);
+      border-radius: 20px;
+      padding: 16px 18px;
+      min-height: 116px;
+      box-shadow: 0 16px 34px rgba(35, 26, 17, 0.06);
+    }
+    .stat-card span {
+      display: block;
+      color: var(--ink-soft);
+      font-size: 14px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .stat-card strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 18px;
+    }
+    .panel {
+      padding: 22px;
+      background: linear-gradient(180deg, rgba(255,252,246,.96), rgba(248,240,229,.92));
+    }
+    .panel h2 {
+      margin: 0 0 14px;
+      color: var(--forest-deep);
+      font-size: 28px;
+      font-family: "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+    }
+    .score-row {
+      display: grid;
+      grid-template-columns: minmax(120px, 1fr) minmax(0, 4fr) 56px;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .score-row:last-child { border-bottom: 0; }
+    .score-label { font-weight: 700; }
+    .score-track {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: var(--sand);
+      overflow: hidden;
+    }
+    .score-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--clay) 0%, var(--gold) 45%, var(--forest) 100%);
+      border-radius: inherit;
+    }
+    .score-value {
+      text-align: right;
+      font-size: 24px;
+      font-weight: 800;
+    }
+    p, li {
+      font-size: 18px;
+      line-height: 1.72;
+      color: #223022;
+      margin: 0;
+    }
+    p + p { margin-top: 12px; }
+    .bullet-list {
+      margin: 0;
+      padding-left: 22px;
+    }
+    .bullet-list li + li { margin-top: 8px; }
+    code {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #f3ecde;
+      font-family: "SFMono-Regular", "Menlo", monospace;
+      font-size: .92em;
+    }
+    .fold-card {
+      background: linear-gradient(180deg, rgba(255,252,246,.98), rgba(250,244,236,.92));
+      border: 1px solid rgba(39,72,63,.1);
+      border-radius: 20px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      box-shadow: 0 16px 30px rgba(35, 26, 17, 0.05);
+    }
+    .fold-card summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 20px;
+    }
+    .fold-card summary::-webkit-details-marker { display: none; }
+    .fold-card summary strong {
+      color: var(--forest);
+      font-size: 22px;
+    }
+    .fold-card summary span {
+      color: var(--ink-soft);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .fold-body {
+      border-top: 1px solid var(--line);
+      padding: 18px 20px 20px;
+    }
+    .section-stack {
+      display: grid;
+      gap: 18px;
+    }
+    .site-footer {
+      padding: 18px 6px 0;
+      color: var(--ink-soft);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    @media (max-width: 980px) {
+      .brand-row {
+        flex-direction: column;
+        align-items: start;
+      }
+      .brand-copy {
+        text-align: left;
+      }
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    @keyframes rise-in {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .hero, .panel {
+      animation: rise-in .52s ease both;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <nav class="site-nav">
+        <a class="nav-pill" href="../index.html">回首頁總覽</a>
+        <span class="nav-pill current">目前頁面：4562 穎漢</span>
+      </nav>
+      <div class="brand-row">
+        <div class="eyebrow">波段觀測站 ・ 個股儀表板</div>
+        <div class="brand-copy">台股波段分析內頁
+        <br>聚焦單一標的的階段、風險與情境</div>
+      </div>
+      <h1>4562 穎漢</h1>
+      <p class="hero-copy">這一頁聚焦單一個股的當前階段、主情境與操作重點。先看置頂結論與核心分數，再往下查看情境預測、交易計畫與延伸分析，就能快速建立對這檔股票的操作節奏感。</p>
+      <div class="meta-row"><div class='meta-chip'>更新時間：2026-04-16</div><div class='meta-chip'>分析定位：依波段共用提示詞進行回測校正與迭代分析</div></div>
+      <div class="key-grid">
+        
+            <article class="stat-card">
+              <span>當前最可能狀態</span>
+              <strong>短線強勢突破後的高位延伸觀察期，偏多但尚未完成中期確認。</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>當前階段</span>
+              <strong>C. 突破確認 與 G. 延伸噴出之間，暫以「突破確認初段」看待。</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>進場訊號</span>
+              <strong>部分成立，屬於突破量增型成立，但因回測與圖上結構資料不足，信心中低。</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>出場訊號</span>
+              <strong>未完全成立，但短線過熱與法人賣超同時出現，需提高警戒。</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>主成本核心區</span>
+              <strong>暫估落在 34.2 至 37.6 的近期急漲帶中，較合理核心觀察區偏近 34.2 至 35.5。</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>防守失效區</span>
+              <strong>若失守近期急漲起漲區與回測支撐，且量增下跌，則視為失效。</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>1 週主情境</span>
+              <strong>高檔整理與回測洗盤的合併機率最高。</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>1 月主情境</span>
+              <strong>箱體震盪整理後再決定是否續攻的機率最高。</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>操作建議</span>
+              <strong>偏多觀察，不追高，等待回測或量價續強再評估；若已持股，優先看守均線與起漲區。</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>把握度</span>
+              <strong>中低</strong>
+            </article>
+            
+      </div>
+    </section>
+
+    <section class="content-grid">
+      <div class="section-stack">
+        <article class="panel">
+          <h2>置頂結論</h2>
+          <p>當前最可能狀態：短線強勢突破後的高位延伸觀察期，偏多但尚未完成中期確認。</p>
+<p>當前階段：C. 突破確認 與 G. 延伸噴出之間，暫以「突破確認初段」看待。</p>
+<p>進場訊號是否成立：部分成立，屬於突破量增型成立，但因回測與圖上結構資料不足，信心中低。</p>
+<p>出場訊號是否成立：未完全成立，但短線過熱與法人賣超同時出現，需提高警戒。</p>
+<p>主成本核心區：暫估落在 34.2 至 37.6 的近期急漲帶中，較合理核心觀察區偏近 34.2 至 35.5。</p>
+<p>波段加碼區：若回測不破 20 日線或突破點，且量縮止穩，再視為加碼區。</p>
+<p>防守失效區：若失守近期急漲起漲區與回測支撐，且量增下跌，則視為失效。</p>
+<p>未來 1 週主情境：高檔整理與回測洗盤的合併機率最高。</p>
+<p>未來 1 月主情境：箱體震盪整理後再決定是否續攻的機率最高。</p>
+<p>操作建議：偏多觀察，不追高，等待回測或量價續強再評估；若已持股，優先看守均線與起漲區。</p>
+<p>把握度：中低</p>
+        </article>
+        <article class="panel">
+          <h2>主力成本與關鍵價</h2>
+          <ul class='bullet-list'>
+<li>主成本核心區：34.2 至 37.6 之間的近期急漲成本帶；若要更保守，觀察 34.2 至 35.5。</li>
+<li>波段加碼區：回測突破點不破、量縮止穩的區域；目前無法給單點，需待 MA20 / AVWAP 讀值確認。</li>
+<li>防守失效區：跌回 34.2 下方且無法快速收復，或量增長黑跌破起漲區。</li>
+<li>上方第一壓力：資料不足，無法可靠定點。</li>
+<li>上方主目標帶：資料不足，暫不給精準目標價。</li>
+<li>下方關鍵支撐：34.2 附近為近期最具參考性的近端支撐，但仍需結合日線/週線確認。</li>
+</ul>
+        </article>
+        <article class="panel">
+          <h2>交易計畫</h2>
+          <p>1~4 週：</p>
+<ul class='bullet-list'>
+<li>以觀察回測是否守住突破區為主。</li>
+<li>若量能續強且守穩，才考慮偏多操作。</li>
+<li>若高檔量縮橫盤，可視為健康整理。</li>
+<li>若爆量轉弱，應降低曝險。</li>
+</ul>
+<p>1~3 月：</p>
+<ul class='bullet-list'>
+<li>目前偏向「先整理、後決定是否主升延續」。</li>
+<li>若月線與週線後續同步轉強，才可提高中期波段配置。</li>
+<li>若月線無法跟上日線急漲，則更可能回歸箱體整理。</li>
+</ul>
+<p>不交易條件：</p>
+<ul class='bullet-list'>
+<li>無法確認日/週/月結構是否站穩關鍵均線。</li>
+<li>無回測規則與成本假設。</li>
+<li>量價已極熱但無事件窗支撐。</li>
+<li>失守近期起漲區或爆量長黑。</li>
+</ul>
+        </article>
+        <article class="panel">
+          <h2>監控清單</h2>
+          <ul class='bullet-list'>
+<li>4/15 爆量後的隔日與次週量價是否續強。</li>
+<li>外資是否由賣超轉為縮手或回補。</li>
+<li>融資是否持續增加且是否伴隨股價失守。</li>
+<li>日線是否守住突破區與近期急漲帶。</li>
+<li>週線是否跟上日線強度，避免日強週弱。</li>
+</ul>
+        </article>
+      </div>
+      <div class="section-stack">
+        <article class="panel">
+          <h2>7 個核心分數</h2>
+          
+            <div class="score-row">
+              <div class="score-label">題材溫度 T</div>
+              <div class="score-track"><div class="score-fill" style="width:68%;"></div></div>
+              <div class="score-value">68</div>
+            </div>
+            
+
+            <div class="score-row">
+              <div class="score-label">基本面修正 F</div>
+              <div class="score-track"><div class="score-fill" style="width:50%;"></div></div>
+              <div class="score-value">50</div>
+            </div>
+            
+
+            <div class="score-row">
+              <div class="score-label">籌碼強度 C</div>
+              <div class="score-track"><div class="score-fill" style="width:56%;"></div></div>
+              <div class="score-value">56</div>
+            </div>
+            
+
+            <div class="score-row">
+              <div class="score-label">價量結構 P</div>
+              <div class="score-track"><div class="score-fill" style="width:73%;"></div></div>
+              <div class="score-value">73</div>
+            </div>
+            
+
+            <div class="score-row">
+              <div class="score-label">多週期趨勢一致性 S</div>
+              <div class="score-track"><div class="score-fill" style="width:60%;"></div></div>
+              <div class="score-value">60</div>
+            </div>
+            
+
+            <div class="score-row">
+              <div class="score-label">主力操作強度 M</div>
+              <div class="score-track"><div class="score-fill" style="width:67%;"></div></div>
+              <div class="score-value">67</div>
+            </div>
+            
+
+            <div class="score-row">
+              <div class="score-label">散戶擁擠度 R</div>
+              <div class="score-track"><div class="score-fill" style="width:69%;"></div></div>
+              <div class="score-value">69</div>
+            </div>
+            
+        </article>
+        <article class="panel">
+          <h2>未來 1 週情境預測</h2>
+          <ul class='bullet-list'>
+<li>強勢續攻：25%</li>
+<li>觸發條件：量能維持高檔，且日線守住突破區，法人賣超收斂。</li>
+<li>目標區：續測新高或高位延伸。</li>
+<li>失效條件：爆量不漲或隔日回落失守關鍵支撐。</li>
+</ul>
+<ul class='bullet-list'>
+<li>高檔整理：35%</li>
+<li>觸發條件：價格維持高檔但量能縮減，分K 過熱後進入整理。</li>
+<li>目標區：在近期急漲區間內震盪。</li>
+<li>失效條件：整理失敗轉弱下破，或再度爆量突破。</li>
+</ul>
+<ul class='bullet-list'>
+<li>回測洗盤：30%</li>
+<li>觸發條件：先漲後回測，回補短線過熱。</li>
+<li>目標區：回測近期起漲帶與突破區。</li>
+<li>失效條件：回測時量縮守穩後再上攻，則洗盤結束。</li>
+</ul>
+<ul class='bullet-list'>
+<li>轉弱下破：10%</li>
+<li>觸發條件：外資續賣、融資續增、量能不繼，並跌破短線支撐。</li>
+<li>目標區：回到前一日或起漲前區域。</li>
+<li>失效條件：快速收復並重返高位。</li>
+</ul>
+        </article>
+        <article class="panel">
+          <h2>未來 1 月情境預測</h2>
+          <ul class='bullet-list'>
+<li>主升延續：30%</li>
+<li>驅動因子：純籌碼與情緒推動為主，若後續出現題材或事件窗配合，機率可上修。</li>
+<li>可能目標區：延續高檔區間往上推升，但目前無法精準定價。</li>
+<li>需要觀察的事件窗：月營收、財報、法說、產業消息。</li>
+</ul>
+<ul class='bullet-list'>
+<li>箱體震盪整理：40%</li>
+<li>驅動因子：急漲後消化獲利、法人仍有賣壓、短線過熱回落。</li>
+<li>可能目標區：在近期急漲區形成箱體。</li>
+<li>需要觀察的事件窗：是否有新的催化事件。</li>
+</ul>
+<ul class='bullet-list'>
+<li>高位派發轉弱：20%</li>
+<li>驅動因子：外資賣超持續、融資增加、借券賣出餘額上升，若價量無法續強。</li>
+<li>可能目標區：回測至起漲區上緣或更低。</li>
+<li>需要觀察的事件窗：法人態度與量價是否背離。</li>
+</ul>
+<ul class='bullet-list'>
+<li>破位進入修正：10%</li>
+<li>驅動因子：高檔鈍化後失守關鍵支撐。</li>
+<li>可能目標區：回到中期均線或更低支撐。</li>
+<li>需要觀察的事件窗：月線與週線是否轉弱。</li>
+</ul>
+        </article>
+        <article class="panel">
+          <h2>延伸內容</h2>
+          
+            <details class="fold-card">
+              <summary>
+                <strong>影像事實擷取</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <p>圖中時點資料：</p>
+<ul class='bullet-list'>
+<li>圖檔可辨識標題包含 <code>4562 穎漢 日K線</code>、<code>4562 穎漢 週K線</code>、<code>4562 穎漢 月K線</code>、<code>4562 穎漢 季K線</code>、<code>4562 穎漢 年K線</code>。</li>
+<li>圖中可辨識日期標示包含 <code>4/15</code>、<code>2026年第16週</code>、<code>2026年4月</code>、<code>2026年第2季</code>、<code>2026年</code>。</li>
+<li>但本輪提供的影像區塊大多為空白圖框，未能可靠讀取完整 OHLC、均線、RSI、KD、MACD、OBV、DMI、ADX、布林帶等圖上數值。</li>
+<li>可確認的最新收盤資訊來自報表與 fubon_csv，非影像圖框本身。</li>
+</ul>
+<p>最新市場資料：</p>
+<ul class='bullet-list'>
+<li>2026/04/15 收盤 37.6，漲跌 +3.4，漲跌幅 +9.94%，成交量 4,791 張。</li>
+<li>2026/04/14 收盤 34.2，漲跌 +3.1，漲跌幅 +9.97%，成交量 629 張。</li>
+<li>2026/04/15 外資買賣超 -559 張，投信 0，三大法人合計 -559 張。</li>
+<li>2026/04/15 融資餘額 2,811 張，較前日增減 +240 張。</li>
+<li>2026/04/15 融券餘額 83 張，較前日增減 +57 張。</li>
+<li>2026/04/15 借券賣出餘額 2,433 張，較前日增減 +74 張。</li>
+<li>60m 收盤序列最後三筆為 37.25 -&gt; 37.05。</li>
+<li>30m 收盤序列最後三筆為 37.35 -&gt; 37.25 -&gt; 37.05。</li>
+<li>15m 收盤序列最後三筆為 37.25 -&gt; 37.15 -&gt; 37.05。</li>
+<li>5m 收盤序列最後三筆為 37.15 -&gt; 37.15 -&gt; 37.05。</li>
+<li>1m 收盤序列最後三筆為 37.1 -&gt; 37.2 -&gt; 37.05。</li>
+</ul>
+<p>高 / 中 / 低信心欄位：</p>
+<ul class='bullet-list'>
+<li>高信心：2026/04/15 收盤、漲跌幅、成交量、外資買賣超、融資融券、借券賣出餘額、fubon_csv 各分K末值。</li>
+<li>中信心：圖中週期標題與日期標示。</li>
+<li>低信心：圖中完整技術指標數值、年/季/月/週/日 K 的 OHLC 明細、均線與布林帶位置。</li>
+</ul>
+<p>無法確認欄位：</p>
+<ul class='bullet-list'>
+<li>年/季/月/週/日圖上的完整 OHLC、MA、RSI、KD、MACD、OBV、DMI、ADX、布林帶與布林帶寬數值。</li>
+<li>月營收、季報、EPS、毛利率、營益率。</li>
+<li>事件窗資訊。</li>
+<li>回測期間、進出場規則、成本、滑價、樣本切分與 walk-forward 設定。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>已知事實 / 需確認 / 推論</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <p>已知事實：</p>
+<ul class='bullet-list'>
+<li>本輪是分析模式 C，應比較圖中時點與最新市場資料，但目前影像圖框資訊不足，故以最新可得報表與 fubon_csv 為主。</li>
+<li>2026/04/14 到 2026/04/15 兩日皆為接近漲停的大漲，且 4/15 成交量明顯放大至 4,791 張。</li>
+<li>4/15 外資大幅賣超，但股價仍上漲，代表當日價格動能強於外資賣壓。</li>
+<li>4/15 融資增加、融券增加、借券賣出餘額也增加，顯示多空都在升溫，但不等於趨勢已被完全驗證。</li>
+<li>分K 指標極度偏熱，60m、30m、15m RSI 皆在 88 以上，KD 幾乎滿值，屬短線過熱區。</li>
+</ul>
+<p>需確認：</p>
+<ul class='bullet-list'>
+<li>日線與週線是否已有效站上關鍵均線與前高。</li>
+<li>月線、季線是否已由整理轉為突破或僅屬短線拉抬。</li>
+<li>事件窗是否存在月營收、法說、財報或題材催化。</li>
+<li>目前是否為高位延伸、突破確認，或是短線噴出後的高位鈍化。</li>
+</ul>
+<p>推論：</p>
+<ul class='bullet-list'>
+<li>由於 4/14、4/15 連續大幅上漲且量能擴大，短線最可能處於「突破後的高位延伸或高位震盪初段」。</li>
+<li>因分K 已高度過熱，但日/週/月圖資訊不足，不能直接判定為主升確立，較合理的推論是「短線動能強，但需等日線收斂與週線確認」。</li>
+<li>若後續量能無法延續，最容易先轉成高位整理或假突破風險。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>市場快照</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <ul class='bullet-list'>
+<li>最新收盤：37.6</li>
+<li>最新漲跌：+3.4</li>
+<li>最新漲跌幅：+9.94%</li>
+<li>最新成交量：4,791 張</li>
+<li>最新成交金額：17,682 萬元</li>
+<li>4/14 收盤：34.2，量 629 張</li>
+<li>近 2 日量能明顯放大，屬爆量上攻背景。</li>
+<li>4/15 外資買賣超：-559 張</li>
+<li>4/15 融資餘額：2,811 張，日增 +240 張</li>
+<li>4/15 融券餘額：83 張，日增 +57 張</li>
+<li>4/15 借券賣出餘額：2,433 張，日增 +74 張</li>
+<li>分K 顯示短線過熱，60m / 30m / 15m RSI 皆接近或高於 90。</li>
+<li>目前無法確認其是否位於 MA20 / MA60 / MA120 / MA240、前高、箱體或缺口的精確位置。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>多週期技術判讀</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <p>年 / 季：</p>
+<ul class='bullet-list'>
+<li>影像未提供可讀數值，無法對年季結構做精準判讀。</li>
+<li>只可保守推定：若近期出現連續漲停與量增，年季圖可能仍屬低基期轉強或低位反彈的早期段，但這僅是推論，不能當事實。</li>
+</ul>
+<p>月：</p>
+<ul class='bullet-list'>
+<li>月圖不可讀，無法確認是否完成月線突破或僅是單月急漲。</li>
+<li>因缺乏月圖數值，不宜宣稱已進入長週期主升。</li>
+</ul>
+<p>週：</p>
+<ul class='bullet-list'>
+<li>週圖不可讀，但兩日急漲搭配量增，週線可能開始脫離整理區。</li>
+<li>然而法人結構偏賣，代表週線是否能維持主升仍待確認。</li>
+</ul>
+<p>日：</p>
+<ul class='bullet-list'>
+<li>日線已出現明確強勢推升，4/14 與 4/15 皆接近漲停。</li>
+<li>日線目前最重要的是後續是否能守住突破後的回測支撐。</li>
+<li>若日線在高位出現量縮整理且不破位，偏向健康；若爆量長黑，則轉為假突破風險。</li>
+</ul>
+<p>分K補充：</p>
+<ul class='bullet-list'>
+<li>60m RSI 90.56，KDJ 近滿值，MACD 多頭但已有高檔偏熱特徵。</li>
+<li>30m RSI 88.56，KDJ 滿值，MACD 仍在多方區，但短線容易震盪。</li>
+<li>15m RSI 89.92，KDJ 滿值，MACD 多頭鈍化。</li>
+<li>5m 與 1m KDJ 已出現極端低值，但這只能視為日內短線背景，不可轉成波段策略。</li>
+<li>綜合而言，分K 顯示的是「極熱後整理風險上升」，不是新的進場保證。</li>
+</ul>
+<p>多週期最終分類：</p>
+<ul class='bullet-list'>
+<li>多頭鈍化</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>進場訊號</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <ul class='bullet-list'>
+<li>突破型</li>
+<li>是否成立：部分成立</li>
+<li>強度：中</li>
+<li>觸發條件：4/15 已出現明顯放量上攻，接近突破確認型態。</li>
+<li>失效條件：後續若無法守住突破區，且量增下跌，則視為假突破。</li>
+<li>說明：目前只知道 4/15 爆量大漲，缺少前高與箱體上緣精確值，因此只能判定為「接近成立」。</li>
+</ul>
+<ul class='bullet-list'>
+<li>回測型</li>
+<li>是否成立：未確認</li>
+<li>強度：弱</li>
+<li>觸發條件：回踩 MA20、AVWAP 或突破點不破且量縮止穩。</li>
+<li>失效條件：回測時直接跌破起漲區，且量能放大。</li>
+<li>說明：因缺少 MA/AVWAP 圖上數值，目前不能確認。</li>
+</ul>
+<ul class='bullet-list'>
+<li>吸籌轉發動型</li>
+<li>是否成立：弱成立</li>
+<li>強度：弱至中</li>
+<li>觸發條件：股價走強、融資增加、融券增加、借券賣出增加，代表市場參與升溫。</li>
+<li>失效條件：若法人續賣且價格無法延伸，則不算有效吸籌。</li>
+<li>說明：目前只有籌碼升溫現象，未見完整法人轉正。</li>
+</ul>
+<ul class='bullet-list'>
+<li>事件窗型</li>
+<li>是否成立：未確認</li>
+<li>強度：弱</li>
+<li>觸發條件：需月營收、財報、法說、展會等事件窗配合。</li>
+<li>失效條件：無事件窗或事件後無量價延續。</li>
+<li>說明：本輪無事件窗資料。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>出場訊號</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <ul class='bullet-list'>
+<li>失守主成本區</li>
+<li>是否成立：未成立</li>
+<li>強度：中</li>
+<li>觸發價或區間：需待主成本區更精確確認，目前只能以近期急漲帶下緣作觀察。</li>
+<li>失效條件：回測守穩後再創高。</li>
+</ul>
+<ul class='bullet-list'>
+<li>失守 MA20 / MA60 / AVWAP</li>
+<li>是否成立：無法確認</li>
+<li>強度：弱</li>
+<li>觸發價或區間：資料不足。</li>
+<li>失效條件：重新站回並量縮整理。</li>
+</ul>
+<ul class='bullet-list'>
+<li>價創高但 OBV / RSI / MACD 不跟</li>
+<li>是否成立：無法確認</li>
+<li>強度：弱</li>
+<li>觸發條件：日後若價再創高，但量能、OBV、MACD 沒同步。</li>
+<li>失效條件：量價指標同步擴張。</li>
+</ul>
+<ul class='bullet-list'>
+<li>融資續增、借券不降、法人轉賣</li>
+<li>是否成立：部分成立</li>
+<li>強度：中</li>
+<li>觸發條件：4/15 已見融資增加、借券賣出餘額增加、外資賣超。</li>
+<li>失效條件：若後續量價續強且法人轉買，則此警訊下降。</li>
+<li>說明：這是目前最明確的警示組合。</li>
+</ul>
+<ul class='bullet-list'>
+<li>達到第一目標價後高檔鈍化</li>
+<li>是否成立：未確認</li>
+<li>強度：弱</li>
+<li>觸發條件：需先有完整目標帶定義。</li>
+<li>失效條件：續攻不鈍化。</li>
+<li>說明：目標帶資料不足。</li>
+</ul>
+<ul class='bullet-list'>
+<li>週線結構轉弱</li>
+<li>是否成立：無法確認</li>
+<li>強度：弱</li>
+<li>觸發條件：週圖跌破關鍵均線或前波支撐。</li>
+<li>失效條件：週線續強。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>回測校正審計</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <p>本輪回測校正資料不足，缺口如下：</p>
+<ul class='bullet-list'>
+<li>未提供回測期間。</li>
+<li>未提供進場規則、出場規則、停損規則、停利規則。</li>
+<li>未提供資金配置、手續費、滑價、流動性限制。</li>
+<li>未提供是否納入漲跌停限制。</li>
+<li>未提供 look-ahead bias、data leakage 的排除方式。</li>
+<li>未提供樣本內 / 樣本外切分。</li>
+<li>未提供 walk-forward / rolling test。</li>
+<li>未提供回測核心績效指標。</li>
+<li>未提供樣本交易明細，無法檢查是否由少數大賺交易撐績效。</li>
+<li>未提供日線以外可驗證的完整技術圖數值，無法檢查信號是否真正在執行 bar 成立。</li>
+</ul>
+<p>因此，本輪只能做「暫時性波段判讀」，不能宣稱已完成完整回測校正。</p>
+<p>目前最需要補的資料是：</p>
+<ul class='bullet-list'>
+<li>日/週/月 OHLCV 與均線完整數值。</li>
+<li>回測規則與成本假設。</li>
+<li>樣本內外與 walk-forward 結果。</li>
+<li>事件窗與基本面資料。</li>
+<li>交易明細與勝率、PF、MDD、成本前後差異。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>下一輪迭代假設</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <ul class='bullet-list'>
+<li>假設名稱：突破後回測不破才是有效主升起點</li>
+<li>為何值得驗證：目前只有爆量大漲，尚未確認是否為真突破。</li>
+<li>要改哪 1~2 個核心變數：回測支撐定義、突破確認條件。</li>
+<li>驗證方法：比較「收盤站上前高後，次日/次週回測不破」與否的後續報酬。</li>
+<li>成功判準：回測後續 1 週 / 1 月報酬優於未回測組，且回撤較小。</li>
+<li>失敗判準：回測不破並未提升勝率，或大量假突破。</li>
+<li>預期影響：提升穩健性，降低假突破交易。</li>
+</ul>
+<ul class='bullet-list'>
+<li>假設名稱：外資賣超不一定代表波段失敗，但需搭配量能續強才有效</li>
+<li>為何值得驗證：4/15 外資賣超但價格仍強，可能代表籌碼換手而非趨勢終結。</li>
+<li>要改哪 1~2 個核心變數：法人淨買賣門檻、量能放大門檻。</li>
+<li>驗證方法：統計「外資賣超但股價續創高」樣本的後續表現。</li>
+<li>成功判準：能區分假壓力與真轉弱。</li>
+<li>失敗判準：外資賣超樣本後續普遍轉弱。</li>
+<li>預期影響：提高籌碼訊號的辨識度。</li>
+</ul>
+<ul class='bullet-list'>
+<li>假設名稱：分K 極熱只能當風險提示，不能當波段進場依據</li>
+<li>為何值得驗證：本輪分K 指標極熱，若誤作進場依據容易追高。</li>
+<li>要改哪 1~2 個核心變數：將分K 由進場條件改為風險過熱標記。</li>
+<li>驗證方法：比較「以分K 追價」與「只作風險過熱過濾」的績效差異。</li>
+<li>成功判準：過熱標記能降低追高回撤。</li>
+<li>失敗判準：分K 熱度對波段無辨識力。</li>
+<li>預期影響：降低高位延伸誤判與追高風險。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>若我有持股</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <p>持股張數 / 均價：</p>
+<ul class='bullet-list'>
+<li>無持股</li>
+</ul>
+<p>續抱條件：</p>
+<ul class='bullet-list'>
+<li>目前無持股，不適用。</li>
+<li>若未來持有，至少需守住近期起漲帶與回測支撐，且量縮整理不破。</li>
+</ul>
+<p>分批減碼價位：</p>
+<ul class='bullet-list'>
+<li>資料不足，無法提供精準價位。</li>
+<li>若後續出現高檔鈍化、量增不漲、法人續賣，可考慮減碼。</li>
+</ul>
+<p>防守價：</p>
+<ul class='bullet-list'>
+<li>目前只能以近期急漲起漲區下緣作為觀察防守點，無法給單一精準價位。</li>
+</ul>
+              </div>
+            </details>
+            
+        </article>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div>波段觀測站個股頁由共用版波段分析流程自動生成，適合手機與桌機閱讀。</div>
+      <div>建議先看置頂結論，再依需要展開延伸內容做深入判讀。</div>
+    </footer>
+  </main>
+</body>
+</html>

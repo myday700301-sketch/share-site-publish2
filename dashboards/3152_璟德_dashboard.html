@@ -1,0 +1,860 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>波段觀測站 | 3152 璟德 個股儀表板</title>
+  <style>
+    :root {
+      --bg: #efe7db;
+      --panel: rgba(253, 248, 241, 0.94);
+      --panel-strong: rgba(255, 252, 246, 0.98);
+      --ink: #1d1710;
+      --ink-soft: #706459;
+      --forest: #27483f;
+      --forest-deep: #173129;
+      --gold: #b47b3f;
+      --clay: #c76d42;
+      --line: rgba(29, 23, 16, 0.12);
+      --sand: #e9dbc4;
+      --shadow: 0 24px 70px rgba(35, 26, 17, 0.11);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Avenir Next", "PingFang TC", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at 10% 12%, rgba(183,122,63,.18), transparent 24%),
+        radial-gradient(circle at 86% 14%, rgba(39,72,63,.14), transparent 28%),
+        linear-gradient(180deg, #fbf6ef 0%, #f0e6d9 58%, #eadfce 100%);
+    }
+    .shell {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 20px 20px 44px;
+    }
+    .hero, .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 24px;
+      margin-bottom: 18px;
+      background:
+        linear-gradient(135deg, rgba(255,252,246,.98) 0%, rgba(247,238,226,.9) 60%, rgba(236,223,206,.92) 100%);
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      left: -70px;
+      top: -80px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(199,109,66,.18) 0%, rgba(199,109,66,0) 68%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -60px;
+      top: -30px;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(39,72,63,.16) 0%, rgba(39,72,63,0) 68%);
+      pointer-events: none;
+    }
+    .hero > * {
+      position: relative;
+      z-index: 1;
+    }
+    .site-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .nav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 250, 242, 0.78);
+      border: 1px solid rgba(39,72,63,.12);
+      color: var(--forest-deep);
+      font-weight: 800;
+      backdrop-filter: blur(8px);
+    }
+    .nav-pill.current {
+      background: linear-gradient(135deg, rgba(39,72,63,.14), rgba(180,123,63,.16));
+    }
+    .brand-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(31,79,64,.08);
+      color: var(--forest-deep);
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+    .brand-copy {
+      color: var(--ink-soft);
+      font-size: 14px;
+      font-weight: 700;
+      text-align: right;
+      line-height: 1.6;
+    }
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(46px, 7vw, 90px);
+      line-height: .96;
+      letter-spacing: -.04em;
+      font-family: "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+    }
+    .hero-copy {
+      margin: 0 0 18px;
+      max-width: 720px;
+      color: var(--ink-soft);
+      font-size: 18px;
+      line-height: 1.72;
+    }
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .meta-chip {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255, 251, 244, 0.76);
+      color: var(--ink-soft);
+      font-weight: 700;
+      border: 1px solid rgba(39,72,63,.08);
+    }
+    .key-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .stat-card {
+      background: linear-gradient(180deg, rgba(255,252,246,.98), rgba(250,244,236,.92));
+      border: 1px solid rgba(39,72,63,.1);
+      border-radius: 20px;
+      padding: 16px 18px;
+      min-height: 116px;
+      box-shadow: 0 16px 34px rgba(35, 26, 17, 0.06);
+    }
+    .stat-card span {
+      display: block;
+      color: var(--ink-soft);
+      font-size: 14px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .stat-card strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 18px;
+    }
+    .panel {
+      padding: 22px;
+      background: linear-gradient(180deg, rgba(255,252,246,.96), rgba(248,240,229,.92));
+    }
+    .panel h2 {
+      margin: 0 0 14px;
+      color: var(--forest-deep);
+      font-size: 28px;
+      font-family: "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+    }
+    .score-row {
+      display: grid;
+      grid-template-columns: minmax(120px, 1fr) minmax(0, 4fr) 56px;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .score-row:last-child { border-bottom: 0; }
+    .score-label { font-weight: 700; }
+    .score-track {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: var(--sand);
+      overflow: hidden;
+    }
+    .score-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--clay) 0%, var(--gold) 45%, var(--forest) 100%);
+      border-radius: inherit;
+    }
+    .score-value {
+      text-align: right;
+      font-size: 24px;
+      font-weight: 800;
+    }
+    p, li {
+      font-size: 18px;
+      line-height: 1.72;
+      color: #223022;
+      margin: 0;
+    }
+    p + p { margin-top: 12px; }
+    .bullet-list {
+      margin: 0;
+      padding-left: 22px;
+    }
+    .bullet-list li + li { margin-top: 8px; }
+    code {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #f3ecde;
+      font-family: "SFMono-Regular", "Menlo", monospace;
+      font-size: .92em;
+    }
+    .fold-card {
+      background: linear-gradient(180deg, rgba(255,252,246,.98), rgba(250,244,236,.92));
+      border: 1px solid rgba(39,72,63,.1);
+      border-radius: 20px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      box-shadow: 0 16px 30px rgba(35, 26, 17, 0.05);
+    }
+    .fold-card summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 20px;
+    }
+    .fold-card summary::-webkit-details-marker { display: none; }
+    .fold-card summary strong {
+      color: var(--forest);
+      font-size: 22px;
+    }
+    .fold-card summary span {
+      color: var(--ink-soft);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .fold-body {
+      border-top: 1px solid var(--line);
+      padding: 18px 20px 20px;
+    }
+    .section-stack {
+      display: grid;
+      gap: 18px;
+    }
+    .site-footer {
+      padding: 18px 6px 0;
+      color: var(--ink-soft);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    @media (max-width: 980px) {
+      .brand-row {
+        flex-direction: column;
+        align-items: start;
+      }
+      .brand-copy {
+        text-align: left;
+      }
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    @keyframes rise-in {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .hero, .panel {
+      animation: rise-in .52s ease both;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <nav class="site-nav">
+        <a class="nav-pill" href="../index.html">回首頁總覽</a>
+        <span class="nav-pill current">目前頁面：3152 璟德</span>
+      </nav>
+      <div class="brand-row">
+        <div class="eyebrow">波段觀測站 ・ 個股儀表板</div>
+        <div class="brand-copy">台股波段分析內頁
+        <br>聚焦單一標的的階段、風險與情境</div>
+      </div>
+      <h1>3152 璟德</h1>
+      <p class="hero-copy">這一頁聚焦單一個股的當前階段、主情境與操作重點。先看置頂結論與核心分數，再往下查看情境預測、交易計畫與延伸分析，就能快速建立對這檔股票的操作節奏感。</p>
+      <div class="meta-row"><div class='meta-chip'>更新時間：2026-04-16</div><div class='meta-chip'>分析定位：依波段共用提示詞進行回測校正與迭代分析</div></div>
+      <div class="key-grid">
+        
+            <article class="stat-card">
+              <span>當前最可能狀態</span>
+              <strong>高檔延伸後的強勢換手盤</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>當前階段</span>
+              <strong>G. 延伸噴出</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>進場訊號</span>
+              <strong>部分成立，偏弱</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>出場訊號</span>
+              <strong>尚未完全成立，但短線過熱警戒已成立</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>主成本核心區</span>
+              <strong>約 157 元附近，對照 4/14 收盤與前一日結構</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>防守失效區</span>
+              <strong>需確認日線關鍵均線與前波低點，現有資料不足以給單點精準失效價</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>1 週主情境</span>
+              <strong>高檔整理或再攻皆有可能，但整理機率略高</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>1 月主情境</span>
+              <strong>若基本面或事件窗接續，偏向主升延續；若無，偏向高位震盪後轉弱</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>操作建議</span>
+              <strong>以觀察與等回測確認為主，不建議在高檔直接追價</strong>
+            </article>
+            
+
+            <article class="stat-card">
+              <span>把握度</span>
+              <strong>中低</strong>
+            </article>
+            
+      </div>
+    </section>
+
+    <section class="content-grid">
+      <div class="section-stack">
+        <article class="panel">
+          <h2>置頂結論</h2>
+          <p>當前最可能狀態：高檔延伸後的強勢換手盤</p>
+<p>當前階段：G. 延伸噴出</p>
+<p>進場訊號是否成立：部分成立，偏弱</p>
+<p>出場訊號是否成立：尚未完全成立，但短線過熱警戒已成立</p>
+<p>主成本核心區：約 157 元附近，對照 4/14 收盤與前一日結構</p>
+<p>波段加碼區：須等回測不破短均或突破後再整理，現階段不宜追高加碼</p>
+<p>防守失效區：需確認日線關鍵均線與前波低點，現有資料不足以給單點精準失效價</p>
+<p>未來 1 週主情境：高檔整理或再攻皆有可能，但整理機率略高</p>
+<p>未來 1 月主情境：若基本面或事件窗接續，偏向主升延續；若無，偏向高位震盪後轉弱</p>
+<p>操作建議：以觀察與等回測確認為主，不建議在高檔直接追價</p>
+<p>把握度：中低</p>
+        </article>
+        <article class="panel">
+          <h2>主力成本與關鍵價</h2>
+          <ul class='bullet-list'>
+<li>主成本核心區：約 157 元附近，為 4/14 收盤與前一交易日結構參考。</li>
+<li>波段加碼區：目前不建議在未回測確認前主動定義為追價加碼區；若後續回測不破突破區，再考慮。</li>
+<li>防守失效區：資料不足，無法給單點；需以日線關鍵均線與突破區下緣共同確認。</li>
+<li>上方第一壓力：資料不足，無法確認單點。</li>
+<li>上方主目標帶：資料不足，無法確認單點。</li>
+<li>下方關鍵支撐：近期成本區與突破區回測位置為首要觀察帶。</li>
+</ul>
+        </article>
+        <article class="panel">
+          <h2>交易計畫</h2>
+          <p>1~4 週：</p>
+<ul class='bullet-list'>
+<li>以等待確認為主，優先觀察是否回測不破後再續攻。</li>
+<li>若未回測而直接續漲，則僅適合已持股者續抱觀察，不建議無持股者追價。</li>
+</ul>
+<p>1~3 月：</p>
+<ul class='bullet-list'>
+<li>若後續有事件窗與基本面配合，才有機會把目前的高檔延伸轉成中期主升。</li>
+<li>若缺乏事件窗與量價續強，則較可能回到箱體或進入派發轉弱。</li>
+</ul>
+<p>不交易條件：</p>
+<ul class='bullet-list'>
+<li>連續高檔急漲但量能與法人未同步延續。</li>
+<li>無法確認日週均線與突破有效性。</li>
+<li>缺乏回測規則與風控參數時，不做精準價位交易。</li>
+</ul>
+        </article>
+        <article class="panel">
+          <h2>監控清單</h2>
+          <ul class='bullet-list'>
+<li>4/15 後續 3~10 日是否守住突破區。</li>
+<li>三大法人是否持續買超，尤其外資是否續買。</li>
+<li>融資餘額是否持續增加並伴隨高檔換手。</li>
+<li>借券賣出餘額是否續降，是否代表空方壓力緩解。</li>
+<li>日線與週線是否同步站穩關鍵均線並維持 OBV 上行。</li>
+</ul>
+        </article>
+      </div>
+      <div class="section-stack">
+        <article class="panel">
+          <h2>7 個核心分數</h2>
+          
+            <div class="score-row">
+              <div class="score-label">題材溫度 T</div>
+              <div class="score-track"><div class="score-fill" style="width:45%;"></div></div>
+              <div class="score-value">45</div>
+            </div>
+            
+
+            <div class="score-row">
+              <div class="score-label">基本面修正 F</div>
+              <div class="score-track"><div class="score-fill" style="width:50%;"></div></div>
+              <div class="score-value">50</div>
+            </div>
+            
+
+            <div class="score-row">
+              <div class="score-label">籌碼強度 C</div>
+              <div class="score-track"><div class="score-fill" style="width:68%;"></div></div>
+              <div class="score-value">68</div>
+            </div>
+            
+
+            <div class="score-row">
+              <div class="score-label">價量結構 P</div>
+              <div class="score-track"><div class="score-fill" style="width:72%;"></div></div>
+              <div class="score-value">72</div>
+            </div>
+            
+
+            <div class="score-row">
+              <div class="score-label">多週期趨勢一致性 S</div>
+              <div class="score-track"><div class="score-fill" style="width:54%;"></div></div>
+              <div class="score-value">54</div>
+            </div>
+            
+
+            <div class="score-row">
+              <div class="score-label">主力操作強度 M</div>
+              <div class="score-track"><div class="score-fill" style="width:67%;"></div></div>
+              <div class="score-value">67</div>
+            </div>
+            
+
+            <div class="score-row">
+              <div class="score-label">散戶擁擠度 R</div>
+              <div class="score-track"><div class="score-fill" style="width:63%;"></div></div>
+              <div class="score-value">63</div>
+            </div>
+            
+        </article>
+        <article class="panel">
+          <h2>未來 1 週情境預測</h2>
+          <ul class='bullet-list'>
+<li>高檔整理：35%</li>
+<li>觸發條件：急漲後量能回落、分鐘級 RSI 維持高檔鈍化但不再擴張。</li>
+<li>目標區：在 172.5 附近上方震盪，或回測近期換手區。</li>
+<li>失效條件：再次放量突破高點且法人續買。</li>
+</ul>
+<ul class='bullet-list'>
+<li>強勢續攻：30%</li>
+<li>觸發條件：法人續買、借券續降、日線站穩突破區，且量能延續。</li>
+<li>目標區：挑戰更高檔波段區間，但目前無法給精準價。</li>
+<li>失效條件：量縮、OBV 不跟、短線指標快速轉弱。</li>
+</ul>
+<ul class='bullet-list'>
+<li>回測洗盤：25%</li>
+<li>觸發條件：高檔換手後回落測試近期成本區。</li>
+<li>目標區：回測 157 元附近或突破區上緣。</li>
+<li>失效條件：回測不破後重新放量。</li>
+</ul>
+<ul class='bullet-list'>
+<li>轉弱下破：10%</li>
+<li>觸發條件：急漲後失守短線支撐，且法人轉賣。</li>
+<li>目標區：回到前一整理帶。</li>
+<li>失效條件：市場仍維持高換手與買盤承接。</li>
+</ul>
+        </article>
+        <article class="panel">
+          <h2>未來 1 月情境預測</h2>
+          <ul class='bullet-list'>
+<li>主升延續：34%</li>
+<li>驅動因子：法人買超延續、籌碼轉強、若有題材或財報事件窗加持。</li>
+<li>可能目標區：走向更高波段區間，但資料不足不宜指定單點。</li>
+<li>需要觀察的事件窗：月營收、財報、法說、產業題材。</li>
+</ul>
+<ul class='bullet-list'>
+<li>箱體震盪整理：30%</li>
+<li>驅動因子：短線過熱後市場消化追價，法人維持中性。</li>
+<li>可能目標區：在近期突破區上下形成整理箱。</li>
+<li>需要觀察的事件窗：無明確催化時，容易進入整理。</li>
+</ul>
+<ul class='bullet-list'>
+<li>高位派發轉弱：22%</li>
+<li>驅動因子：融資增加、當沖偏高、若法人轉賣則容易轉為派發。</li>
+<li>可能目標區：回到前波成本帶或更低支撐。</li>
+<li>需要觀察的事件窗：量價背離、OBV 不再創高。</li>
+</ul>
+<ul class='bullet-list'>
+<li>破位進入修正：14%</li>
+<li>驅動因子：突破失敗、量縮、籌碼鬆動。</li>
+<li>可能目標區：修正回前波整理區。</li>
+<li>需要觀察的事件窗：跌破關鍵支撐或均線。</li>
+</ul>
+        </article>
+        <article class="panel">
+          <h2>延伸內容</h2>
+          
+            <details class="fold-card">
+              <summary>
+                <strong>影像事實擷取</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <p>圖中時點資料：</p>
+<ul class='bullet-list'>
+<li>圖檔標題可辨識到「3152 璟德 日K線 / 週K線 / 月K線 / 季K線 / 年K線」相關頁面。</li>
+<li>依畫面可見，這些圖框目前大多為空白頁面或未成功呈現完整 K 線內容，因此無法從圖面可靠擷取開高低收、均線、RSI、KD、MACD、OBV、DMI、ADX、布林帶等數值。</li>
+<li>圖面可辨識日期標記包含「4/15 交易資料統計」、「2026年 第16週」、「2026年 4月」、「2026年 第2季」、「2026年 交易資料統計」等，但圖中細部數值不可讀。</li>
+</ul>
+<p>最新市場資料：</p>
+<ul class='bullet-list'>
+<li>2026/04/15 收盤 172.5 元，漲 15.5 元，漲幅 +9.87%。</li>
+<li>成交量 3,808 張。</li>
+<li>成交金額 63,537 萬元。</li>
+<li>外資買賣超 +296 張。</li>
+<li>三大法人合計買賣超 +480 張。</li>
+<li>融資餘額 1,827 張，日增 +162 張。</li>
+<li>融券餘額 13 張，日增 +8 張。</li>
+<li>借券賣出餘額 1,782 張，日減 13 張。</li>
+<li>現股當沖成交張數 1,314 張，當沖率 34.5%。</li>
+<li>60 分、30 分、15 分、5 分、1 分最新技術值如下：</li>
+<li>60m：RSI 76.50，K 94.53，D 90.75，J 102.09，MACD 3.06，Signal 1.76。</li>
+<li>30m：RSI 78.70，K 98.89，D 95.37，J 105.93，MACD 3.41，Signal 1.85。</li>
+<li>15m：RSI 84.19，K 98.55，D 96.03，J 103.60，MACD 3.62，Signal 2.79。</li>
+<li>5m：RSI 82.72，K 100.00，D 96.67，J 106.67，MACD 2.40，Signal 2.24。</li>
+<li>1m：RSI 58.25，K 100.00，D 100.00，J 100.00，MACD 0.34，Signal 0.42。</li>
+</ul>
+<p>高 / 中 / 低信心欄位：</p>
+<ul class='bullet-list'>
+<li>高信心：2026/04/15 收盤、漲跌幅、成交量、法人買賣超、融資融券、借券賣出餘額、各分鐘級技術值。</li>
+<li>中信心：圖面存在多週期 K 線頁，但內容未成功辨識。</li>
+<li>低信心：圖中年 / 季 / 月 / 週 / 日 K 的細部趨勢、均線位置、布林帶位置。</li>
+</ul>
+<p>無法確認欄位：</p>
+<ul class='bullet-list'>
+<li>圖中日 / 週 / 月 / 季 / 年 K 的完整 OHLCV 與指標數值。</li>
+<li>月營收、季報、EPS、毛利率、營益率。</li>
+<li>事件窗內容。</li>
+<li>回測期間、進出場規則、成本、滑價、樣本內外與 walk-forward。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>已知事實 / 需確認 / 推論</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <p>已知事實：</p>
+<ul class='bullet-list'>
+<li>2026/04/15 股價單日上漲至 172.5 元，屬明顯強勢跳空或長紅型態的結果，但是否為突破型態，需仰賴更完整的日線圖確認。</li>
+<li>法人與外資同步偏多，三大法人合計買超，且借券賣出餘額下降，屬偏正向籌碼背景。</li>
+<li>融資餘額增加，搭配大漲與高當沖率，代表短線追價與換手同步偏高。</li>
+<li>60 分到 5 分 RSI 與 K 值普遍處於高檔，顯示短線過熱或高檔延伸狀態明顯。</li>
+</ul>
+<p>需確認：</p>
+<ul class='bullet-list'>
+<li>是否已站穩日線 / 週線關鍵均線與前高。</li>
+<li>是否屬於真正突破確認，或只是事件驅動的單日噴出。</li>
+<li>年 / 月 / 週 K 的位階是否已在高檔延伸區。</li>
+<li>是否有營收、財報、法說或題材事件窗支撐。</li>
+<li>是否存在回測資料可供校正。</li>
+</ul>
+<p>推論：</p>
+<ul class='bullet-list'>
+<li>目前最可能是「短線強勢噴出後的高檔延伸」，而非穩定的主升初段，因為分鐘級與日內技術已明顯過熱，但日週級結構缺圖，無法直接升格為完整主升確認。</li>
+<li>若日線與週線同時配合站上關鍵均線與前高，則可視為突破確認；否則較偏向高位延伸或假突破風險。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>市場快照</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <ul class='bullet-list'>
+<li>最新收盤：172.5 元。</li>
+<li>當日漲跌：+15.5 元，+9.87%。</li>
+<li>成交量：3,808 張，相較前一日 692 張明顯放大。</li>
+<li>成交金額：63,537 萬元。</li>
+<li>三大法人合計買超：+480 張。</li>
+<li>外資買超：+296 張。</li>
+<li>融資餘額：1,827 張，增加 162 張。</li>
+<li>融券餘額：13 張，增加 8 張。</li>
+<li>借券賣出餘額：1,782 張，日減 13 張。</li>
+<li>當沖率：34.5%，顯示高換手特徵。</li>
+<li>近 5 / 10 / 20 / 60 日量能比較：目前僅有 4/14 與 4/15 兩筆可直接比對，4/15 量能顯著放大。</li>
+<li>位置判讀：可推定已脫離短線整理區，但是否位於 MA20 / MA60 / MA120 / MA240 上方，缺乏圖面或 OHLC 序列，無法確認。</li>
+<li>事件窗：本輪資料不足，需確認。</li>
+<li>相對大盤與同族群強弱：資料不足，無法確認。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>多週期技術判讀</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <p>年 / 季：</p>
+<ul class='bullet-list'>
+<li>圖面未成功解析年 / 季 K 細節，無法確認長周期位階。</li>
+<li>因 2026/04/15 為急漲狀態，推論長周期若原本處於盤整上緣，則本次可能是突破延伸；但此僅為低信心推論。</li>
+</ul>
+<p>月：</p>
+<ul class='bullet-list'>
+<li>月線圖未能讀取細部指標與 K 棒，無法判斷是否高檔鈍化。</li>
+<li>目前無法確認是否已進入月線主升延伸或中長期轉折。</li>
+</ul>
+<p>週：</p>
+<ul class='bullet-list'>
+<li>週線圖未能讀取，但從法人轉買、量能放大與當日大漲推估，週線可能已進入轉強或突破後延伸狀態。</li>
+<li>然而缺乏週 MA13 / 26 / 52、週 MACD 與 OBV，無法確認是否為主升或高位派發前段。</li>
+</ul>
+<p>日：</p>
+<ul class='bullet-list'>
+<li>日線圖未能完整辨識，因此只能依最新市場資料與分鐘級結構輔助判斷。</li>
+<li>4/15 屬放量大漲，搭配融資增加與高當沖率，日線短期偏多，但也同時具備短線過熱風險。</li>
+</ul>
+<p>分K補充：</p>
+<ul class='bullet-list'>
+<li>60m / 30m / 15m / 5m RSI 均高於 76，KDJ 皆接近或進入超買鈍化區，MACD 仍在零軸上方，代表短線仍有慣性，但追價成本提高。</li>
+<li>1m RSI 反而回到 58 左右，顯示極短線可能已進入小幅換手或暫歇。</li>
+<li>分 K 僅能作為波段背景補充，不能轉成當沖策略。</li>
+</ul>
+<p>多週期最終分類：</p>
+<ul class='bullet-list'>
+<li>偏向「高位延伸」與「多頭鈍化」交界，但因長周期圖面缺失，最終採保守分類為「高位延伸」。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>進場訊號</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <ul class='bullet-list'>
+<li>突破型</li>
+<li>是否成立：部分成立。</li>
+<li>強度：中。</li>
+<li>觸發價或觸發區間：需日線確認是否有效站穩 4/15 高檔區間與前高。</li>
+<li>失效條件：若隔日或後續回跌失守突破區且量能不續，則視為假突破風險。</li>
+</ul>
+<ul class='bullet-list'>
+<li>回測型</li>
+<li>是否成立：尚未成立。</li>
+<li>強度：弱。</li>
+<li>觸發價或觸發區間：需等待回測短均或突破點不破。</li>
+<li>失效條件：若回測時量增跌破且法人轉賣，則回測失敗。</li>
+</ul>
+<ul class='bullet-list'>
+<li>吸籌轉發動型</li>
+<li>是否成立：部分成立。</li>
+<li>強度：中。</li>
+<li>觸發價或觸發區間：外資與三大法人續買、借券賣出餘額續降、OBV 若同步抬升才可強化。</li>
+<li>失效條件：法人由買轉賣或 OBV 不跟價。</li>
+</ul>
+<ul class='bullet-list'>
+<li>事件窗型</li>
+<li>是否成立：無法確認。</li>
+<li>強度：弱。</li>
+<li>觸發價或觸發區間：需事件窗資料。</li>
+<li>失效條件：無事件催化而僅靠單日急漲，續航通常下降。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>出場訊號</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <ul class='bullet-list'>
+<li>失守主成本區</li>
+<li>是否成立：尚未成立。</li>
+<li>強度：弱。</li>
+<li>觸發區間：以 157 元附近作為已知近期成本參考，但非正式失效價。</li>
+<li>失效條件：若後續回檔仍守住近期換手區，則未成立。</li>
+</ul>
+<ul class='bullet-list'>
+<li>失守 MA20 / MA60 / AVWAP</li>
+<li>是否成立：無法確認。</li>
+<li>強度：無法判定。</li>
+<li>觸發區間：資料不足。</li>
+<li>失效條件：需日線與均線圖補齊。</li>
+</ul>
+<ul class='bullet-list'>
+<li>價創高但 OBV / RSI / MACD 不跟</li>
+<li>是否成立：目前無法完整確認。</li>
+<li>強度：中低。</li>
+<li>觸發條件：若後續再創高但量能縮、OBV 不增、MACD 柱體縮，則成立。</li>
+<li>失效條件：量價與籌碼同步續強。</li>
+</ul>
+<ul class='bullet-list'>
+<li>融資續增、借券不降、法人轉賣</li>
+<li>是否成立：部分風險已現。</li>
+<li>強度：中。</li>
+<li>觸發條件：融資增加與高當沖已存在；若後續法人轉賣且借券不降，出場訊號會升級。</li>
+<li>失效條件：法人持續買超且借券持續下降。</li>
+</ul>
+<ul class='bullet-list'>
+<li>達到第一目標價後高檔鈍化</li>
+<li>是否成立：無法確認。</li>
+<li>強度：無法判定。</li>
+<li>觸發條件：需有明確波段目標與日週結構。</li>
+<li>失效條件：續攻擴張。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>回測校正審計</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <ul class='bullet-list'>
+<li>回測期間：未提供，無法執行完整校正。</li>
+<li>資料頻率：僅見日 / 60m / 30m / 15m / 5m 與報表摘要，仍不足以完成嚴格回測。</li>
+<li>進場規則：未提供，無法審計。</li>
+<li>出場規則：未提供，無法審計。</li>
+<li>停損 / 停利規則：未提供，無法審計。</li>
+<li>資金配置、手續費、滑價：未提供，無法審計。</li>
+<li>流動性限制：未提供，無法審計。</li>
+<li>漲跌停限制是否納入：未提供，無法審計。</li>
+<li>look-ahead bias / data leakage：未提供具體排除方式，無法確認。</li>
+<li>樣本內 / 樣本外切分：未提供，無法確認。</li>
+<li>walk-forward / rolling test：未提供，無法確認。</li>
+<li>結論：本輪回測校正資料明顯不足，不能宣稱已有完整回測結果，只能先做市場結構判讀與暫時性波段推論。</li>
+<li>前版對照：前版無波段結論，因此無法做失準回顧。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>下一輪迭代假設</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <ul class='bullet-list'>
+<li>假設名稱：突破後是否能轉為可持續主升</li>
+<li>為何值得驗證：目前最大不確定性在於這是主升起點還是高檔噴出。</li>
+<li>要改哪 1~2 個核心變數：加入日線前高有效站穩條件、加入週線 MACD / OBV 確認。</li>
+<li>驗證方法：比較「突破當日後 3~10 日」是否續攻且不跌回突破區。</li>
+<li>成功判準：突破後維持高位、回測不破、週線同步轉強。</li>
+<li>失敗判準：突破後快速跌回整理區。</li>
+<li>預期對報酬 / 回撤 / 穩健性的影響：若成立，可提升報酬與穩健性；若不成立，可降低假突破損失。</li>
+</ul>
+<ul class='bullet-list'>
+<li>假設名稱：法人買超是否真能轉化為中期籌碼優勢</li>
+<li>為何值得驗證：4/15 法人偏多，但是否只是短線跟價尚未明確。</li>
+<li>要改哪 1~2 個核心變數：觀察連續買超天數、借券賣出餘額變化。</li>
+<li>驗證方法：統計法人連買後 5 / 10 / 20 日報酬與回撤。</li>
+<li>成功判準：法人續買且股價維持高檔。</li>
+<li>失敗判準：法人一日買超後快速反轉。</li>
+<li>預期對報酬 / 回撤 / 穩健性的影響：有助於區分真籌碼與假拉抬。</li>
+</ul>
+<ul class='bullet-list'>
+<li>假設名稱：高當沖環境是否容易造成延伸噴出後轉弱</li>
+<li>為何值得驗證：當沖率 34.5%，短線換手很高，容易出現情緒化波動。</li>
+<li>要改哪 1~2 個核心變數：加入當沖率門檻與量能擴張條件。</li>
+<li>驗證方法：比較高當沖日後 1 週是否常出現高檔整理或回檔。</li>
+<li>成功判準：高當沖不代表立即轉弱，仍需量價與法人配合。</li>
+<li>失敗判準：高當沖後常伴隨急跌。</li>
+<li>預期對報酬 / 回撤 / 穩健性的影響：可降低追高誤判與回撤。</li>
+</ul>
+              </div>
+            </details>
+            
+            <details class="fold-card">
+              <summary>
+                <strong>若我有持股</strong>
+                <span>展開查看完整內容</span>
+              </summary>
+              <div class="fold-body">
+                <p>持股張數 / 均價：無持股。</p>
+<p>續抱條件：若後續回測不破突破區，且法人持續買超，可續抱觀察。</p>
+<p>分批減碼價位：資料不足，不宜給單點。若高檔出現量價背離、法人轉賣，可考慮分批調節。</p>
+<p>防守價：需以日線關鍵支撐與主成本區共同確認，現階段不能硬給單點。</p>
+              </div>
+            </details>
+            
+        </article>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div>波段觀測站個股頁由共用版波段分析流程自動生成，適合手機與桌機閱讀。</div>
+      <div>建議先看置頂結論，再依需要展開延伸內容做深入判讀。</div>
+    </footer>
+  </main>
+</body>
+</html>
