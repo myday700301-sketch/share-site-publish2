@@ -263,7 +263,7 @@
       text-transform: uppercase;
     }
     .field input,
-    .field select {
+    .stage-filter-toggle {
       width: 100%;
       border: 1px solid rgba(39,72,63,.12);
       background: rgba(255, 252, 246, 0.82);
@@ -274,9 +274,100 @@
       outline: none;
     }
     .field input:focus,
-    .field select:focus {
+    .stage-filter-toggle:focus {
       border-color: rgba(180,123,63,.55);
       box-shadow: 0 0 0 4px rgba(180,123,63,.12);
+    }
+    .stage-filter-box {
+      position: relative;
+    }
+    .stage-filter-box[open] {
+      z-index: 4;
+    }
+    .stage-filter-box summary {
+      list-style: none;
+    }
+    .stage-filter-box summary::-webkit-details-marker {
+      display: none;
+    }
+    .stage-filter-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 600;
+    }
+    .stage-filter-toggle strong {
+      font: inherit;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .stage-filter-toggle span {
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1;
+      transition: transform .2s ease;
+    }
+    .stage-filter-box[open] .stage-filter-toggle span {
+      transform: rotate(180deg);
+    }
+    .stage-filter-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      padding: 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(39,72,63,.12);
+      background: rgba(255, 252, 246, 0.98);
+      box-shadow: 0 22px 48px rgba(35, 26, 17, 0.12);
+      display: grid;
+      gap: 8px;
+    }
+    .stage-filter-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(39,72,63,.08);
+    }
+    .stage-filter-action {
+      border: 0;
+      background: transparent;
+      color: var(--forest);
+      font: inherit;
+      font-size: var(--text-sm);
+      font-weight: 700;
+      padding: 4px 0;
+      cursor: pointer;
+    }
+    .stage-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.6);
+      border: 1px solid rgba(39,72,63,.06);
+      cursor: pointer;
+    }
+    .stage-option:hover {
+      background: rgba(180,123,63,.09);
+    }
+    .stage-option input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--forest);
+      margin: 0;
+      flex: 0 0 auto;
+    }
+    .stage-option span {
+      color: var(--ink);
+      font-size: var(--text-md);
+      line-height: 1.5;
+      font-weight: 600;
     }
     .filter-status {
       margin-top: 12px;
@@ -885,17 +976,26 @@
           <input id="stock-search" type="search" placeholder="輸入代號、名稱、狀態或操作建議關鍵字">
         </div>
         <div class="field">
-          <label for="stage-filter">階段篩選</label>
-          <select id="stage-filter">
-            <option value="">全部階段</option>
-            <option value="C">C. 突破確認</option>
-            <option value="D">D. 主升一波</option>
-            <option value="E">E. 高位震盪洗盤</option>
-            <option value="F">F. 主升二波</option>
-            <option value="G">G. 延伸噴出</option>
-            <option value="H">H. 派發 / 鈍化</option>
-            <option value="I">I. 破位轉弱</option>
-          </select>
+          <label for="stage-filter-toggle">階段篩選</label>
+          <details class="stage-filter-box" id="stage-filter">
+            <summary class="stage-filter-toggle" id="stage-filter-toggle">
+              <strong id="stage-filter-label">全部階段</strong>
+              <span>⌄</span>
+            </summary>
+            <div class="stage-filter-menu">
+              <div class="stage-filter-actions">
+                <button class="stage-filter-action" id="stage-filter-select-all" type="button">全選</button>
+                <button class="stage-filter-action" id="stage-filter-clear" type="button">清除</button>
+              </div>
+              <label class="stage-option"><input type="checkbox" value="C" data-stage-option><span>C. 突破確認</span></label>
+              <label class="stage-option"><input type="checkbox" value="D" data-stage-option><span>D. 主升一波</span></label>
+              <label class="stage-option"><input type="checkbox" value="E" data-stage-option><span>E. 高位震盪洗盤</span></label>
+              <label class="stage-option"><input type="checkbox" value="F" data-stage-option><span>F. 主升二波</span></label>
+              <label class="stage-option"><input type="checkbox" value="G" data-stage-option><span>G. 延伸噴出</span></label>
+              <label class="stage-option"><input type="checkbox" value="H" data-stage-option><span>H. 派發 / 鈍化</span></label>
+              <label class="stage-option"><input type="checkbox" value="I" data-stage-option><span>I. 破位轉弱</span></label>
+            </div>
+          </details>
         </div>
         <div class="toggle-field">
           <label for="favorite-filter">收藏檢視</label>
@@ -2629,6 +2729,10 @@
   <script>
     const searchInput = document.getElementById('stock-search');
     const stageFilter = document.getElementById('stage-filter');
+    const stageFilterLabel = document.getElementById('stage-filter-label');
+    const stageOptions = Array.from(document.querySelectorAll('[data-stage-option]'));
+    const stageFilterSelectAll = document.getElementById('stage-filter-select-all');
+    const stageFilterClear = document.getElementById('stage-filter-clear');
     const favoriteFilter = document.getElementById('favorite-filter');
     const statusText = document.getElementById('filter-status');
     const panels = Array.from(document.querySelectorAll('.stage-panel'));
@@ -2678,6 +2782,25 @@
       });
     }
 
+    function getSelectedStages() {
+      return stageOptions.filter((option) => option.checked).map((option) => option.value);
+    }
+
+    function syncStageFilterLabel() {
+      const selected = getSelectedStages();
+      if (!stageFilterLabel) return;
+      if (!selected.length) {
+        stageFilterLabel.textContent = '全部階段';
+        return;
+      }
+      if (selected.length === 1) {
+        const optionLabel = stageOptions.find((option) => option.value === selected[0])?.parentElement?.textContent?.trim();
+        stageFilterLabel.textContent = optionLabel || selected[0];
+        return;
+      }
+      stageFilterLabel.textContent = `已選 ${selected.length} 個階段`;
+    }
+
     function renderFavoriteSpotlight() {
       if (!favoriteSpotlight || !favoriteSpotlightGrid || !favoriteSpotlightEmpty || !favoriteSpotlightCount) return;
       const favoriteCards = allCards
@@ -2712,7 +2835,7 @@
 
     function applyFilters() {
       const query = (searchInput?.value || '').trim().toLowerCase();
-      const stage = (stageFilter?.value || '').trim();
+      const selectedStages = getSelectedStages();
       const favoritesOnly = favoriteFilter?.classList.contains('active');
       let visibleCount = 0;
 
@@ -2729,7 +2852,7 @@
             card.dataset.action || '',
           ].join(' ');
           const matchesQuery = !query || haystack.includes(query);
-          const matchesStage = !stage || card.dataset.stage === stage;
+          const matchesStage = !selectedStages.length || selectedStages.includes(card.dataset.stage || '');
           const stockId = card.dataset.stockId || '';
           const matchesFavorite = !favoritesOnly || favorites.has(stockId);
           const show = matchesQuery && matchesStage && matchesFavorite;
@@ -2743,19 +2866,43 @@
         panel.style.display = panelVisibleCount > 0 ? '' : 'none';
       });
 
-      if (!query && !stage) {
+      if (!query && !selectedStages.length) {
         statusText.textContent = favoritesOnly ? `目前顯示收藏中的 ${visibleCount} 檔。` : '目前顯示全部標的。';
       } else {
         const parts = [];
         if (query) parts.push(`關鍵字「${query}」`);
-        if (stage) parts.push(`階段 ${stage}`);
+        if (selectedStages.length) {
+          const selectedLabels = stageOptions
+            .filter((option) => option.checked)
+            .map((option) => option.parentElement?.textContent?.trim() || option.value);
+          parts.push(`階段 ${selectedLabels.join('、')}`);
+        }
         if (favoritesOnly) parts.push('只看收藏');
         statusText.textContent = `目前顯示 ${visibleCount} 檔，條件：${parts.join('、')}。`;
       }
     }
 
     searchInput?.addEventListener('input', applyFilters);
-    stageFilter?.addEventListener('change', applyFilters);
+    stageOptions.forEach((option) => {
+      option.addEventListener('change', () => {
+        syncStageFilterLabel();
+        applyFilters();
+      });
+    });
+    stageFilterSelectAll?.addEventListener('click', () => {
+      stageOptions.forEach((option) => {
+        option.checked = true;
+      });
+      syncStageFilterLabel();
+      applyFilters();
+    });
+    stageFilterClear?.addEventListener('click', () => {
+      stageOptions.forEach((option) => {
+        option.checked = false;
+      });
+      syncStageFilterLabel();
+      applyFilters();
+    });
     [favoriteFilter].forEach((button) => {
       button?.addEventListener('click', () => {
         favoriteFilter?.classList.toggle('active');
@@ -2782,6 +2929,7 @@
 
     syncFavoriteButtons();
     syncFavoriteFilterButtons();
+    syncStageFilterLabel();
     renderFavoriteSpotlight();
     applyFilters();
   </script>
