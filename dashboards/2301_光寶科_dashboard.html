@@ -3,934 +3,1051 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>波段觀測站 | 2301 光寶科 個股儀表板</title>
+  <title>2301 光寶科 波段分析儀表板</title>
   <style>
     :root {
-      --bg: #efe7db;
-      --panel: rgba(253, 248, 241, 0.94);
-      --panel-strong: rgba(255, 252, 246, 0.98);
-      --ink: #1d1710;
-      --ink-soft: #706459;
-      --forest: #27483f;
-      --forest-deep: #173129;
-      --gold: #b47b3f;
-      --clay: #c76d42;
-      --line: rgba(29, 23, 16, 0.12);
-      --sand: #e9dbc4;
-      --shadow: 0 24px 70px rgba(35, 26, 17, 0.11);
-      --sans: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", "Avenir Next", sans-serif;
-      --serif: "Iowan Old Style", "Noto Serif TC", "PingFang TC", serif;
-      --mono: "SFMono-Regular", "Menlo", monospace;
-      --text-xs: 12px;
-      --text-sm: 13px;
-      --text-md: 16px;
-      --text-lg: 18px;
-      --text-xl: 20px;
-      --text-2xl: 24px;
-      --text-3xl: 30px;
+      --bg: #f4f1e9;
+      --paper: rgba(255, 251, 244, 0.95);
+      --paper-strong: #fffdf8;
+      --ink: #162018;
+      --ink-soft: #697269;
+      --forest: #1f4f40;
+      --forest-deep: #13352b;
+      --sage: #6d8c79;
+      --amber: #ae8040;
+      --sand: #ebe1cf;
+      --line: rgba(22, 32, 24, 0.10);
+      --shadow: 0 22px 52px rgba(15, 28, 21, 0.08);
     }
+
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       color: var(--ink);
-      font-family: var(--sans);
-      font-size: var(--text-md);
-      line-height: 1.75;
+      font-family: "PingFang TC", "Noto Sans TC", sans-serif;
       background:
-        radial-gradient(circle at 10% 12%, rgba(183,122,63,.18), transparent 24%),
-        radial-gradient(circle at 86% 14%, rgba(39,72,63,.14), transparent 28%),
-        linear-gradient(180deg, #fbf6ef 0%, #f0e6d9 58%, #eadfce 100%);
+        radial-gradient(circle at top left, rgba(31, 79, 64, 0.11), transparent 24%),
+        radial-gradient(circle at top right, rgba(174, 128, 64, 0.10), transparent 22%),
+        linear-gradient(180deg, #faf7f0, #f3efe6);
     }
+
     .shell {
-      max-width: 1480px;
+      max-width: 1560px;
       margin: 0 auto;
-      padding: 20px 20px 44px;
+      padding: 20px 20px 40px;
     }
-    .hero, .panel {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 28px;
-      box-shadow: var(--shadow);
-    }
+
     .hero {
-      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.18fr) minmax(350px, 0.82fr);
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .hero-main, .hero-side, .panel {
+      border-radius: 28px;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
       overflow: hidden;
-      padding: 24px;
-      margin-bottom: 18px;
-      background:
-        linear-gradient(135deg, rgba(255,252,246,.98) 0%, rgba(247,238,226,.9) 60%, rgba(236,223,206,.92) 100%);
     }
-    .hero::before {
-      content: "";
-      position: absolute;
-      left: -70px;
-      top: -80px;
-      width: 320px;
-      height: 320px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(199,109,66,.18) 0%, rgba(199,109,66,0) 68%);
-      pointer-events: none;
-    }
-    .hero::after {
-      content: "";
-      position: absolute;
-      right: -60px;
-      top: -30px;
-      width: 280px;
-      height: 280px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(39,72,63,.16) 0%, rgba(39,72,63,0) 68%);
-      pointer-events: none;
-    }
-    .hero > * {
-      position: relative;
-      z-index: 1;
-    }
-    .site-nav {
+
+    .hero-main {
+      padding: 28px 30px;
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 18px;
+      flex-direction: column;
+      background: linear-gradient(135deg, #18382e, #1f4f40 62%, #2d6755);
+      color: #f7f6f2;
     }
-    .nav-pill {
+
+    .eyebrow {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 14px;
+      width: fit-content;
+      padding: 8px 12px;
       border-radius: 999px;
-      background: rgba(255, 250, 242, 0.78);
-      border: 1px solid rgba(39,72,63,.12);
-      color: var(--forest-deep);
-      font-weight: 800;
-      backdrop-filter: blur(8px);
-    }
-    .nav-pill.current {
-      background: linear-gradient(135deg, rgba(39,72,63,.14), rgba(180,123,63,.16));
-    }
-    .brand-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-    .eyebrow {
-      display: inline-flex;
-      padding: 10px 18px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.2);
-      background: rgba(31,79,64,.08);
-      color: var(--forest-deep);
-      font-weight: 800;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      font-size: var(--text-xs);
-    }
-    h1 {
-      margin: 18px 0 12px;
-      font-size: clamp(42px, 6vw, 72px);
-      line-height: 1.02;
-      letter-spacing: -.03em;
-      font-family: var(--serif);
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      font-size: 12px;
       font-weight: 700;
+      letter-spacing: 0.04em;
+      backdrop-filter: blur(10px);
     }
-    .meta-row {
+
+    .hero-main h1 {
+      margin: 14px 0 0;
+      font-size: clamp(36px, 4.2vw, 70px);
+      line-height: 1.08;
+      letter-spacing: 0.01em;
+      word-break: keep-all;
+    }
+
+    .hero-lead, .hero-note {
+      max-width: 74ch;
+      line-height: 1.8;
+      word-break: keep-all;
+    }
+
+    .hero-lead {
+      margin-top: 14px;
+      font-size: 17px;
+      color: rgba(247, 246, 242, 0.94);
+    }
+
+    .hero-note {
+      margin-top: 10px;
+      font-size: 14px;
+      color: rgba(247, 246, 242, 0.76);
+    }
+
+    .hero-strip {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .meta-chip {
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: rgba(255, 251, 244, 0.76);
-      color: var(--ink-soft);
-      font-size: var(--text-sm);
-      font-weight: 600;
-      border: 1px solid rgba(39,72,63,.08);
-    }
-    .key-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 14px;
-    }
-    .stat-card {
-      background: linear-gradient(180deg, rgba(255,252,246,.98), rgba(250,244,236,.92));
-      border: 1px solid rgba(39,72,63,.1);
-      border-radius: 20px;
-      padding: 16px 18px;
-      min-height: 116px;
-      box-shadow: 0 16px 34px rgba(35, 26, 17, 0.06);
-    }
-    .stat-card span {
-      display: block;
-      color: var(--ink-soft);
-      font-size: var(--text-sm);
-      margin-bottom: 10px;
-      font-weight: 600;
-    }
-    .stat-card strong {
-      display: block;
-      font-size: 22px;
-      line-height: 1.45;
-      word-break: break-word;
-      font-weight: 700;
-    }
-    .content-grid {
-      display: grid;
-      grid-template-columns: 1.05fr .95fr;
-      gap: 18px;
-    }
-    .panel {
-      padding: 22px;
-      background: linear-gradient(180deg, rgba(255,252,246,.96), rgba(248,240,229,.92));
-    }
-    .panel h2 {
-      margin: 0 0 14px;
-      color: var(--forest-deep);
-      font-size: 26px;
-      font-family: var(--serif);
-      line-height: 1.15;
-      letter-spacing: -.01em;
-      font-weight: 700;
-    }
-    .score-row {
-      display: grid;
-      grid-template-columns: minmax(120px, 1fr) minmax(0, 4fr) 56px;
       gap: 12px;
-      align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--line);
+      margin-top: 20px;
     }
-    .score-row:last-child { border-bottom: 0; }
-    .score-label {
-      font-size: var(--text-sm);
-      font-weight: 600;
-      line-height: 1.5;
-    }
-    .score-track {
-      width: 100%;
-      height: 12px;
-      border-radius: 999px;
-      background: var(--sand);
-      overflow: hidden;
-    }
-    .score-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--clay) 0%, var(--gold) 45%, var(--forest) 100%);
-      border-radius: inherit;
-    }
-    .score-value {
-      text-align: right;
-      font-size: 22px;
-      font-weight: 800;
-      font-family: var(--serif);
-    }
-    .scenario-grid {
-      display: grid;
-      gap: 14px;
-    }
-    .scenario-card {
-      position: relative;
-      overflow: hidden;
-      border-radius: 22px;
-      border: 1px solid color-mix(in srgb, var(--forest) calc(4% * var(--scenario-emphasis)), rgba(39,72,63,.08));
-      background:
-        linear-gradient(
-          180deg,
-          color-mix(in srgb, rgba(255,252,246,.99) calc(100% - 4% * var(--scenario-emphasis)), rgba(199,109,66,.12) calc(4% * var(--scenario-emphasis))),
-          color-mix(in srgb, rgba(249,243,234,.94) calc(100% - 5% * var(--scenario-emphasis)), rgba(39,72,63,.08) calc(5% * var(--scenario-emphasis)))
-        );
-      box-shadow: 0 calc(10px + 2px * var(--scenario-emphasis)) calc(18px + 4px * var(--scenario-emphasis)) rgba(35, 26, 17, calc(.035 + .008 * var(--scenario-emphasis)));
-      padding: 18px;
-      transform: translateY(calc((5 - var(--scenario-emphasis)) * 1px));
-    }
-    .scenario-card::before {
-      content: "";
-      position: absolute;
-      inset: 0 0 auto 0;
-      height: 3px;
-      background: linear-gradient(
-        90deg,
-        color-mix(in srgb, var(--clay) calc(58% + 6% * var(--scenario-emphasis)), white),
-        color-mix(in srgb, var(--gold) calc(56% + 5% * var(--scenario-emphasis)), white),
-        color-mix(in srgb, var(--forest) calc(54% + 7% * var(--scenario-emphasis)), white)
-      );
-      opacity: calc(.55 + .08 * var(--scenario-emphasis));
-    }
-    .scenario-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: start;
-      gap: 14px;
-      margin-bottom: 14px;
-      padding-bottom: 14px;
-      border-bottom: 1px solid rgba(29,23,16,.08);
-    }
-    .scenario-kicker {
-      margin: 0 0 6px;
-      color: var(--ink-soft);
-      font-size: var(--text-xs);
-      font-weight: 700;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-    }
-    .scenario-head h3 {
-      margin: 0;
-      color: color-mix(in srgb, var(--forest-deep) calc(70% + 6% * var(--scenario-emphasis)), var(--clay));
-      font-family: var(--serif);
-      font-size: calc(22px + 2px * var(--scenario-emphasis));
-      line-height: 1.08;
-      letter-spacing: -.01em;
-      font-weight: 700;
-    }
-    .scenario-probability {
-      min-width: 96px;
-      text-align: right;
-    }
-    .scenario-probability strong {
-      display: block;
-      color: color-mix(in srgb, var(--forest-deep) calc(74% + 5% * var(--scenario-emphasis)), var(--clay));
-      font-family: var(--serif);
-      font-size: calc(26px + 2px * var(--scenario-emphasis));
-      line-height: 1;
-      font-weight: 700;
-    }
-    .scenario-details {
-      display: grid;
-      gap: 10px;
-    }
-    .scenario-detail {
-      display: grid;
-      gap: 6px;
+
+    .hero-chip {
+      flex: 1 1 164px;
       padding: 12px 14px;
       border-radius: 18px;
-      background: color-mix(in srgb, rgba(255,255,255,.62) calc(100% - 4% * var(--scenario-emphasis)), rgba(199,109,66,.08) calc(4% * var(--scenario-emphasis)));
-      border: 1px solid color-mix(in srgb, rgba(39,72,63,.06) calc(100% - 4% * var(--scenario-emphasis)), rgba(39,72,63,.16) calc(4% * var(--scenario-emphasis)));
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
     }
-    .scenario-detail span {
-      color: var(--ink-soft);
-      font-size: var(--text-xs);
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
-    .scenario-detail strong {
+
+    .hero-chip span {
       display: block;
-      color: var(--ink);
-      font-size: var(--text-md);
-      line-height: 1.8;
-      font-family: var(--sans);
-      word-break: break-word;
-      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: rgba(247, 246, 242, 0.68);
     }
-    p, li {
-      font-size: var(--text-md);
-      line-height: 1.85;
-      color: #223022;
+
+    .hero-chip strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 24px;
+      line-height: 1.15;
+      word-break: keep-all;
+    }
+
+    .hero-side {
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,251,244,0.96));
+    }
+
+    .section-kicker {
       margin: 0;
-      font-weight: 500;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
     }
-    p + p { margin-top: 12px; }
-    .bullet-list {
-      margin: 0;
-      padding-left: 22px;
+
+    .section-title {
+      margin: 8px 0 0;
+      font-size: 30px;
+      line-height: 1.12;
+      word-break: keep-all;
     }
-    .bullet-list li + li { margin-top: 8px; }
-    code {
-      padding: 2px 8px;
+
+    .aside-note {
+      margin-top: 10px;
+      color: var(--ink-soft);
+      line-height: 1.75;
+      font-size: 14px;
+    }
+
+    .bar-stack, .score-stack, .stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .bar-meta {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .bar-meta span {
+      color: var(--ink-soft);
+    }
+
+    .bar-track, .score-track {
+      width: 100%;
+      height: 10px;
       border-radius: 999px;
-      background: #f3ecde;
-      font-family: var(--mono);
-      font-size: .92em;
-    }
-    .fold-card {
-      background: linear-gradient(180deg, rgba(255,252,246,.98), rgba(250,244,236,.92));
-      border: 1px solid rgba(39,72,63,.1);
-      border-radius: 20px;
-      margin-bottom: 12px;
+      background: #e8e0d2;
       overflow: hidden;
-      box-shadow: 0 16px 30px rgba(35, 26, 17, 0.05);
     }
+
+    .bar-fill, .score-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--forest), #5f8873);
+    }
+
+    .fold-card {
+      margin-top: 18px;
+      border: 1px solid #eadfcd;
+      border-radius: 22px;
+      background: #fffcf7;
+      overflow: hidden;
+    }
+
     .fold-card summary {
       list-style: none;
       cursor: pointer;
+      padding: 16px 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
-      padding: 18px 20px;
+      gap: 16px;
+      background: #faf4ea;
     }
-    .fold-card summary::-webkit-details-marker { display: none; }
-    .fold-card summary strong {
+
+    .fold-card summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .fold-title {
+      display: grid;
+      gap: 4px;
+    }
+
+    .fold-title strong {
+      font-size: 16px;
+      line-height: 1.25;
+      word-break: keep-all;
+    }
+
+    .fold-title span {
+      color: var(--ink-soft);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .fold-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: #efe4d5;
       color: var(--forest);
       font-size: 20px;
-      line-height: 1.2;
-      font-family: var(--serif);
       font-weight: 700;
+      flex: 0 0 auto;
     }
-    .fold-card summary span {
-      color: var(--ink-soft);
-      font-size: var(--text-sm);
-      white-space: nowrap;
-      font-weight: 500;
+
+    .fold-card[open] .fold-icon {
+      background: #dcebe4;
     }
-    .fold-body {
-      border-top: 1px solid var(--line);
-      padding: 18px 20px 20px;
+
+    .fold-card-body {
+      padding: 8px 18px 18px;
     }
-    .section-stack {
+
+    .score-row {
       display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(180px, 1fr) 64px;
+      gap: 14px;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee5d8;
+    }
+
+    .score-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .score-text {
+      display: grid;
+      gap: 4px;
+    }
+
+    .score-label {
+      font-weight: 700;
+      color: var(--forest);
+      font-size: 15px;
+      word-break: keep-all;
+    }
+
+    .score-desc {
+      color: var(--ink-soft);
+      line-height: 1.55;
+      font-size: 12px;
+    }
+
+    .score-value {
+      display: grid;
+      justify-items: end;
+      gap: 3px;
+    }
+
+    .score-value em {
+      font-style: normal;
+      color: var(--ink-soft);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.06fr) minmax(340px, 0.94fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .stack {
       gap: 18px;
     }
-    .site-footer {
-      padding: 18px 6px 0;
-      color: var(--ink-soft);
+
+    .panel {
+      padding: 22px 24px;
+      background: linear-gradient(180deg, var(--paper-strong), var(--paper));
+    }
+
+    .panel-head {
       display: flex;
       justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-      font-size: var(--text-sm);
-      line-height: 1.75;
-      font-weight: 500;
+      gap: 14px;
+      align-items: end;
+      margin-bottom: 16px;
     }
-    @media (max-width: 980px) {
-      .brand-row {
-        flex-direction: column;
-        align-items: start;
-      }
-      .content-grid {
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+
+    .panel-head strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 30px;
+      line-height: 1.1;
+      word-break: keep-all;
+    }
+
+    .panel-tag {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #efe6d7;
+      color: #7d6537;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .decision-copy {
+      display: grid;
+      gap: 10px;
+      line-height: 1.85;
+      font-size: 15px;
+    }
+
+    .two-up {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .level-card {
+      padding: 16px;
+      border-radius: 20px;
+      background: #fbf7ef;
+      border: 1px solid #eadfcd;
+    }
+
+    .level-card h3 {
+      margin: 0;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+
+    .level-card strong {
+      display: block;
+      margin-top: 10px;
+      font-size: 28px;
+      line-height: 1.08;
+      word-break: keep-all;
+    }
+
+    .level-card p {
+      margin: 10px 0 0;
+      line-height: 1.75;
+      color: var(--ink-soft);
+      font-size: 14px;
+    }
+
+    .metric-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: 128px 1fr;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee5d8;
+      align-items: start;
+    }
+
+    .metric-row:last-child {
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .metric-row span {
+      color: var(--ink-soft);
+      font-size: 13px;
+    }
+
+    .metric-row div {
+      line-height: 1.72;
+      font-size: 15px;
+    }
+
+    .copy-block p, .copy-block li {
+      line-height: 1.82;
+      font-size: 15px;
+    }
+
+    .copy-block h3 {
+      margin: 16px 0 10px;
+      font-size: 18px;
+    }
+
+    .bullet-list {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .bullet-list.compact {
+      gap: 10px;
+    }
+
+    .ordered-look {
+      list-style: decimal;
+    }
+
+    .empty-copy {
+      color: var(--ink-soft);
+      line-height: 1.75;
+      margin: 0;
+    }
+
+    code {
+      font-family: "SFMono-Regular", "Menlo", monospace;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: #f0e9dd;
+      color: #6f5322;
+      font-size: 0.92em;
+    }
+
+    .source-link {
+      margin-top: 14px;
+      color: var(--ink-soft);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .source-link a {
+      color: var(--forest);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .footer-note {
+      margin-top: 8px;
+      color: var(--ink-soft);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 1100px) {
+      .hero, .layout, .two-up {
         grid-template-columns: 1fr;
       }
-      .scenario-head {
-        flex-direction: column;
-      }
-      .scenario-probability {
-        width: 100%;
-        text-align: left;
-      }
     }
+
     @media (max-width: 720px) {
       .shell {
-        padding: 14px 12px 28px;
+        padding: 14px 14px 28px;
       }
-      .hero {
-        padding: 18px 16px;
-        border-radius: 22px;
+
+      .hero-main, .hero-side, .panel {
+        border-radius: 24px;
       }
-      .panel {
-        padding: 16px;
-        border-radius: 22px;
+
+      .hero-main {
+        padding: 20px;
       }
-      .site-nav {
-        gap: 8px;
-        margin-bottom: 14px;
+
+      .hero-main h1 {
+        font-size: clamp(32px, 11vw, 52px);
       }
-      .nav-pill {
-        width: 100%;
-        justify-content: center;
-        padding: 12px 14px;
+
+      .hero-chip {
+        min-width: calc(50% - 6px);
       }
-      .brand-row {
-        gap: 10px;
-        margin-bottom: 14px;
-      }
-      h1 {
-        margin: 10px 0 10px;
-        font-size: clamp(30px, 10vw, 42px);
-        line-height: 1.06;
-      }
-      .meta-row {
-        gap: 8px;
-        margin-bottom: 14px;
-      }
-      .meta-chip {
-        width: 100%;
-        justify-content: center;
-        text-align: center;
-        padding: 10px 12px;
-      }
-      .key-grid {
+
+      .metric-row {
         grid-template-columns: 1fr;
-        gap: 10px;
+        gap: 4px;
       }
-      .stat-card {
-        min-height: 0;
-        padding: 14px 14px;
-      }
-      .stat-card strong {
-        font-size: 20px;
-        line-height: 1.5;
-      }
-      .panel h2 {
-        font-size: 22px;
-        margin-bottom: 12px;
-      }
+
       .score-row {
         grid-template-columns: 1fr;
-        gap: 8px;
-        padding: 10px 0;
       }
-      .score-value {
-        text-align: left;
-      }
-      .scenario-card {
-        padding: 14px;
-        border-radius: 18px;
-      }
-      .scenario-head h3 {
-        font-size: calc(20px + 1px * var(--scenario-emphasis));
-      }
-      .scenario-probability strong {
-        font-size: calc(24px + 1px * var(--scenario-emphasis));
-      }
-      .scenario-detail {
-        padding: 10px 12px;
-        border-radius: 14px;
-      }
-      .scenario-detail strong {
-        font-size: 15px;
-        line-height: 1.75;
-      }
-      .fold-card summary {
-        padding: 14px 16px;
-        align-items: start;
-      }
-      .fold-card summary strong {
-        font-size: 18px;
-      }
-      .fold-card summary span {
-        display: none;
-      }
-      .fold-body {
-        padding: 14px 16px 16px;
-      }
-      .links {
-        gap: 8px;
-      }
-      .links a {
-        flex: 1 1 100%;
-        justify-content: center;
-        padding: 12px 14px;
-      }
-      .site-footer {
-        padding: 12px 2px 0;
-      }
-    }
-    @keyframes rise-in {
-      from {
-        opacity: 0;
-        transform: translateY(18px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    .hero, .panel {
-      animation: rise-in .52s ease both;
     }
   </style>
 </head>
 <body>
   <main class="shell">
     <section class="hero">
-      <nav class="site-nav">
-        <a class="nav-pill" href="../index.html">回首頁總覽</a>
-        <span class="nav-pill current">目前頁面：2301 光寶科</span>
-      </nav>
-      <div class="brand-row">
-        <div class="eyebrow">波段觀測站 ・ 個股儀表板</div>
-      </div>
-      <h1>2301 光寶科</h1>
-      <div class="meta-row"><div class='meta-chip'>更新時間：2026-04-17</div></div>
-      <div class="key-grid">
-        
-            <article class="stat-card">
-              <span>當前最可能狀態</span>
-              <strong>—</strong>
-            </article>
-            
+      <article class="hero-main">
+        <div class="eyebrow">2301 光寶科 ・ 專屬波段分析儀表板</div>
+        <h1>高位延伸後的高檔整理</h1>
+        <div class="hero-lead">目前較可能屬於「高位延伸後的高檔整理」，偏多但不宜追價。</div>
+        <div class='hero-note'>日線仍在 160 一帶附近維持結構，法人續買與融資下降同時存在，短線偏向洗盤後續攻而非明確轉弱。</div>
+        <div class="hero-strip">
+          <div class="hero-chip">
+            <span>資料日期</span>
+            <strong>2026-04-17</strong>
+          </div>
+          <div class="hero-chip">
+            <span>更新執行時間</span>
+            <strong>2026-04-17 11:22</strong>
+          </div>
+          <div class="hero-chip">
+            <span>最新收盤</span>
+            <strong>—</strong>
+          </div>
+          <div class="hero-chip">
+            <span>關鍵支撐</span>
+            <strong>160～159.5</strong>
+          </div>
+          <div class="hero-chip">
+            <span>失效條件</span>
+            <strong>159.5</strong>
+          </div>
+        </div>
+      </article>
 
-            <article class="stat-card">
-              <span>當前階段</span>
-              <strong>—</strong>
-            </article>
-            
-
-            <article class="stat-card">
-              <span>進場訊號</span>
-              <strong>—</strong>
-            </article>
-            
-
-            <article class="stat-card">
-              <span>出場訊號</span>
-              <strong>—</strong>
-            </article>
-            
-
-            <article class="stat-card">
-              <span>主成本核心區</span>
-              <strong>—</strong>
-            </article>
-            
-
-            <article class="stat-card">
-              <span>防守失效區</span>
-              <strong>—</strong>
-            </article>
-            
-
-            <article class="stat-card">
-              <span>1 週主情境</span>
-              <strong>—</strong>
-            </article>
-            
-
-            <article class="stat-card">
-              <span>1 月主情境</span>
-              <strong>—</strong>
-            </article>
-            
-
-            <article class="stat-card">
-              <span>操作建議</span>
-              <strong>—</strong>
-            </article>
-            
-
-            <article class="stat-card">
-              <span>把握度</span>
-              <strong>—</strong>
-            </article>
-            
-      </div>
+      <aside class="hero-side">
+        <p class="section-kicker">Decision Snapshot</p>
+        <h2 class="section-title">機率與核心判讀</h2>
+        <p class="aside-note">先看最可能情境，再用中文化指標理解這一檔現在的趨勢、籌碼、位置與風報比。</p>
+        <div class="bar-stack"><div class='metric-list'><div class="metric-row"><span>目前最可能狀態</span><div>高位整理偏多，仍有續攻機會。</div></div>
+<div class="metric-row"><span>當前階段</span><div>E. 高位震盪洗盤，略偏向主升後整理。</div></div>
+<div class="metric-row"><span>進場訊號是否成立</span><div>部分成立，偏向回測型與事件窗延續型。</div></div>
+<div class="metric-row"><span>出場訊號是否成立</span><div>尚未完全成立，但若失守 159.5～160，風險升高。</div></div></div></div>
+        <details class="fold-card">
+          <summary>
+            <div class="fold-title">
+              <strong>核心判讀</strong>
+              <span>目前無可用核心分數。</span>
+            </div>
+            <div class="fold-icon">+</div>
+          </summary>
+          <div class="fold-card-body">
+            <div class="score-stack"><p class='empty-copy'>目前沒有可用核心分數。</p></div>
+          </div>
+        </details>
+        <div class="source-link">
+          來源：
+          <a href="/Users/fan/trading_data/03_回測資料/個股資料/2301_光寶科/波段結論/2301光寶科波段_2026-04-17_批次整理.md">2301光寶科波段_2026-04-17_批次整理.md</a>
+           ｜ 技術圖：<a href='/Users/fan/trading_data/03_回測資料/個股資料/2301_光寶科/02_技術圖/2301光寶科_goodinfo_日週月季年_合併版.png'>2301光寶科_goodinfo_日週月季年_合併版.png</a>
+        </div>
+      </aside>
     </section>
 
-    <section class="content-grid">
-      <div class="section-stack">
+    <section class="layout">
+      <div class="stack">
         <article class="panel">
-          <h2>置頂結論</h2>
-          <p>目前較可能屬於「高位延伸後的高檔整理」，偏多但不宜追價。</p>
-<p>日線仍在 160 一帶附近維持結構，法人續買與融資下降同時存在，短線偏向洗盤後續攻而非明確轉弱。</p>
-<p>若 160.5～161 一帶能守穩，後續仍有向上測試前高與上緣壓力的機會；若失守 159.5，則會提高回測 154～155 區的機率。</p>
+          <div class="panel-head">
+            <div>
+              <h2>影像事實擷取</h2>
+              <strong>圖中時點與資料可信度</strong>
+            </div>
+            <div class="panel-tag">Image Facts</div>
+          </div>
+          <div class="metric-list">
+            <div class="metric-row"><span>圖中時點資料</span><div>見下方校正</div></div>
+<div class="metric-row"><span>最新市場資料</span><div>2026-04-17</div></div>
+<div class="metric-row"><span>高信心欄位</span><div>圖中 K 線時點、價位、技術指標與 fubon_csv 日期一致的部分</div></div>
+<div class="metric-row"><span>中信心欄位</span><div>需結合報表與提示詞上下文判讀的結構、籌碼與階段</div></div>
+<div class="metric-row"><span>低信心欄位</span><div>未直接提供精確均線、AVWAP、Donchian、完整量能序列的部分</div></div>
+<div class="metric-row"><span>無法確認欄位</span><div>月營收、財報、事件窗、完整回測校正與外部最新資料</div></div>
+          </div>
         </article>
+
         <article class="panel">
-          <h2>主力成本與關鍵價</h2>
-          <ul class='bullet-list'>
-<li>第一支撐：<code>160～159.5</code></li>
-<li>第二支撐：<code>154～155</code></li>
-<li>近壓：<code>162.5</code></li>
-<li>次壓：<code>165</code></li>
-<li>強壓：<code>167～168</code></li>
-<li>前高壓力：<code>162.5</code></li>
-<li>日收盤跌破 <code>159.5</code>，視為短線轉弱警戒</li>
-</ul>
+          <div class="panel-head">
+            <div>
+              <h2>現在該怎麼看</h2>
+              <strong>高位延伸後的高檔整理</strong>
+            </div>
+            <div class="panel-tag">Decision First</div>
+          </div>
+          <div class="decision-copy">
+            <p>目前較可能屬於「高位延伸後的高檔整理」，偏多但不宜追價。</p><p>日線仍在 160 一帶附近維持結構，法人續買與融資下降同時存在，短線偏向洗盤後續攻而非明確轉弱。</p>
+          </div>
         </article>
+
         <article class="panel">
-          <h2>交易計畫</h2>
-          <ul class='bullet-list'>
-<li>1~4 週：</li>
+          <div class="panel-head">
+            <div>
+              <h2>階段定位</h2>
+              <strong>E. 高位震盪洗盤</strong>
+            </div>
+            <div class="panel-tag">Stage</div>
+          </div>
+          <div class="two-up">
+            <div class="level-card">
+              <h3>目前偏向</h3>
+              <strong>E. 高位震盪洗盤</strong>
+              <p>目前整體把握度為 中，因此更適合把重點放在關鍵價位是否守住，以及後續收盤結構是否進一步確認。</p>
+            </div>
+            <div class="level-card">
+              <h3>階段解讀</h3>
+              <strong>E. 高位震盪洗盤</strong>
+              <p>目前最接近：目前最接近：E. 高位震盪洗盤</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>置頂總結欄位</h2>
+              <strong>專屬提示詞固定輸出</strong>
+            </div>
+            <div class="panel-tag">Top Fields</div>
+          </div>
+          <div class='metric-list'><div class="metric-row"><span>當前最可能狀態</span><div>E. 高位震盪洗盤</div></div>
+<div class="metric-row"><span>當前階段</span><div>E. 高位震盪洗盤，略偏向主升後整理。</div></div>
+<div class="metric-row"><span>進場訊號是否成立</span><div>部分成立，偏向回測型與事件窗延續型。</div></div>
+<div class="metric-row"><span>出場訊號是否成立</span><div>尚未完全成立，但若失守 159.5～160，風險升高。</div></div>
+<div class="metric-row"><span>主成本核心區</span><div>159.5～161</div></div>
+<div class="metric-row"><span>波段加碼區</span><div>160～162 回測止穩後</div></div>
+<div class="metric-row"><span>防守失效區</span><div>159.5 下方，若有效跌破則轉弱</div></div>
+<div class="metric-row"><span>上方第一壓力</span><div>162.5</div></div>
+<div class="metric-row"><span>上方主目標帶</span><div>165～168</div></div>
+<div class="metric-row"><span>下方關鍵支撐</span><div>159.5，次級支撐在 154～155</div></div></div>
+        </article>
+
+        <article class="panel copy-block">
+          <div class="panel-head">
+            <div>
+              <h2>市場快照</h2>
+              <strong>先看行情位置與缺口</strong>
+            </div>
+            <div class="panel-tag">Market Snapshot</div>
+          </div>
+          <div class="metric-list">
+            <div class="metric-row"><span>最新收盤</span><div>—</div></div>
+<div class="metric-row"><span>漲跌</span><div>資料不足</div></div>
+<div class="metric-row"><span>成交量</span><div>資料不足</div></div>
+<div class="metric-row"><span>成交額</span><div>資料不足</div></div>
+<div class="metric-row"><span>換手率</span><div>資料不足</div></div>
+<div class="metric-row"><span>量能比較</span><div>需連網補 5 / 10 / 20 / 60 日均量與量比</div></div>
+<div class="metric-row"><span>均線 / 箱體 / 缺口 / AVWAP</span><div>目前文字僅能確認箱體與壓支撐，均線與 AVWAP 尚不足</div></div>
+<div class="metric-row"><span>是否位於事件窗</span><div>待補法說、月營收、產品 / 認證 / 合作案事件窗</div></div>
+<div class="metric-row"><span>相對大盤與族群強弱</span><div>待補最新同族群與大盤相對強弱</div></div>
+<div class="metric-row"><span>專屬主線一致性</span><div>需結合專屬主線與目前價量判讀，見專屬邏輯卡</div></div>
+          </div>
+        </article>
+
+        <article class="panel copy-block">
+          <div class="panel-head">
+            <div>
+              <h2>多週期技術判讀</h2>
+              <strong>年季月週日與分K統整</strong>
+            </div>
+            <div class="panel-tag">Multi-Timeframe</div>
+          </div>
+          <ul class='bullet-list compact'><li>60m RSI 約 62.19，MACD 線高於訊號線。</li><li>30m RSI 約 59.17，MACD 線略高於訊號線。</li><li>15m RSI 約 56.39，MACD 線仍略低於訊號線。</li><li>5m RSI 約 50.12，短周期偏中性。</li><li>1m RSI 約 47.60，短周期偏弱，但僅供波段背景補充，不作當沖依據。</li></ul>
+        </article>
+
+        <article class="panel copy-block">
+          <div class="panel-head">
+            <div>
+              <h2>波段操作計畫</h2>
+              <strong>先看條件，再決定動作</strong>
+            </div>
+            <div class="panel-tag">Action Map</div>
+          </div>
+          <h3>1~4 週</h3>
+<ul class='bullet-list'>
 <li>以 <code>159.5～161</code> 為核心觀察帶。</li>
 <li>若守穩並放量站上 <code>162.5</code>，可視為續攻確認。</li>
 <li>若回測 <code>160</code> 附近量縮止穩，可視為偏多換手。</li>
-<li>1~3 月：</li>
+</ul>
+<h3>1~3 月</h3>
+<ul class='bullet-list'>
 <li>以月線偏多結構為前提，等待法說、月營收或產業事件窗再擴大攻擊。</li>
 <li>若後續能突破 <code>165</code>，可把中期目標往 <code>168～173</code> 提升。</li>
-<li>不交易條件：</li>
+</ul>
+<h3>不交易條件</h3>
+<ul class='bullet-list'>
 <li>若跌破 <code>159.5</code> 後無法站回。</li>
 <li>若法人買超中止且融資重新升高。</li>
 <li>若量增但收黑，並連續失守短均。</li>
 </ul>
         </article>
-        <article class="panel">
-          <h2>監控清單</h2>
+
+        <article class="panel copy-block">
+          <div class="panel-head">
+            <div>
+              <h2>主要風險與反證</h2>
+              <strong>看多看空都要有退路</strong>
+            </div>
+            <div class="panel-tag">Risk Control</div>
+          </div>
           <ul class='bullet-list'>
 <li>若外資買超只是短線調節後的回補，而非中期布局，則續攻力道會被高估。</li>
 <li>若 162.5 附近無法帶量突破，則這裡更可能是短壓而非突破前夜。</li>
 <li>若融資在後續幾日重新增加，且借券同步擴大，代表籌碼修復程度不如目前判讀。</li>
 <li>若公司沒有新的月營收、法說或產品事件支撐，則高位整理容易拖長。</li>
 <li>目前缺少完整 MA / ATR / AVWAP / 布林帶數值，因此對精準突破判斷仍有資料不足。</li>
-</ul>
-<ul class='bullet-list'>
-<li>最新公司官網 IR、法說會、月營收公告、重大訊息。</li>
-<li>最近 2 個月月營收與最近 4 季毛利率、營益率、EPS。</li>
-<li>是否有最新法說、合作案、產品發表、展會、認證或併購整合進度。</li>
-<li>最新完整日線技術值：MA5 / 10 / 20 / 60 / 120 / 240、ATR(14)、布林帶、AVWAP、Donchian。</li>
-<li>最新股票期貨、選擇權、集保分級、主力分點資料。</li>
 </ul>
         </article>
       </div>
-      <div class="section-stack">
+
+      <div class="stack">
         <article class="panel">
-          <h2>7 個核心分數</h2>
-          
+          <div class="panel-head">
+            <div>
+              <h2>關鍵價位</h2>
+              <strong>壓力 / 支撐梯階</strong>
+            </div>
+            <div class="panel-tag">Price Map</div>
+          </div>
+          <div class="metric-list">
+            <div class="metric-row"><span>第一支撐</span><div>160～159.5</div></div>
+<div class="metric-row"><span>第二支撐</span><div>154～155</div></div>
+<div class="metric-row"><span>近壓</span><div>162.5</div></div>
+<div class="metric-row"><span>次壓</span><div>165</div></div>
+<div class="metric-row"><span>強壓</span><div>167～168</div></div>
+<div class="metric-row"><span>前高壓力</span><div>162.5</div></div>
+          </div>
         </article>
+
         <article class="panel">
-          <h2>未來 1 週情境預測</h2>
-          <ul class='bullet-list'>
-<li>主要情境：- 若外資買超只是短線調節後的回補，而非中期布局，則續攻力道會被高估。</li>
-<li>若 162.5 附近無法帶量突破，則這裡更可能是短壓而非突破前夜。</li>
-<li>若融資在後續幾日重新增加，且借券同步擴大，代表籌碼修復程度不如目前判讀。</li>
-<li>若公司沒有新的月營收、法說或產品事件支撐，則高位整理容易拖長。</li>
-<li>目前缺少完整 MA / ATR / AVWAP / 布林帶數值，因此對精準突破判斷仍有資料不足。</li>
-</ul>
+          <div class="panel-head">
+            <div>
+              <h2>進場訊號</h2>
+              <strong>成立與否、強度與觸發區</strong>
+            </div>
+            <div class="panel-tag">Entry Signal</div>
+          </div>
+          <div class="metric-list">
+            <div class="metric-row"><span>是否成立</span><div>部分成立，偏向回測型與事件窗延續型。</div></div>
+<div class="metric-row"><span>強度</span><div>中</div></div>
+<div class="metric-row"><span>觸發價 / 區間</span><div>160～162 回測止穩後</div></div>
+<div class="metric-row"><span>失效條件</span><div>159.5 下方，若有效跌破則轉弱</div></div>
+          </div>
         </article>
+
         <article class="panel">
-          <h2>未來 1 月情境預測</h2>
-          <ul class='bullet-list'>
-<li>主要情境：- 若外資買超只是短線調節後的回補，而非中期布局，則續攻力道會被高估。</li>
-<li>若 162.5 附近無法帶量突破，則這裡更可能是短壓而非突破前夜。</li>
-<li>若融資在後續幾日重新增加，且借券同步擴大，代表籌碼修復程度不如目前判讀。</li>
-<li>若公司沒有新的月營收、法說或產品事件支撐，則高位整理容易拖長。</li>
-<li>目前缺少完整 MA / ATR / AVWAP / 布林帶數值，因此對精準突破判斷仍有資料不足。</li>
-</ul>
+          <div class="panel-head">
+            <div>
+              <h2>出場訊號</h2>
+              <strong>哪些條件會先破壞結構</strong>
+            </div>
+            <div class="panel-tag">Exit Signal</div>
+          </div>
+          <div class="metric-list">
+            <div class="metric-row"><span>是否成立</span><div>尚未完全成立，但若失守 159.5～160，風險升高。</div></div>
+<div class="metric-row"><span>強度</span><div>資料不足</div></div>
+<div class="metric-row"><span>觸發價 / 區間</span><div>159.5 下方，若有效跌破則轉弱</div></div>
+<div class="metric-row"><span>失效條件</span><div>若重新站穩主成本區且量價回穩，出場訊號會降級</div></div>
+          </div>
         </article>
-        <article class="panel">
-          <h2>延伸內容</h2>
-          
-            <details class="fold-card">
-              <summary>
-                <strong>影像事實擷取</strong>
-                <span>展開查看完整內容</span>
-              </summary>
-              <div class="fold-body">
-                <ul class='bullet-list'>
-<li>依報表與圖面，2301 光寶科 2026/04/16 收盤為 <code>161</code>，漲 <code>+2</code>，漲幅 <code>+1.26%</code>。</li>
-<li>2026/04/16 成交量為 <code>18,578</code> 張，成交額約 <code>299,258</code> 萬元。</li>
-<li>三大法人 2026/04/16 合計買超 <code>4,859</code> 張；其中外資買超 <code>5,799</code> 張，投信賣超 <code>1,054</code> 張，自營商買超 <code>114</code> 張。</li>
-<li>外資 5 日合計買超 <code>10,231</code> 張；三大法人 5 日合計買超 <code>5,737</code> 張。</li>
-<li>融資餘額 2026/04/16 為 <code>16,068</code> 張，日減 <code>235</code> 張。</li>
-<li>借券賣出餘額 2026/04/16 為 <code>59,200</code> 張，日增 <code>187</code> 張。</li>
-<li>現股當沖率為 <code>0.01%</code>，報表顯示當沖占比極低。</li>
-<li>日線圖顯示：收盤 <code>161.00</code>，開盤 <code>161.50</code>，最高 <code>162.50</code>，最低 <code>159.50</code>，振幅約 <code>1.86%</code>。</li>
-<li>週線圖顯示：收盤 <code>161.00</code>，週漲幅 <code>-0.31%</code>，週區間高低約 <code>162.50 / 153.00</code>。</li>
-<li>月線圖顯示：收盤 <code>161.00</code>，月漲幅 <code>+14.59%</code>。</li>
-<li>季線圖顯示：收盤 <code>161.00</code>，季漲幅 <code>+14.59%</code>。</li>
-<li>年線圖顯示：收盤 <code>161.00</code>，年漲幅 <code>-1.53%</code>。</li>
-<li>fubon_csv 最新日期為 2026/04/17；60m、30m、15m、5m、1m 都有收盤與技術指標資料。</li>
-<li>60m RSI 約 <code>62.19</code>，MACD 線高於訊號線。</li>
-<li>30m RSI 約 <code>59.17</code>，MACD 線略高於訊號線。</li>
-<li>15m RSI 約 <code>56.39</code>，MACD 線仍略低於訊號線。</li>
-<li>5m RSI 約 <code>50.12</code>，短周期偏中性。</li>
-<li>1m RSI 約 <code>47.60</code>，短周期偏弱，但僅供波段背景補充，不作當沖依據。</li>
-</ul>
+
+        <article class="panel copy-block">
+          <div class="panel-head">
+            <div>
+              <h2>情境預測卡</h2>
+              <strong>1 週 / 1 月主情境</strong>
+            </div>
+            <div class="panel-tag">Scenarios</div>
+          </div>
+          <div class="two-up">
+            <div class="level-card">
+              <h3>未來 1 週</h3>
+              <strong>高檔整理後續攻。</strong>
+              <p>目前只有主情境文字，尚未輸出完整 4 情境機率。</p>
+              <div class='metric-list'><div class="metric-row"><span>主情境</span><div>高檔整理後續攻。</div></div>
+<div class="metric-row"><span>把握度</span><div>中</div></div></div>
+            </div>
+            <div class="level-card">
+              <h3>未來 1 月</h3>
+              <strong>箱體偏多整理，等待新事件窗再選方向。</strong>
+              <p>若要符合固定輸出欄位，後續仍需補上 4 個月內情境的完整機率、驅動因子與事件窗。</p>
+              <div class='metric-list'><div class="metric-row"><span>主情境</span><div>箱體偏多整理，等待新事件窗再選方向。</div></div></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel copy-block">
+          <div class="panel-head">
+            <div>
+              <h2>關鍵數據</h2>
+              <strong>先看已知事實</strong>
+            </div>
+            <div class="panel-tag">Key Facts</div>
+          </div>
+          <ul class='bullet-list compact'><li>依報表與圖面，2301 光寶科 2026/04/16 收盤為 161，漲 +2，漲幅 +1.26%。</li><li>2026/04/16 成交量為 18,578 張，成交額約 299,258 萬元。</li><li>三大法人 2026/04/16 合計買超 4,859 張；其中外資買超 5,799 張，投信賣超 1,054 張，自營商買超 114 張。</li><li>外資 5 日合計買超 10,231 張；三大法人 5 日合計買超 5,737 張。</li><li>融資餘額 2026/04/16 為 16,068 張，日減 235 張。</li><li>借券賣出餘額 2026/04/16 為 59,200 張，日增 187 張。</li></ul>
+        </article>
+
+        <article class="panel copy-block">
+          <div class="panel-head">
+            <div>
+              <h2>推論重點</h2>
+              <strong>目前可採信的方向</strong>
+            </div>
+            <div class="panel-tag">Inference</div>
+          </div>
+          <ul class='bullet-list compact'><li>依已提供資料，這波較像「法人推升下的高位整理」，不是單純籌碼亂飆。</li><li>外資與三大法人持續站在買方，且融資下降，較符合高位換手或洗盤，而非明確出貨。</li><li>由於圖上日線收盤仍守在 161 附近，且 60m 動能尚未失真，短線仍偏向多方延伸。</li><li>但 15m 與 1m 動能較弱，顯示近端追價意願不強，若無新催化，容易先進入整理。</li><li>依專屬提示詞，光寶科應視為雲端與 AI 基礎設施、光電半導體、車用與網通延伸的中大型外資型趨勢股；目前資料中沒有足夠內容可支持把它改判成別種股性。</li></ul>
+        </article>
+
+        <article class="panel copy-block">
+          <div class="panel-head">
+            <div>
+              <h2>本輪新增資料重點</h2>
+              <strong>只展開真正變化</strong>
+            </div>
+            <div class="panel-tag">What Changed</div>
+          </div>
+          <details class="fold-card">
+            <summary>
+              <div class="fold-title">
+                <strong>展開本輪新增資料重點</strong>
+                <span>查看這次迭代相較前版，多了哪些會改變判斷的資訊。</span>
               </div>
-            </details>
-            
-            <details class="fold-card">
-              <summary>
-                <strong>已知事實 / 需確認 / 推論</strong>
-                <span>展開查看完整內容</span>
-              </summary>
-              <div class="fold-body">
-                <ul class='bullet-list'>
-<li>依報表與圖面，2301 光寶科 2026/04/16 收盤為 <code>161</code>，漲 <code>+2</code>，漲幅 <code>+1.26%</code>。</li>
-<li>2026/04/16 成交量為 <code>18,578</code> 張，成交額約 <code>299,258</code> 萬元。</li>
-<li>三大法人 2026/04/16 合計買超 <code>4,859</code> 張；其中外資買超 <code>5,799</code> 張，投信賣超 <code>1,054</code> 張，自營商買超 <code>114</code> 張。</li>
-<li>外資 5 日合計買超 <code>10,231</code> 張；三大法人 5 日合計買超 <code>5,737</code> 張。</li>
-<li>融資餘額 2026/04/16 為 <code>16,068</code> 張，日減 <code>235</code> 張。</li>
-<li>借券賣出餘額 2026/04/16 為 <code>59,200</code> 張，日增 <code>187</code> 張。</li>
-<li>現股當沖率為 <code>0.01%</code>，報表顯示當沖占比極低。</li>
-<li>日線圖顯示：收盤 <code>161.00</code>，開盤 <code>161.50</code>，最高 <code>162.50</code>，最低 <code>159.50</code>，振幅約 <code>1.86%</code>。</li>
-<li>週線圖顯示：收盤 <code>161.00</code>，週漲幅 <code>-0.31%</code>，週區間高低約 <code>162.50 / 153.00</code>。</li>
-<li>月線圖顯示：收盤 <code>161.00</code>，月漲幅 <code>+14.59%</code>。</li>
-<li>季線圖顯示：收盤 <code>161.00</code>，季漲幅 <code>+14.59%</code>。</li>
-<li>年線圖顯示：收盤 <code>161.00</code>，年漲幅 <code>-1.53%</code>。</li>
-<li>fubon_csv 最新日期為 2026/04/17；60m、30m、15m、5m、1m 都有收盤與技術指標資料。</li>
-<li>60m RSI 約 <code>62.19</code>，MACD 線高於訊號線。</li>
-<li>30m RSI 約 <code>59.17</code>，MACD 線略高於訊號線。</li>
-<li>15m RSI 約 <code>56.39</code>，MACD 線仍略低於訊號線。</li>
-<li>5m RSI 約 <code>50.12</code>，短周期偏中性。</li>
-<li>1m RSI 約 <code>47.60</code>，短周期偏弱，但僅供波段背景補充，不作當沖依據。</li>
+              <div class="fold-icon">+</div>
+            </summary>
+            <div class="fold-card-body">
+              <ul class='bullet-list'>
+<li>外資連續買超，且 2026/04/16 單日買超 <code>5,799</code> 張。</li>
+<li>三大法人單日合計買超 <code>4,859</code> 張。</li>
+<li>融資單日減少 <code>235</code> 張，籌碼面偏向去槓桿。</li>
+<li>借券賣出餘額略增，但幅度不大。</li>
+<li>日線收在 161，仍站在 160 上方。</li>
+<li>60m 技術偏強，30m 中偏強，15m 與 5m 偏整理，呈現上攻後的短線降溫。</li>
+<li>圖中月線與季線仍維持偏多，說明中期趨勢未壞。</li>
 </ul>
+            </div>
+          </details>
+        </article>
+
+        <article class="panel copy-block">
+          <div class="panel-head">
+            <div>
+              <h2>主力成本與目標價模型</h2>
+              <strong>成本帶、加碼區、延伸目標</strong>
+            </div>
+            <div class="panel-tag">Target Model</div>
+          </div>
+          <details class="fold-card">
+            <summary>
+              <div class="fold-title">
+                <strong>展開主力成本帶與目標價模型</strong>
+                <span>查看主成本核心區、延伸目標與模型錨點是否仍有效。</span>
+              </div>
+              <div class="fold-icon">+</div>
+            </summary>
+            <div class="fold-card-body">
+              <div class="metric-list">
+                <div class="metric-row"><span>主成本核心區</span><div>159.5～161</div></div>
+<div class="metric-row"><span>波段加碼區</span><div>160～162 回測止穩後</div></div>
+<div class="metric-row"><span>防守失效區</span><div>159.5 下方，若有效跌破則轉弱</div></div>
+<div class="metric-row"><span>上方第一壓力</span><div>162.5</div></div>
+<div class="metric-row"><span>上方主目標帶</span><div>165～168</div></div>
+<div class="metric-row"><span>下方關鍵支撐</span><div>159.5，次級支撐在 154～155</div></div>
+<div class="metric-row"><span>目標價模型錨點</span><div>部分有效，因目前仍未有效跌破前波結構。</div></div>
+<div class="metric-row"><span>第一短目標</span><div>162.5～163.5</div></div>
+<div class="metric-row"><span>第一主目標</span><div>165～166.5</div></div>
+<div class="metric-row"><span>1.272 延伸</span><div>167～168</div></div>
+<div class="metric-row"><span>1.618 延伸</span><div>171～173</div></div>
+              </div>
+            </div>
+          </details>
+        </article>
+
+        <article class="panel copy-block">
+          <div class="panel-head">
+            <div>
+              <h2>專屬邏輯卡</h2>
+              <strong>股性、主線、比較籃子與事件 Beta</strong>
+            </div>
+            <div class="panel-tag">Special Logic</div>
+          </div>
+          <details class="fold-card">
+            <summary>
+              <div class="fold-title">
+                <strong>展開專屬提示詞邏輯</strong>
+                <span>查看這檔股票的股性校正、核心主線、比較籃子與事件敏感度。</span>
+              </div>
+              <div class="fold-icon">+</div>
+            </summary>
+            <div class="fold-card-body">
+              <h3>股性校正</h3>
+              <p class='empty-copy'>目前沒有可整理的摘要。</p>
+              <h3>核心主線</h3>
+              <p class='empty-copy'>目前沒有可整理的摘要。</p>
+              <h3>比較籃子 / 代理指標</h3>
+              <ul class='bullet-list compact'><li>同業 / 比較籃子：電源 / 電能管理：2308台達電、6409旭隼、6412群電、6282康舒；AI 伺服器電源與 BBU proxy：台達電、群電、CSP Capex、NVDA 供應鏈</li><li>產業判讀規則：A級題材看設備擴產、AI / 先進封裝 / 自動化；B級看一般電子製造與系統整合；C級看純市場輪動。</li></ul>
+              <h3>事件 Beta / 題材分級</h3>
+              <ul class='bullet-list compact'><li>A 級題材：真正改變產品 mix、毛利率、客戶層級或量產節奏的高值應用。</li><li>B 級題材：可帶來短中期營收改善，但估值彈性不如 A 級。</li><li>C 級題材：族群輪動、媒體敘事、低成長或低毛利舊業務，不能取代 A 級主線。</li></ul>
+              <h3>常見主力劇本</h3>
+              <p class='empty-copy'>目前沒有可整理的摘要。</p>
+            </div>
+          </details>
+        </article>
+
+        <article class="panel copy-block">
+          <div class="panel-head">
+            <div>
+              <h2>回測與迭代卡</h2>
+              <strong>目前已補到哪裡、下一輪補什麼</strong>
+            </div>
+            <div class="panel-tag">Audit & Iterate</div>
+          </div>
+          <details class="fold-card">
+            <summary>
+              <div class="fold-title">
+                <strong>展開回測校正審計</strong>
+                <span>查看目前回測校正欄位哪些已補齊、哪些仍缺資料。</span>
+              </div>
+              <div class="fold-icon">+</div>
+            </summary>
+            <div class="fold-card-body">
+              <div class="metric-list">
+                <div class="metric-row"><span>復權 / 除權息</span><div>目前 markdown 未提供，需補回測審計欄位</div></div>
+<div class="metric-row"><span>缺值 / 異常值</span><div>目前 markdown 未提供，需補回測審計欄位</div></div>
+<div class="metric-row"><span>成本 / 滑價</span><div>需連網確認 / 回測設定補齊</div></div>
+<div class="metric-row"><span>流動性限制</span><div>需連網確認 / 回測設定補齊</div></div>
+<div class="metric-row"><span>look-ahead bias</span><div>需連網確認 / 回測設定補齊</div></div>
+<div class="metric-row"><span>data leakage</span><div>需連網確認 / 回測設定補齊</div></div>
+<div class="metric-row"><span>校正是否充分</span><div>目前專屬分析未輸出完整回測審計，暫列資料不足</div></div>
+              </div>
+            </div>
+          </details>
+          <details class="fold-card">
+            <summary>
+              <div class="fold-title">
+                <strong>展開下一輪最值得驗證的假設</strong>
+                <span>目前依現有 markdown 可先提出的 3 個下一輪補強方向。</span>
+              </div>
+              <div class="fold-icon">+</div>
+            </summary>
+            <div class="fold-card-body">
+              <div class="metric-list">
+                <div class="metric-row"><span>校正前 vs 校正後差異</span><div>目前僅有文字迭代，缺完整回測對照</div></div>
+<div class="metric-row"><span>樣本內 vs 樣本外</span><div>資料不足</div></div>
+<div class="metric-row"><span>成本前 vs 成本後</span><div>資料不足</div></div>
+<div class="metric-row"><span>是否過度擬合</span><div>資料不足</div></div>
+<div class="metric-row"><span>下一輪假設 1</span><div>補齊均線 / AVWAP / Donchian 與量能序列</div></div>
+<div class="metric-row"><span>下一輪假設 2</span><div>補齊月營收、財報、事件窗後重新評估主情境</div></div>
+<div class="metric-row"><span>下一輪假設 3</span><div>補回測參數後驗證突破型與回測型訊號穩健度</div></div>
+              </div>
+            </div>
+          </details>
+        </article>
+
+        <article class="panel copy-block">
+          <div class="panel-head">
+            <div>
+              <h2>圖中時點校正</h2>
+              <strong>圖、報表、csv 是否一致</strong>
+            </div>
+            <div class="panel-tag">Chart Context</div>
+          </div>
+          <details class="fold-card">
+            <summary>
+              <div class="fold-title">
+                <strong>展開圖中時點校正</strong>
+                <span>查看技術圖時點、報表日期與本輪文字判斷之間的校正差異。</span>
+              </div>
+              <div class="fold-icon">+</div>
+            </summary>
+            <div class="fold-card-body">
+              <ul class='bullet-list'>
+<li>圖中日線、週線、月線、季線、年線都顯示到 2026/04/16。</li>
+<li>fubon_csv 最新日期為 2026/04/17，且 60m / 30m / 15m / 5m / 1m 顯示最後收盤都落在 <code>161</code> 附近。</li>
+</ul>
+<h3>因此本次判讀需區分</h3>
 <ul class='bullet-list'>
+<li>圖中時點：以 2026/04/16 收盤資料為主。</li>
+<li>最新盤中 / 近端資料：以 2026/04/17 的 fubon_csv 為主。</li>
+<li>若兩者略有差異，以 2026/04/17 的近端技術狀態補足，但日線主結構仍以圖中 2026/04/16 為基準。</li>
+</ul>
+            </div>
+          </details>
+        </article>
+
+        <article class="panel copy-block">
+          <div class="panel-head">
+            <div>
+              <h2>待補資料</h2>
+              <strong>還不能直接腦補的部分</strong>
+            </div>
+            <div class="panel-tag">Need Verify</div>
+          </div>
+          <details class="fold-card">
+            <summary>
+              <div class="fold-title">
+                <strong>展開需連網確認</strong>
+                <span>查看目前尚未補齊、會影響信心等級的資料缺口。</span>
+              </div>
+              <div class="fold-icon">+</div>
+            </summary>
+            <div class="fold-card-body">
+              <ul class='bullet-list'>
 <li>最新公司官網 IR、法說會、月營收公告、重大訊息。</li>
 <li>最近 2 個月月營收與最近 4 季毛利率、營益率、EPS。</li>
 <li>是否有最新法說、合作案、產品發表、展會、認證或併購整合進度。</li>
 <li>最新完整日線技術值：MA5 / 10 / 20 / 60 / 120 / 240、ATR(14)、布林帶、AVWAP、Donchian。</li>
 <li>最新股票期貨、選擇權、集保分級、主力分點資料。</li>
 </ul>
-<ul class='bullet-list'>
-<li>依已提供資料，這波較像「法人推升下的高位整理」，不是單純籌碼亂飆。</li>
-<li>外資與三大法人持續站在買方，且融資下降，較符合高位換手或洗盤，而非明確出貨。</li>
-<li>由於圖上日線收盤仍守在 161 附近，且 60m 動能尚未失真，短線仍偏向多方延伸。</li>
-<li>但 15m 與 1m 動能較弱，顯示近端追價意願不強，若無新催化，容易先進入整理。</li>
-<li>依專屬提示詞，光寶科應視為雲端與 AI 基礎設施、光電半導體、車用與網通延伸的中大型外資型趨勢股；目前資料中沒有足夠內容可支持把它改判成別種股性。</li>
-</ul>
-<ul class='bullet-list'>
-<li>圖中日線、週線、月線、季線、年線都顯示到 2026/04/16。</li>
-<li>fubon_csv 最新日期為 2026/04/17，且 60m / 30m / 15m / 5m / 1m 顯示最後收盤都落在 <code>161</code> 附近。</li>
-<li>因此本次判讀需區分：</li>
-<li>圖中時點：以 2026/04/16 收盤資料為主。</li>
-<li>最新盤中 / 近端資料：以 2026/04/17 的 fubon_csv 為主。</li>
-<li>若兩者略有差異，以 2026/04/17 的近端技術狀態補足，但日線主結構仍以圖中 2026/04/16 為基準。</li>
-</ul>
-<ul class='bullet-list'>
-<li>外資連續買超，且 2026/04/16 單日買超 <code>5,799</code> 張。</li>
-<li>三大法人單日合計買超 <code>4,859</code> 張。</li>
-<li>融資單日減少 <code>235</code> 張，籌碼面偏向去槓桿。</li>
-<li>借券賣出餘額略增，但幅度不大。</li>
-<li>日線收在 161，仍站在 160 上方。</li>
-<li>60m 技術偏強，30m 中偏強，15m 與 5m 偏整理，呈現上攻後的短線降溫。</li>
-<li>圖中月線與季線仍維持偏多，說明中期趨勢未壞。</li>
-</ul>
-              </div>
-            </details>
-            
-            <details class="fold-card">
-              <summary>
-                <strong>市場快照</strong>
-                <span>展開查看完整內容</span>
-              </summary>
-              <div class="fold-body">
-                <ul class='bullet-list'>
-<li>外資連續買超，且 2026/04/16 單日買超 <code>5,799</code> 張。</li>
-<li>三大法人單日合計買超 <code>4,859</code> 張。</li>
-<li>融資單日減少 <code>235</code> 張，籌碼面偏向去槓桿。</li>
-<li>借券賣出餘額略增，但幅度不大。</li>
-<li>日線收在 161，仍站在 160 上方。</li>
-<li>60m 技術偏強，30m 中偏強，15m 與 5m 偏整理，呈現上攻後的短線降溫。</li>
-<li>圖中月線與季線仍維持偏多，說明中期趨勢未壞。</li>
-</ul>
-              </div>
-            </details>
-            
-            <details class="fold-card">
-              <summary>
-                <strong>多週期技術判讀</strong>
-                <span>展開查看完整內容</span>
-              </summary>
-              <div class="fold-body">
-                <ul class='bullet-list'>
-<li>依已提供資料，這波較像「法人推升下的高位整理」，不是單純籌碼亂飆。</li>
-<li>外資與三大法人持續站在買方，且融資下降，較符合高位換手或洗盤，而非明確出貨。</li>
-<li>由於圖上日線收盤仍守在 161 附近，且 60m 動能尚未失真，短線仍偏向多方延伸。</li>
-<li>但 15m 與 1m 動能較弱，顯示近端追價意願不強，若無新催化，容易先進入整理。</li>
-<li>依專屬提示詞，光寶科應視為雲端與 AI 基礎設施、光電半導體、車用與網通延伸的中大型外資型趨勢股；目前資料中沒有足夠內容可支持把它改判成別種股性。</li>
-</ul>
-              </div>
-            </details>
-            
-            <details class="fold-card">
-              <summary>
-                <strong>進場訊號</strong>
-                <span>展開查看完整內容</span>
-              </summary>
-              <div class="fold-body">
-                <ul class='bullet-list'>
-<li>目前最接近：E. 高位震盪洗盤</li>
-<li>升級到下一段的條件：</li>
-<li>收盤有效站上 <code>162.5</code> 前高壓力；</li>
-<li>同時量能維持高於近 20 日均量；</li>
-<li>外資與三大法人延續買超；</li>
-<li>日線 RSI 與 MACD 續強。</li>
-<li>失效或降級條件：</li>
-<li>跌破 <code>159.5</code> 且無法快速收回；</li>
-<li>法人買超轉弱；</li>
-<li>融資回升、借券擴大；</li>
-<li>60m 動能轉弱並失守短均線。</li>
-</ul>
-              </div>
-            </details>
-            
-            <details class="fold-card">
-              <summary>
-                <strong>出場訊號</strong>
-                <span>展開查看完整內容</span>
-              </summary>
-              <div class="fold-body">
-                <ul class='bullet-list'>
-<li>若外資買超只是短線調節後的回補，而非中期布局，則續攻力道會被高估。</li>
-<li>若 162.5 附近無法帶量突破，則這裡更可能是短壓而非突破前夜。</li>
-<li>若融資在後續幾日重新增加，且借券同步擴大，代表籌碼修復程度不如目前判讀。</li>
-<li>若公司沒有新的月營收、法說或產品事件支撐，則高位整理容易拖長。</li>
-<li>目前缺少完整 MA / ATR / AVWAP / 布林帶數值，因此對精準突破判斷仍有資料不足。</li>
-</ul>
-              </div>
-            </details>
-            
-            <details class="fold-card">
-              <summary>
-                <strong>回測校正審計</strong>
-                <span>展開查看完整內容</span>
-              </summary>
-              <div class="fold-body">
-                <ul class='bullet-list'>
-<li>圖中日線、週線、月線、季線、年線都顯示到 2026/04/16。</li>
-<li>fubon_csv 最新日期為 2026/04/17，且 60m / 30m / 15m / 5m / 1m 顯示最後收盤都落在 <code>161</code> 附近。</li>
-<li>因此本次判讀需區分：</li>
-<li>圖中時點：以 2026/04/16 收盤資料為主。</li>
-<li>最新盤中 / 近端資料：以 2026/04/17 的 fubon_csv 為主。</li>
-<li>若兩者略有差異，以 2026/04/17 的近端技術狀態補足，但日線主結構仍以圖中 2026/04/16 為基準。</li>
-</ul>
-              </div>
-            </details>
-            
-            <details class="fold-card">
-              <summary>
-                <strong>下一輪迭代假設</strong>
-                <span>展開查看完整內容</span>
-              </summary>
-              <div class="fold-body">
-                <ul class='bullet-list'>
-<li>目前最可能狀態：高位整理偏多，仍有續攻機會。</li>
-<li>當前階段：E. 高位震盪洗盤，略偏向主升後整理。</li>
-<li>進場訊號是否成立：部分成立，偏向回測型與事件窗延續型。</li>
-<li>出場訊號是否成立：尚未完全成立，但若失守 159.5～160，風險升高。</li>
-<li>主成本核心區：<code>159.5～161</code></li>
-<li>波段加碼區：<code>160～162</code> 回測止穩後</li>
-<li>防守失效區：<code>159.5</code> 下方，若有效跌破則轉弱</li>
-<li>上方第一壓力：<code>162.5</code></li>
-<li>上方主目標帶：<code>165～168</code></li>
-<li>下方關鍵支撐：<code>159.5</code>，次級支撐在 <code>154～155</code></li>
-<li>目標價模型錨點是否有效：部分有效，因目前仍未有效跌破前波結構。</li>
-<li>第一短目標：<code>162.5～163.5</code></li>
-<li>第一主目標：<code>165～166.5</code></li>
-<li>1.272 延伸：<code>167～168</code></li>
-<li>1.618 延伸：<code>171～173</code></li>
-<li>未來 1 週主情境：高檔整理後續攻。</li>
-<li>未來 1 月主情境：箱體偏多整理，等待新事件窗再選方向。</li>
-<li>操作建議：偏多續抱，等回測確認，不宜在 161 附近追價；若拉回守穩再看加碼。</li>
-<li>把握度：中</li>
-</ul>
-              </div>
-            </details>
-            
-            <details class="fold-card">
-              <summary>
-                <strong>若我有持股</strong>
-                <span>展開查看完整內容</span>
-              </summary>
-              <div class="fold-body">
-                <ul class='bullet-list'>
-<li>目前最接近：E. 高位震盪洗盤</li>
-<li>升級到下一段的條件：</li>
-<li>收盤有效站上 <code>162.5</code> 前高壓力；</li>
-<li>同時量能維持高於近 20 日均量；</li>
-<li>外資與三大法人延續買超；</li>
-<li>日線 RSI 與 MACD 續強。</li>
-<li>失效或降級條件：</li>
-<li>跌破 <code>159.5</code> 且無法快速收回；</li>
-<li>法人買超轉弱；</li>
-<li>融資回升、借券擴大；</li>
-<li>60m 動能轉弱並失守短均線。</li>
-</ul>
-<p>2301 光寶科目前的結構，較像法人持續參與下的高位整理，而不是明確見頂轉空。</p>
+            </div>
+          </details>
+        </article>
+
+        <article class="panel copy-block">
+          <div class="panel-head">
+            <div>
+              <h2>總結</h2>
+              <strong>先抓結論，再抓條件</strong>
+            </div>
+            <div class="panel-tag">Closing Note</div>
+          </div>
+          <p>2301 光寶科目前的結構，較像法人持續參與下的高位整理，而不是明確見頂轉空。</p>
 <p>日線與中周期仍偏多，短周期則已出現降溫，因此比較合理的策略是等待回測確認，不追 161 附近的短波動。</p>
 <p>若能守住 159.5～160 並再攻破 162.5，後續仍有機會延伸到 165 以上；反之，若失守 159.5，則要提高回測 154～155 的機率。</p>
-              </div>
-            </details>
-            
+          <p class="footer-note">僅供研究整理，不構成投資建議。</p>
         </article>
       </div>
     </section>
-
-    <footer class="site-footer">
-      <div>波段觀測站個股頁由共用版波段分析流程自動生成，適合手機與桌機閱讀。</div>
-      <div>建議先看置頂結論，再依需要展開延伸內容做深入判讀。</div>
-    </footer>
   </main>
 </body>
 </html>
