@@ -1,0 +1,3149 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>2419 仲琦 儀表板 V2</title>
+  <style>
+    :root {
+      --bg: #f5f1e7;
+      --paper: rgba(255,255,255,0.92);
+      --ink: #1d241e;
+      --muted: #5f665f;
+      --line: rgba(29,36,30,0.12);
+      --accent: #b24a2d;
+      --accent-2: #355b4c;
+      --gold: #b68b3b;
+      --good: #2e6b53;
+      --warn: #8a5b11;
+      --bad: #9d3f33;
+      --shadow: 0 18px 40px rgba(41, 35, 24, 0.10);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(178,74,45,0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(53,91,76,0.10), transparent 24%),
+        linear-gradient(180deg, #f8f5ee 0%, #efe8d7 100%);
+      font-family: "Avenir Next", "Noto Sans TC", "PingFang TC", sans-serif;
+    }
+    .page {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 28px 20px 72px;
+    }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 18px;
+      padding: 28px;
+      border-radius: 32px;
+      background:
+        linear-gradient(140deg, rgba(255,255,255,0.96), rgba(245,241,231,0.92)),
+        linear-gradient(180deg, rgba(178,74,45,0.08), transparent);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .hero:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(115deg, transparent 0%, rgba(182,139,59,0.06) 48%, transparent 100%);
+      pointer-events: none;
+    }
+    .hero-copy {
+      position: relative;
+      z-index: 1;
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent-2);
+      margin-bottom: 10px;
+    }
+    .hero h1 {
+      margin: 0;
+      font-family: "Iowan Old Style", "Noto Serif TC", serif;
+      font-weight: 700;
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1.02;
+    }
+    .hero p {
+      margin: 14px 0 0;
+      font-size: 16px;
+      line-height: 1.75;
+      max-width: 780px;
+    }
+    .hero-side {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 14px;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .hero-stat {
+      padding: 16px 16px 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(29,36,30,0.08);
+      backdrop-filter: blur(6px);
+    }
+    .hero-stat h4 {
+      margin: 0 0 8px;
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .hero-stat p {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+    .anchor-panel {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(29,36,30,0.04);
+      border: 1px solid rgba(29,36,30,0.08);
+    }
+    .anchor-panel h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+    }
+    .sticky-nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      margin: 16px 0 22px;
+      padding: 12px;
+      border-radius: 18px;
+      backdrop-filter: blur(14px);
+      background: rgba(245,241,231,0.88);
+      border: 1px solid var(--line);
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .sticky-nav a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 13px;
+      border: 1px solid var(--line);
+    }
+    .layout {
+      display: grid;
+      gap: 18px;
+    }
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .panel[open] {
+      box-shadow: 0 22px 46px rgba(41, 35, 24, 0.12);
+    }
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      padding: 20px 22px 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,255,255,0.5));
+      cursor: pointer;
+      list-style: none;
+    }
+    .panel[open] > .panel-head {
+      border-bottom: 1px solid var(--line);
+    }
+    .panel-head::-webkit-details-marker,
+    .subpanel-head::-webkit-details-marker,
+    .source-basis > summary::-webkit-details-marker,
+    .full-json > summary::-webkit-details-marker {
+      display: none;
+    }
+    .panel-head::after {
+      content: "展開";
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .panel[open] > .panel-head::after {
+      content: "收合";
+    }
+    .panel-head h2 {
+      margin: 0;
+      font-family: "Iowan Old Style", "Noto Serif TC", serif;
+      font-size: 28px;
+    }
+    .panel-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .panel-body {
+      padding: 22px;
+    }
+    .grid-2, .grid-3, .grid-4 {
+      display: grid;
+      gap: 14px;
+    }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .mini-card, .zone-card, .signal-card, .score-card, .snapshot-card, .mtf-card, .scenario-card, .watch-card {
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(29,36,30,0.08);
+    }
+    .zone-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(248,244,235,0.76));
+    }
+    .zone-head, .signal-head, .score-top, .snapshot-head, .watch-head, .scenario-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    h3, h4, h5 {
+      margin: 0;
+    }
+    .badge-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      border: 1px solid rgba(29,36,30,0.08);
+      background: #fff;
+      color: var(--ink);
+    }
+    .badge-good { background: rgba(46,107,83,0.10); color: var(--good); }
+    .badge-warn { background: rgba(182,139,59,0.13); color: var(--warn); }
+    .badge-bad { background: rgba(157,63,51,0.10); color: var(--bad); }
+    .zone-range, .signal-range, .snapshot-value {
+      font-size: 28px;
+      line-height: 1.1;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    p {
+      margin: 0 0 10px;
+      line-height: 1.75;
+    }
+    .muted {
+      color: var(--muted);
+    }
+    .bullet-list {
+      margin: 0;
+      padding-left: 18px;
+      line-height: 1.72;
+    }
+    .subpanel {
+      padding: 0;
+      border-top: 1px solid var(--line);
+    }
+    .subpanel:first-child {
+      border-top: 0;
+    }
+    .subpanel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+      margin: 0;
+      padding: 18px 0 14px;
+      cursor: pointer;
+      list-style: none;
+    }
+    .subpanel-head::after {
+      content: "展開";
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .subpanel[open] > .subpanel-head::after {
+      content: "收合";
+    }
+    .subpanel-body {
+      padding-bottom: 12px;
+    }
+    .source-basis, .full-json {
+      margin-top: 12px;
+      border-top: 1px dashed rgba(29,36,30,0.14);
+      padding-top: 12px;
+    }
+    details summary {
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .source-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 12px;
+    }
+    .json-block {
+      margin: 0;
+      padding: 14px;
+      border-radius: 16px;
+      background: #171b18;
+      color: #eef3ea;
+      font-size: 12px;
+      line-height: 1.6;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .facts-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .facts-box {
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(29,36,30,0.04);
+      border: 1px solid rgba(29,36,30,0.08);
+    }
+    .footer-note {
+      margin-top: 22px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    @media (max-width: 1100px) {
+      .hero { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .facts-grid { grid-template-columns: 1fr; }
+      .source-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 720px) {
+      .page { padding: 16px 12px 48px; }
+      .hero { padding: 18px; border-radius: 24px; }
+      .panel-head { padding: 16px; }
+      .panel-head h2 { font-size: 23px; }
+      .panel-body { padding: 16px; }
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .hero-grid { grid-template-columns: 1fr; }
+      .zone-range, .signal-range, .snapshot-value { font-size: 22px; }
+      .sticky-nav { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">儀表板 V2・結構化 JSON 主導・固定設定卡整合</div>
+        <h1>2419 仲琦</h1>
+        <p>事件題材推升後進入高檔回測；04/17收盤36.80已低於37.10至37.56事件/突破AVWAP成本帶，04/20盤中分K34.65又低於session VWAP，短線防守權重上升。</p>
+        <div class="hero-meta">
+          <span class='badge badge-plain'>資料日期 2026-04-20</span>
+          <span class='badge badge-plain'>分K更新 2026-04-20</span>
+          <span class='badge badge-warn'>中</span>
+          <span class='badge badge-plain'>維持不變</span>
+          <span class='badge badge-plain'>延後觀察</span>
+        </div>
+      </div>
+      <aside class="hero-side">
+        <div class="hero-grid">
+          <article class='hero-stat'><h4>最新狀態</h4><p>事件題材推升後進入高檔回測；04/17收盤36.80已低於37.10至37.56事件/突破AVWAP成本帶，04/20盤中分K34.65又低於session VWAP，短線防守權重上升。</p></article><article class='hero-stat'><h4>主階段</h4><p>事件驅動後高檔回測期</p></article><article class='hero-stat'><h4>靠近階段</h4><p>成本帶失守後再確認期</p></article><article class='hero-stat'><h4>把握度</h4><p>中</p></article>
+        </div>
+        <section class="anchor-panel">
+          <h3>目標模型錨點</h3>
+          <ul class='bullet-list'><li>突破段起漲AVWAP：37.5578 (2026-04-16)</li><li>月營收出表AVWAP：37.1001 (2026-04-17)</li><li>2026-04-20 session VWAP：35.9061 (2026-04-20)</li></ul>
+          <p class="muted">主錨點尚未完全失效，但已受壓；短線先看34.05至35.20是否守住，再看35.90、37.10與37.56是否依序收復。</p>
+        </section>
+        <section class="anchor-panel">
+          <h3>輸入來源</h3>
+          <ul class='bullet-list'><li>驗證後 JSON：2026-04-20_2419仲琦_自動監看匯入.json</li><li>專屬提示詞：2419_仲琦_波段專屬提示詞_GPT54Pro優化版_v7.md</li></ul>
+        </section>
+      </aside>
+    </section>
+
+    <nav class="sticky-nav"><a href='#overview'>決策總覽</a><a href='#profile'>股性與固定設定卡</a><a href='#stage'>階段與狀態切換</a><a href='#strategy'>操作策略總圖</a><a href='#levels'>價格區間主地圖</a><a href='#evidence'>證據與市場結構</a><a href='#scenarios'>情境推演與監控</a><a href='#governance'>校正、回測與治理</a></nav>
+
+    <div class="layout">
+      
+    <details id="overview" class="panel" open>
+      <summary class="panel-head">
+        <div class="panel-title-wrap">
+          <h2>決策總覽</h2>
+        </div>
+        <div class="badge-row"><span class='badge badge-good'>事件驅動後高檔回測期</span><span class='badge badge-warn'>成本帶失守後再確認期</span></div>
+      </summary>
+      <div class="panel-body">
+        
+      <div class="grid-2">
+        <article class="mini-card">
+          <h4>現在是什麼局</h4>
+          <p>月營收與題材事件偏正面，日週月技術動能仍在多頭側；但收盤低於雙AVWAP、一日法人轉賣、借券賣出增加與當沖比重偏高，使追價品質下降，必須等待成本帶收復或支撐止跌。</p>
+        </article>
+        <article class="mini-card">
+          <h4>先怎麼做</h4>
+          <p>以37.10至37.56作多方成本帶、34.05至35.20作防守帶；成本帶未收復前不把事件題材視為已恢復主升。</p>
+        </article>
+      </div>
+      <div class="grid-4" style="margin-top:14px;">
+        <article class='mini-card'><h4>進場摘要</h4><p>回測34.05至35.20不破，且重新站回35.90 session VWAP與37.10事件AVWAP。</p></article><article class='mini-card'><h4>出場摘要</h4><p>36.80已低於兩條AVWAP，04/20分K34.65低於session VWAP；若跌破34.05，回測轉修正的機率升高。</p></article><article class='mini-card'><h4>1週主情境</h4><p>回測洗盤</p></article><article class='mini-card'><h4>1月主情境</h4><p>箱體震盪整理</p></article>
+      </div>
+    
+      </div>
+    </details>
+    
+      
+    <details id="profile" class="panel" open>
+      <summary class="panel-head">
+        <div class="panel-title-wrap">
+          <h2>股性與固定設定卡</h2>
+        </div>
+        <div class="badge-row"><span class='badge badge-warn'>維持不變</span></div>
+      </summary>
+      <div class="panel-body">
+        
+      <div class="grid-2">
+        <article class="mini-card">
+          <h4>固定設定卡主體</h4>
+          <ul class='bullet-list'><li>台股中型寬頻與網通設備股，主體在 Cable / FTTx / 寬頻接取設備，營運與電信商專案節奏高度相關。</li><li>股性主型偏「成長趨勢股或事件驅動股，需看網通升級、寬頻基建、衛星與營運商專案節奏」</li><li>市場定位：通信網路</li><li>非屬類型：不是純衛星股，也不是可只靠消費型 Wi-Fi 敘事拉評價；需看營運商專案與標案進度。</li><li>常見切換情境：標案預熱、營收跳增、量縮整理、突破後換手。</li></ul>
+        </article>
+        <article class="mini-card">
+          <h4>本輪校正結論</h4>
+          <p>本次資料顯示DOCSIS4.0、Wi-Fi 7、10G寬頻、企業/工業網通投資與月營收事件，與既有固定設定卡的Cable/FTTx/寬頻接取、營運商專案、企業網路升級與事件Beta框架相符；單次Perle投資新聞與短線波動不足以證明股性或核心主線已持續性改變。</p>
+          <p class="muted">變動欄位：無</p>
+        </article>
+      </div>
+      <div class="grid-3" style="margin-top:14px;">
+        <article class='mini-card'><h4>核心主線</h4><ul class='bullet-list'><li>A 級核心主線：Cable modem、寬頻接取與 FTTx / PON 設備，屬營收主體。</li><li>A / B 級交會主線：營運商專案與企業網路升級，屬成長主線。</li><li>題材重評主線：5G / Wi-Fi / 寬頻基建與智慧城市應用，屬題材主線。</li><li>中長線補充主線：法說、月營收、電信標案與海外專案，屬事件 Beta 核心。</li></ul></article><article class='mini-card'><h4>比較籃子</h4><ul class='bullet-list'><li>網通：4906正文、5388中磊、3596智易、6285啟碁、3062建漢</li></ul></article><article class='mini-card'><h4>題材分級</h4><ul class='bullet-list'><li>A 級：真正改變產品 mix、毛利率、客戶層級或量產節奏的高值應用</li><li>B 級：可帶來短中期營收改善，但估值彈性不如 A 級</li><li>C 級：族群輪動、媒體敘事、低成長或低毛利舊業務，不能取代 A 級主線</li></ul></article><article class='mini-card'><h4>常見劇本</h4><ul class='bullet-list'><li>標案預熱</li><li>營收跳增</li><li>量縮整理</li><li>突破後換手。</li></ul></article><article class='mini-card'><h4>固定校正原則</h4><ul class='bullet-list'><li>A 級主線權重高於 C 級敘事</li><li>題材驅動、基本面修復、純籌碼推動必須分開判讀</li><li>分 K 只能補充波段背景，不可主導波段結論</li><li>單日爆量、單筆大單、零星盤中異常，不得直接當成主力定論</li><li>專屬提醒：不是純衛星股，也不是可只靠消費型 Wi-Fi 敘事拉評價；需看營運商專案與標案進度。</li></ul></article>
+      </div>
+    
+      </div>
+    </details>
+    
+      
+    <details id="stage" class="panel" open>
+      <summary class="panel-head">
+        <div class="panel-title-wrap">
+          <h2>階段與狀態切換</h2>
+        </div>
+        <div class="badge-row"><span class='badge badge-plain'>日K/週K/分K</span><span class='badge badge-warn'>中</span></div>
+      </summary>
+      <div class="panel-body">
+        
+      <div class="grid-3">
+        <article class="mini-card">
+          <h4>當前階段</h4>
+          <p>事件驅動後高檔回測期</p>
+          <p class="muted">成本帶失守再確認期</p>
+        </article>
+        <article class="mini-card">
+          <h4>升級條件</h4>
+          <ul class='bullet-list'><li>日收重新站回37.10至37.56雙AVWAP成本帶。</li><li>站回成本帶後，成交量維持高於5日均量且外資/三大法人不再連續賣超。</li><li>放量突破39.85前高，且隔日不跌回38.50以下。</li></ul>
+        </article>
+        <article class="mini-card">
+          <h4>降級 / 失效</h4>
+          <ul class='bullet-list'><li>反彈到37.10至37.95區間量縮或留下上影，且外資續賣。</li><li>分K持續低於35.90 session VWAP，日K無法回到35.20以上。</li><li>當沖比與借券賣出同步上升，價格卻無法收復36.80。</li><li>日收跌破34.05。</li><li>跌破34.35後反彈不過35.20，且量能放大。</li><li>32.70至33.25支撐帶再失守，表示事件波段回到修正。</li></ul>
+        </article>
+      </div>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li><li>03_技術結構摘要.json</li><li>04_錨點候選集.json</li><li>05_技術圖_日週月季年合併.png</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>latest_close</li><li>institutional_flow</li><li>session_vwap</li><li>candidates</li><li>日K/週K/月K指標</li><li>raw_section_snapshots.price_legal_margin</li></ul></div><div><h5>推導方法</h5><p>綜合收盤/籌碼、AVWAP、分K與多週期技術圖判定階段。</p></div></div></details>
+    
+      </div>
+    </details>
+    
+      
+    <details id="strategy" class="panel" open>
+      <summary class="panel-head">
+        <div class="panel-title-wrap">
+          <h2>操作策略總圖</h2>
+        </div>
+        <div class="badge-row"><span class='badge badge-good'>部分成立</span><span class='badge badge-warn'>部分成立</span></div>
+      </summary>
+      <div class="panel-body">
+        
+      <div class="grid-2">
+        <article class="mini-card">
+          <h4>未持股</h4>
+          <p><strong>最佳進場：</strong>回測34.05至35.20不破，且重新站回35.90 session VWAP與37.10事件AVWAP。</p>
+          <p><strong>較弱進場：</strong>未收復37.10至37.56前直接追高，或僅依單日新聞題材追價。</p>
+        </article>
+        <article class="mini-card">
+          <h4>已持股</h4>
+          <p><strong>主動警訊：</strong>36.80已低於兩條AVWAP，04/20分K34.65低於session VWAP；若跌破34.05，回測轉修正的機率升高。</p>
+          <p><strong>正式出場：</strong>日收跌破34.05，或反彈無法站回35.90且放量跌破34.35。</p>
+        </article>
+      </div>
+      <div class="grid-2" style="margin-top:14px;">
+        <article class="mini-card">
+          <h4>續抱條件</h4>
+          <p class="muted">未提供實際持倉成本與部位大小，以下僅為條件式波段管理框架。</p>
+          <ul class='bullet-list'><li>34.05至35.20支撐帶不被日收跌破。</li><li>價格重新站回35.90，並嘗試收復37.10至37.56成本帶。</li><li>外資或三大法人不再連續放大賣超，借券賣出增加幅度收斂。</li></ul>
+        </article>
+        <article class="mini-card">
+          <h4>分批減碼與防守</h4>
+          <ul class='bullet-list'><li>減碼：37.1~37.56</li><li>減碼：38.5~39.85</li><li>減碼：41.7~41.9</li><li>防守：35.85~36.8</li><li>防守：34.05~35.2</li><li>防守：32.7~33.25</li></ul>
+        </article>
+      </div>
+      <div class="grid-2" style="margin-top:14px;">
+        <div>
+    <article class="signal-card">
+      <div class="signal-head">
+        <h4>收復事件/突破AVWAP成本帶</h4>
+        <div class="badge-row"><span class='badge badge-plain'>進場</span><span class='badge badge-bad'>尚未成立</span><span class='badge badge-warn'>中高</span></div>
+      </div>
+      <div class="signal-range">37.1~37.56</div>
+      <p><strong>失效條件：</strong>日收再跌回36.80以下或站上後隔日失守37.10。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>03_技術結構摘要.json</li><li>04_錨點候選集.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>primary_avwap.avwap</li><li>candidates[0].anchor_price</li><li>candidates[1].anchor_price</li></ul></div><div><h5>推導方法</h5><p>以雙AVWAP作進場確認帶。</p></div></div></details>
+    </article>
+    
+    <article class="signal-card">
+      <div class="signal-head">
+        <h4>支撐帶止跌反彈</h4>
+        <div class="badge-row"><span class='badge badge-plain'>進場</span><span class='badge badge-good'>部分成立</span><span class='badge badge-warn'>中</span></div>
+      </div>
+      <div class="signal-range">34.05~35.2</div>
+      <p><strong>失效條件：</strong>日收跌破34.05。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>03_技術結構摘要.json</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>timeframes.60m.latest_close</li><li>raw_section_snapshots.price_legal_margin[2026-04-14].low</li><li>raw_section_snapshots.price_legal_margin[2026-04-16].low</li></ul></div><div><h5>推導方法</h5><p>04/20分K已靠近支撐帶，但尚未確認反彈。</p></div></div></details>
+    </article>
+    
+    <article class="signal-card">
+      <div class="signal-head">
+        <h4>突破39.85前高</h4>
+        <div class="badge-row"><span class='badge badge-plain'>進場</span><span class='badge badge-bad'>尚未成立</span><span class='badge badge-warn'>高</span></div>
+      </div>
+      <div class="signal-range">39.85~39.85</div>
+      <p><strong>失效條件：</strong>突破後跌回38.50以下。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>05_技術圖_日週月季年合併.png</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>月K.high</li><li>raw_section_snapshots.price_legal_margin[2026-04-09].high</li></ul></div><div><h5>推導方法</h5><p>以前高39.85作主升延續確認。</p></div></div></details>
+    </article>
+    </div>
+        <div>
+    <article class="signal-card">
+      <div class="signal-head">
+        <h4>事件成本帶失守警訊</h4>
+        <div class="badge-row"><span class='badge badge-plain'>出場</span><span class='badge badge-good'>成立</span><span class='badge badge-warn'>中</span></div>
+      </div>
+      <div class="signal-range">37.1~37.56</div>
+      <p><strong>失效條件：</strong>日收重新站回37.56，且隔日不跌回37.10。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li><li>03_技術結構摘要.json</li><li>04_錨點候選集.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>latest_close</li><li>primary_avwap.avwap</li><li>candidates[1].anchor_price</li></ul></div><div><h5>推導方法</h5><p>36.80低於37.10與37.56，視為成本帶失守警訊。</p></div></div></details>
+    </article>
+    
+    <article class="signal-card">
+      <div class="signal-head">
+        <h4>盤中session VWAP失守</h4>
+        <div class="badge-row"><span class='badge badge-plain'>出場</span><span class='badge badge-good'>部分成立</span><span class='badge badge-warn'>中低</span></div>
+      </div>
+      <div class="signal-range">35.85~35.91</div>
+      <p><strong>失效條件：</strong>分K重新站回35.9061且日內不再失守。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>03_技術結構摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>session_vwap</li><li>timeframes.60m.latest_close</li><li>timeframes.5m.latest_close</li></ul></div><div><h5>推導方法</h5><p>04/20分K最新34.65低於session VWAP 35.9061，但樣本含大量補平bar。</p></div></div></details>
+    </article>
+    
+    <article class="signal-card">
+      <div class="signal-head">
+        <h4>短線防守帶跌破</h4>
+        <div class="badge-row"><span class='badge badge-plain'>出場</span><span class='badge badge-bad'>尚未成立</span><span class='badge badge-warn'>高</span></div>
+      </div>
+      <div class="signal-range">34.05~34.35</div>
+      <p><strong>失效條件：</strong>重新站回35.20並收復35.90。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>06_Goodinfo整合報表.html</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>raw_section_snapshots.price_legal_margin[2026-04-14].low</li><li>raw_section_snapshots.price_legal_margin[2026-04-14].close</li></ul></div><div><h5>推導方法</h5><p>以34.05至34.35作正式破位判斷。</p></div></div></details>
+    </article>
+    </div>
+      </div>
+    
+      </div>
+    </details>
+    
+      
+    <details id="levels" class="panel" open>
+      <summary class="panel-head">
+        <div class="panel-title-wrap">
+          <h2>價格區間主地圖</h2>
+        </div>
+        <div class="badge-row"><span class='badge badge-plain'>primary_anchor_under_pressure</span></div>
+      </summary>
+      <div class="panel-body">
+        
+      <div class="grid-2">
+        
+    <article class="zone-card">
+      <div class="zone-head">
+        <h4>主成本核心區</h4>
+        <div class="badge-row"><span class='badge badge-plain'>日K/事件AVWAP</span><span class='badge badge-warn'>推導</span><span class='badge badge-good'>中高</span></div>
+      </div>
+      <div class="zone-range">37.1~37.56</div>
+      <p class="muted">收復37.10且最好站穩37.56，才視為事件成本帶重新轉強。</p>
+      <div class="micro-block">
+        <h5>錨點</h5>
+        <ul class='bullet-list'><li>月營收出表AVWAP：37.1001 (2026-04-17)</li><li>突破段起漲AVWAP：37.5578 (2026-04-16)</li></ul>
+      </div>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>03_技術結構摘要.json</li><li>04_錨點候選集.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>primary_avwap.avwap</li><li>candidates[0].anchor_price</li><li>candidates[1].anchor_price</li></ul></div><div><h5>推導方法</h5><p>以突破段起漲AVWAP 37.5578與月營收出表AVWAP 37.1001組成核心成本帶。</p></div></div></details>
+    </article>
+    
+    <article class="zone-card">
+      <div class="zone-head">
+        <h4>波段加碼區</h4>
+        <div class="badge-row"><span class='badge badge-plain'>日K/分K</span><span class='badge badge-warn'>推導</span><span class='badge badge-warn'>中低</span></div>
+      </div>
+      <div class="zone-range">35.85~36.8</div>
+      <p class="muted">僅在價格重新站回35.90且量縮止跌時成立；跌破35.85則不視為加碼區。</p>
+      <div class="micro-block">
+        <h5>錨點</h5>
+        <ul class='bullet-list'><li>04/17收盤：36.8 (2026-04-17)</li><li>2026-04-20 session VWAP：35.9061 (2026-04-20)</li></ul>
+      </div>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li><li>03_技術結構摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>latest_close</li><li>session_vwap</li><li>timeframes.5m.session_vwap</li></ul></div><div><h5>推導方法</h5><p>以04/17收盤36.80與04/20 session VWAP 35.9061形成短線再站回觀察區。</p></div></div></details>
+    </article>
+    
+    <article class="zone-card">
+      <div class="zone-head">
+        <h4>防守失效區</h4>
+        <div class="badge-row"><span class='badge badge-plain'>日K</span><span class='badge badge-warn'>推導</span><span class='badge badge-warn'>中</span></div>
+      </div>
+      <div class="zone-range">34.05~34.35</div>
+      <p class="muted">日收跌破34.05或跌破後反彈無法站回34.35，視為回測轉修正。</p>
+      <div class="micro-block">
+        <h5>錨點</h5>
+        <ul class='bullet-list'><li>2026-04-14低點：34.05 (2026-04-14)</li><li>2026-04-14收盤：34.35 (2026-04-14)</li><li>2026-04-15低點：34.25 (2026-04-15)</li></ul>
+      </div>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>06_Goodinfo整合報表.html</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>raw_section_snapshots.price_legal_margin[2026-04-14].low</li><li>raw_section_snapshots.price_legal_margin[2026-04-14].close</li><li>raw_section_snapshots.price_legal_margin[2026-04-15].low</li></ul></div><div><h5>推導方法</h5><p>以04/14低點34.05、04/14收盤34.35與04/15低點34.25作短線破位防守帶。</p></div></div></details>
+    </article>
+    
+    <article class="zone-card">
+      <div class="zone-head">
+        <h4>上方第一壓力</h4>
+        <div class="badge-row"><span class='badge badge-plain'>日K/事件AVWAP</span><span class='badge badge-warn'>推導</span><span class='badge badge-good'>中高</span></div>
+      </div>
+      <div class="zone-range">37.1~37.95</div>
+      <p class="muted">反彈到此區若量縮或外資續賣，容易形成賣壓；放量站穩才轉強。</p>
+      <div class="micro-block">
+        <h5>錨點</h5>
+        <ul class='bullet-list'><li>月營收出表AVWAP：37.1001 (2026-04-17)</li><li>突破段起漲AVWAP：37.5578 (2026-04-16)</li><li>2026-04-17高點：37.95 (2026-04-17)</li></ul>
+      </div>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>03_技術結構摘要.json</li><li>04_錨點候選集.json</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>candidates[1].anchor_price</li><li>primary_avwap.avwap</li><li>raw_section_snapshots.price_legal_margin[2026-04-17].high</li></ul></div><div><h5>推導方法</h5><p>以月營收AVWAP 37.1001、突破AVWAP 37.5578與04/17高點37.95組成第一壓力。</p></div></div></details>
+    </article>
+    
+    <article class="zone-card">
+      <div class="zone-head">
+        <h4>上方主目標帶</h4>
+        <div class="badge-row"><span class='badge badge-plain'>日K/月K</span><span class='badge badge-warn'>推導</span><span class='badge badge-warn'>中</span></div>
+      </div>
+      <div class="zone-range">38.5~39.85</div>
+      <p class="muted">須先站回37.56並維持量價不背離，才有機會挑戰。</p>
+      <div class="micro-block">
+        <h5>錨點</h5>
+        <ul class='bullet-list'><li>2026-04-16高點：38.5 (2026-04-16)</li><li>2026-04-09高點：39.85 (2026-04-09)</li></ul>
+      </div>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>05_技術圖_日週月季年合併.png</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>日K.2026-04-16.high</li><li>日K.2026-04-09.high</li><li>月K.high</li></ul></div><div><h5>推導方法</h5><p>以04/16高點38.50與04/09/月K高點39.85作主壓力與前高挑戰區。</p></div></div></details>
+    </article>
+    
+    <article class="zone-card">
+      <div class="zone-head">
+        <h4>下方關鍵支撐</h4>
+        <div class="badge-row"><span class='badge badge-plain'>日K</span><span class='badge badge-warn'>推導</span><span class='badge badge-warn'>中</span></div>
+      </div>
+      <div class="zone-range">34.05~35.2；32.7~33.25</div>
+      <p class="muted">第一支撐失守後，下個防守帶轉向32.70至33.25。</p>
+      <div class="micro-block">
+        <h5>錨點</h5>
+        <ul class='bullet-list'><li>2026-04-16低點：35.2 (2026-04-16)</li><li>2026-04-14低點：34.05 (2026-04-14)</li><li>2026-04-02低點：32.7 (2026-04-02)</li></ul>
+      </div>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>06_Goodinfo整合報表.html</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>raw_section_snapshots.price_legal_margin[2026-04-16].low</li><li>raw_section_snapshots.price_legal_margin[2026-04-14].low</li><li>raw_section_snapshots.price_legal_margin[2026-04-02].low</li><li>raw_section_snapshots.price_legal_margin[2026-03-26].close</li></ul></div><div><h5>推導方法</h5><p>第一組以34.05至35.20近期低檔與突破日低點組成；第二組以04/02低點32.70與03/26收盤33.25組成。</p></div></div></details>
+    </article>
+    
+    <article class="zone-card">
+      <div class="zone-head">
+        <h4>第一短目標</h4>
+        <div class="badge-row"><span class='badge badge-plain'>日K</span><span class='badge badge-warn'>推導</span><span class='badge badge-warn'>中</span></div>
+      </div>
+      <div class="zone-range">32.7~33.25</div>
+      <p class="muted">日收跌破34.05或跌破34.35後反彈不過35.20時啟用。</p>
+      <div class="micro-block">
+        <h5>錨點</h5>
+        <ul class='bullet-list'><li>2026-04-02低點：32.7 (2026-04-02)</li><li>2026-03-26收盤：33.25 (2026-03-26)</li></ul>
+      </div>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>06_Goodinfo整合報表.html</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>raw_section_snapshots.price_legal_margin[2026-04-02].low</li><li>raw_section_snapshots.price_legal_margin[2026-03-26].close</li></ul></div><div><h5>推導方法</h5><p>若34.05失守，以前次事件起漲後低點32.70與漲停收盤33.25為第一回測目標。</p></div></div></details>
+    </article>
+    
+    <article class="zone-card">
+      <div class="zone-head">
+        <h4>第一主目標</h4>
+        <div class="badge-row"><span class='badge badge-plain'>日K/事件AVWAP</span><span class='badge badge-warn'>推導</span><span class='badge badge-good'>中高</span></div>
+      </div>
+      <div class="zone-range">37.1~37.56</div>
+      <p class="muted">34.05至35.20止跌後，先以37.10至37.56為第一回補目標。</p>
+      <div class="micro-block">
+        <h5>錨點</h5>
+        <ul class='bullet-list'><li>月營收出表AVWAP：37.1001 (2026-04-17)</li><li>突破段起漲AVWAP：37.5578 (2026-04-16)</li></ul>
+      </div>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>03_技術結構摘要.json</li><li>04_錨點候選集.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>candidates[0].anchor_price</li><li>candidates[1].anchor_price</li></ul></div><div><h5>推導方法</h5><p>多方若由支撐反彈，第一目標先看雙AVWAP成本帶收復，而非直接看前高。</p></div></div></details>
+    </article>
+    
+    <article class="zone-card">
+      <div class="zone-head">
+        <h4>1.272 延伸</h4>
+        <div class="badge-row"><span class='badge badge-plain'>日K延伸</span><span class='badge badge-warn'>推導</span><span class='badge badge-bad'>低</span></div>
+      </div>
+      <div class="zone-range">41.7~41.9</div>
+      <p class="muted">只有有效突破39.85並站穩後才啟用。</p>
+      <div class="micro-block">
+        <h5>錨點</h5>
+        <ul class='bullet-list'><li>2026-04-02低點：32.7 (2026-04-02)</li><li>2026-04-09高點：39.85 (2026-04-09)</li></ul>
+      </div>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>06_Goodinfo整合報表.html</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>raw_section_snapshots.price_legal_margin[2026-04-02].low</li><li>raw_section_snapshots.price_legal_margin[2026-04-09].high</li></ul></div><div><h5>推導方法</h5><p>以04/02低點32.70至04/09高點39.85作區間，32.70 + (39.85-32.70) × 1.272 ≈ 41.79。</p></div></div></details>
+    </article>
+    
+    <article class="zone-card">
+      <div class="zone-head">
+        <h4>1.618 延伸</h4>
+        <div class="badge-row"><span class='badge badge-plain'>日K延伸</span><span class='badge badge-warn'>推導</span><span class='badge badge-bad'>低</span></div>
+      </div>
+      <div class="zone-range">44.1~44.35</div>
+      <p class="muted">須先突破39.85且量價續強，否則不啟用。</p>
+      <div class="micro-block">
+        <h5>錨點</h5>
+        <ul class='bullet-list'><li>2026-04-02低點：32.7 (2026-04-02)</li><li>2026-04-09高點：39.85 (2026-04-09)</li></ul>
+      </div>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>06_Goodinfo整合報表.html</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>raw_section_snapshots.price_legal_margin[2026-04-02].low</li><li>raw_section_snapshots.price_legal_margin[2026-04-09].high</li></ul></div><div><h5>推導方法</h5><p>以04/02低點32.70至04/09高點39.85作區間，32.70 + (39.85-32.70) × 1.618 ≈ 44.27。</p></div></div></details>
+    </article>
+    
+      </div>
+    
+      </div>
+    </details>
+    
+      
+    <details id="evidence" class="panel" open>
+      <summary class="panel-head">
+        <div class="panel-title-wrap">
+          <h2>證據與市場結構</h2>
+        </div>
+        <div class="badge-row"><span class='badge badge-plain'>中期事件多頭仍在，但短線成本帶失守、盤中偏弱，屬高檔震盪回測而非乾淨主升。</span></div>
+      </summary>
+      <div class="panel-body">
+        
+      <div class="grid-3">
+        
+    <article class="snapshot-card">
+      <div class="snapshot-head">
+        <h4>收盤與漲跌</h4>
+        <div class="badge-row"><span class='badge badge-plain'>EOD</span><span class='badge badge-good'>高</span></div>
+      </div>
+      <p class="snapshot-value">36.80，-0.95，-2.52%</p>
+      <p class="muted">Goodinfo可定位最新收盤列為2026-04-17。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>latest_close</li><li>change</li><li>change_pct</li><li>market_snapshot_eod.close</li><li>market_snapshot_eod.change_pct</li></ul></div><div><h5>推導方法</h5><p>直接引用市場快照與EOD摘要欄位。</p></div></div></details>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-head">
+        <h4>成交量與量比</h4>
+        <div class="badge-row"><span class='badge badge-plain'>EOD</span><span class='badge badge-good'>高</span></div>
+      </div>
+      <p class="snapshot-value">12,911張；5日均量13,827.75張；量比0.93</p>
+      <p class="muted"></p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>volume_lot</li><li>avg_volume_5d_lot</li><li>volume_ratio_5d</li></ul></div><div><h5>推導方法</h5><p>直接引用市場快照成交量欄位。</p></div></div></details>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-head">
+        <h4>成交值與週轉率</h4>
+        <div class="badge-row"><span class='badge badge-plain'>EOD</span><span class='badge badge-good'>高</span></div>
+      </div>
+      <p class="snapshot-value">4.79億元；週轉率4.02%</p>
+      <p class="muted"></p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>turnover_100m</li><li>turnover_rate_pct</li></ul></div><div><h5>推導方法</h5><p>直接引用市場快照欄位。</p></div></div></details>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-head">
+        <h4>外資買賣超</h4>
+        <div class="badge-row"><span class='badge badge-plain'>EOD</span><span class='badge badge-good'>高</span></div>
+      </div>
+      <p class="snapshot-value">1日-3,195張；3日+4,512張；5日+4,824張</p>
+      <p class="muted">一日轉賣與3/5日仍偏多並存。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>institutional_flow.foreign_net_1d</li><li>institutional_flow.foreign_net_3d</li><li>institutional_flow.foreign_net_5d</li></ul></div><div><h5>推導方法</h5><p>直接引用法人籌碼欄位。</p></div></div></details>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-head">
+        <h4>三大法人合計</h4>
+        <div class="badge-row"><span class='badge badge-plain'>EOD</span><span class='badge badge-good'>高</span></div>
+      </div>
+      <p class="snapshot-value">1日-3,412張；3日+4,466張；5日+4,589張</p>
+      <p class="muted"></p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>institutional_flow.total_institutional_net_1d</li><li>institutional_flow.total_institutional_net_3d</li><li>institutional_flow.total_institutional_net_5d</li></ul></div><div><h5>推導方法</h5><p>直接引用法人籌碼欄位。</p></div></div></details>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-head">
+        <h4>融資與融券</h4>
+        <div class="badge-row"><span class='badge badge-plain'>EOD</span><span class='badge badge-good'>高</span></div>
+      </div>
+      <p class="snapshot-value">融資餘額7,539張、減45張；融券餘額145張、減29張；券資比1.92%</p>
+      <p class="muted"></p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>margin_short_borrow.margin_balance</li><li>margin_short_borrow.margin_change</li><li>margin_short_borrow.short_balance</li><li>margin_short_borrow.short_change</li><li>margin_short_borrow.short_margin_ratio</li></ul></div><div><h5>推導方法</h5><p>直接引用融資融券欄位。</p></div></div></details>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-head">
+        <h4>借券賣出</h4>
+        <div class="badge-row"><span class='badge badge-plain'>EOD</span><span class='badge badge-good'>高</span></div>
+      </div>
+      <p class="snapshot-value">借券賣出增加143張；餘額8,608張；使用率0.18%</p>
+      <p class="muted">借券增加為短線風險旗標之一。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>margin_short_borrow.borrow_sell_delta</li><li>margin_short_borrow.borrow_sell_balance</li><li>margin_short_borrow.borrow_usage_ratio</li></ul></div><div><h5>推導方法</h5><p>直接引用借券欄位。</p></div></div></details>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-head">
+        <h4>現股當沖</h4>
+        <div class="badge-row"><span class='badge badge-plain'>EOD</span><span class='badge badge-good'>高</span></div>
+      </div>
+      <p class="snapshot-value">當沖量4,604張；當沖比35.7%；5日均比42.48%</p>
+      <p class="muted">當沖比仍高，代表短線籌碼較敏感。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>day_trade_state.day_trade_volume_lot</li><li>day_trade_state.day_trade_ratio_pct</li><li>day_trade_state.day_trade_ratio_5d_avg_pct</li></ul></div><div><h5>推導方法</h5><p>直接引用當沖欄位。</p></div></div></details>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-head">
+        <h4>事件窗</h4>
+        <div class="badge-row"><span class='badge badge-plain'>事件</span><span class='badge badge-good'>高</span></div>
+      </div>
+      <p class="snapshot-value">月營收/季報/EPS/毛利率/法說/IR/重大訊息/新聞；freshness_days=3</p>
+      <p class="muted">事件窗進行中，題材Beta上調但需驗證。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li><li>02_事件與基本面摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>event_window.active</li><li>event_window.type</li><li>event_window.freshness_days</li></ul></div><div><h5>推導方法</h5><p>直接引用事件窗欄位。</p></div></div></details>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-head">
+        <h4>3月營收</h4>
+        <div class="badge-row"><span class='badge badge-plain'>2026-03</span><span class='badge badge-good'>高</span></div>
+      </div>
+      <p class="snapshot-value">1,007,693千元；MoM 100.60%；YoY 54.96%；YTD YoY 9.46%</p>
+      <p class="muted">備註：配合客戶需求出貨量增加。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>02_事件與基本面摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>month_revenue.latest_month.revenue</li><li>month_revenue.latest_month.mom_pct</li><li>month_revenue.latest_month.yoy_pct</li><li>month_revenue.latest_month.ytd_yoy_pct</li></ul></div><div><h5>推導方法</h5><p>直接引用月營收欄位並四捨五入顯示。</p></div></div></details>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-head">
+        <h4>2025Q4財報</h4>
+        <div class="badge-row"><span class='badge badge-plain'>2025Q4</span><span class='badge badge-good'>高</span></div>
+      </div>
+      <p class="snapshot-value">EPS -0.36；毛利率18.81%；營益率1.5%</p>
+      <p class="muted">營收事件偏正面但獲利仍需驗證。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>02_事件與基本面摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>financial_report.eps</li><li>financial_report.gross_margin_pct</li><li>financial_report.operating_margin_pct</li></ul></div><div><h5>推導方法</h5><p>直接引用財報欄位。</p></div></div></details>
+    </article>
+    
+      </div>
+      <div class="facts-grid">
+        <article class="facts-box">
+          <h4>已知事實</h4>
+          <ul class='bullet-list'><li>2419仲琦在01市場快照與02/03/04摘要中代號名稱一致。</li><li>收盤基準摘要顯示最新收盤36.80、跌0.95元、跌幅2.52%、成交量12,911張、成交值4.79億元、量比5日均量0.93。</li><li>法人籌碼呈現一日轉賣：外資1日賣超3,195張、三大法人1日賣超3,412張；但3日與5日三大法人仍分別買超4,466張與4,589張。</li><li>2026-03月營收1,007,693千元，MoM 100.60%、YoY 54.96%，備註為配合客戶需求出貨量增加。</li><li>2025Q4財報EPS為-0.36、毛利率18.81%、營業利益率1.5%，顯示營收事件偏正面但獲利品質仍需追蹤。</li><li>AVWAP候選顯示突破段起漲AVWAP為37.5578、月營收出表AVWAP為37.1001；36.80收盤已低於兩者。</li><li>2026-04-20分K最新價34.65低於session VWAP 35.9061，但分K資料含大量補平bar，僅作短線警訊。</li></ul>
+        </article>
+        <article class="facts-box">
+          <h4>需補資料 / 驗證</h4>
+          <ul class='bullet-list'><li>2026-04-20完整EOD正式收盤與當日法人籌碼尚需補入，避免用盤中34.65覆蓋收盤36.80。</li><li>新聞來源多為RSS彙整，4月重大訊息與投資Perle Systems等事項需人工核對正式公告內容與金額條件。</li><li>固定設定卡要求的Cable/PON占比、營運商專案、庫存與訂單能見度，本次資料包沒有完整量化資料。</li><li>分K Donchian與ATR多處樣本不足或補平bar過多，不能作為波段主結論。</li></ul>
+        </article>
+        <article class="facts-box">
+          <h4>推論</h4>
+          <ul class='bullet-list'><li>目前較像事件題材推升後的高檔回測期，而非乾淨主升追價點；37.10至37.56成本帶是否收復是多方再確認核心。</li><li>3月營收明顯轉強與DOCSIS4.0/Wi-Fi 7題材可上調事件Beta，但Q4 EPS仍為負使基本面修復結論不能過度延伸。</li><li>一日外資大賣、借券賣出增加與當沖比重偏高，代表短線波動與洗盤/派發辨識要優先於單純看多。</li><li>若34.05至35.20支撐帶守住並站回35.90，仍有回到37.10至39.85箱體上緣的機會；若日收跌破34.05，則修正目標會轉向32.70至33.25。</li></ul>
+        </article>
+      </div>
+      <div class="grid-2" style="margin-top:16px;">
+        <section class="mini-card">
+          <h4>多週期判讀</h4>
+          <p>中期事件多頭仍在，但短線成本帶失守、盤中偏弱，屬高檔震盪回測而非乾淨主升。</p>
+          <div class="grid-2" style="margin-top:12px;">
+    <article class="mtf-card">
+      <h4>日K結構</h4>
+      <p>04/17收36.80，KDJ K53.26/D52.86/J54.07，RSI6 60.45，MACD OSC 0.33，DI+30.47大於DI-10.41，ADX 40.93</p>
+      <p class="muted">動能仍正，但已低於37.10至37.56事件成本帶。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>05_技術圖_日週月季年合併.png</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>日K.header</li><li>日K.KD</li><li>日K.RSI</li><li>日K.MACD</li><li>日K.DM</li></ul></div><div><h5>推導方法</h5><p>由上傳日K圖讀取指標與收盤資訊。</p></div></div></details>
+    </article>
+    
+    <article class="mtf-card">
+      <h4>週K結構</h4>
+      <p>週K收36.80，週高38.50；RSI6 75.1、RSI12 71.4；MACD OSC 1.58；ADX 48.89</p>
+      <p class="muted">週線趨勢強，但RSI偏高，容易震盪。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>05_技術圖_日週月季年合併.png</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>週K.header</li><li>週K.RSI</li><li>週K.MACD</li><li>週K.DM</li></ul></div><div><h5>推導方法</h5><p>由上傳週K圖讀取指標。</p></div></div></details>
+    </article>
+    
+    <article class="mtf-card">
+      <h4>月K結構</h4>
+      <p>2026/04月K暫收36.80，月漲13.41%；月高39.85；RSI6 83.18；KDJ J94.45；MACD OSC 2.38</p>
+      <p class="muted">月線強勢但過熱，前高39.85是重要上緣。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>05_技術圖_日週月季年合併.png</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>月K.header</li><li>月K.KD</li><li>月K.RSI</li><li>月K.MACD</li></ul></div><div><h5>推導方法</h5><p>由上傳月K圖讀取指標。</p></div></div></details>
+    </article>
+    
+    <article class="mtf-card">
+      <h4>季K結構</h4>
+      <p>2026Q2暫收36.80，季漲13.41%；KDJ K49.05/D34.48/J78.19；ADX 34.55</p>
+      <p class="muted">季線轉強但仍需確認能否突破39.85。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>05_技術圖_日週月季年合併.png</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>季K.header</li><li>季K.KD</li><li>季K.DM</li></ul></div><div><h5>推導方法</h5><p>由上傳季K圖讀取指標。</p></div></div></details>
+    </article>
+    
+    <article class="mtf-card">
+      <h4>年K結構</h4>
+      <p>2026年暫收36.80，年漲52.38%；年高39.85；RSI6 65.74；ADX 74.05</p>
+      <p class="muted">長週期轉強，但距離年高仍需突破確認。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>05_技術圖_日週月季年合併.png</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>年K.header</li><li>年K.RSI</li><li>年K.DM</li></ul></div><div><h5>推導方法</h5><p>由上傳年K圖讀取指標。</p></div></div></details>
+    </article>
+    
+    <article class="mtf-card">
+      <h4>分K結構</h4>
+      <p>04/20分K最新約34.65，低於session VWAP 35.9061；5m/1m Donchian上中下皆34.65且width 0</p>
+      <p class="muted">不可用分K單獨推翻日週月架構，但可提升防守權重。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>03_技術結構摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>session_vwap</li><li>timeframes.60m.latest_close</li><li>timeframes.5m.latest_close</li><li>timeframes.5m.donchian20</li><li>technical_context_notes</li></ul></div><div><h5>推導方法</h5><p>直接引用分K摘要；因大量補平bar，僅作短線警訊。</p></div></div></details>
+    </article>
+    </div>
+        </section>
+        <section class="mini-card">
+          <h4>七大分數 / 證據強度</h4>
+          <div class="grid-2" style="margin-top:12px;">
+    <article class="score-card">
+      <div class="score-top">
+        <h4>趨勢結構</h4>
+        <span class='badge badge-good'>中高</span>
+      </div>
+      <p>多週期動能仍偏多，週/月線強，但收盤低於事件成本帶使短線趨勢扣分。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>05_技術圖_日週月季年合併.png</li><li>03_技術結構摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>日K.RSI/MACD/DM</li><li>週K.RSI/MACD/DM</li><li>月K.header</li><li>primary_avwap.avwap</li></ul></div><div><h5>推導方法</h5><p>綜合引用欄位評分。</p></div></div></details>
+    </article>
+    
+    <article class="score-card">
+      <div class="score-top">
+        <h4>籌碼結構</h4>
+        <span class='badge badge-warn'>中</span>
+      </div>
+      <p>1日外資與三大法人轉賣，但3日/5日累計仍正，判為中性偏多但不穩。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>institutional_flow.foreign_net_1d</li><li>institutional_flow.foreign_net_3d</li><li>institutional_flow.total_institutional_net_1d</li><li>institutional_flow.total_institutional_net_5d</li></ul></div><div><h5>推導方法</h5><p>綜合引用欄位評分。</p></div></div></details>
+    </article>
+    
+    <article class="score-card">
+      <div class="score-top">
+        <h4>量能與流動性</h4>
+        <span class='badge badge-warn'>中</span>
+      </div>
+      <p>成交量約低於5日均量，流動性仍高但追價動能未延續。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>volume_lot</li><li>volume_ratio_5d</li><li>turnover_100m</li><li>turnover_rate_pct</li></ul></div><div><h5>推導方法</h5><p>綜合引用欄位評分。</p></div></div></details>
+    </article>
+    
+    <article class="score-card">
+      <div class="score-top">
+        <h4>事件與基本面</h4>
+        <span class='badge badge-good'>中高</span>
+      </div>
+      <p>3月營收明顯改善與法說題材加分；Q4 EPS仍負與毛利率18.81%限制評分。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>02_事件與基本面摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>month_revenue.latest_month.mom_pct</li><li>month_revenue.latest_month.yoy_pct</li><li>financial_report.eps</li><li>financial_report.gross_margin_pct</li><li>earnings_call.summary</li></ul></div><div><h5>推導方法</h5><p>綜合引用欄位評分。</p></div></div></details>
+    </article>
+    
+    <article class="score-card">
+      <div class="score-top">
+        <h4>短線風險控制</h4>
+        <span class='badge badge-warn'>中低</span>
+      </div>
+      <p>當沖比高、借券賣出增加、分K低於session VWAP，短線風險偏高。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li><li>03_技術結構摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>day_trade_state.day_trade_ratio_pct</li><li>margin_short_borrow.borrow_sell_delta</li><li>session_vwap</li><li>timeframes.5m.latest_close</li></ul></div><div><h5>推導方法</h5><p>綜合引用欄位評分。</p></div></div></details>
+    </article>
+    
+    <article class="score-card">
+      <div class="score-top">
+        <h4>進場品質</h4>
+        <span class='badge badge-warn'>中低</span>
+      </div>
+      <p>目前未收復37.10至37.56，支撐止跌也未確認，進場品質不如等待觸發。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>03_技術結構摘要.json</li><li>04_錨點候選集.json</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>primary_avwap.avwap</li><li>candidates</li><li>raw_section_snapshots.price_legal_margin</li></ul></div><div><h5>推導方法</h5><p>綜合引用欄位評分。</p></div></div></details>
+    </article>
+    </div>
+        </section>
+      </div>
+    
+      </div>
+    </details>
+    
+      
+    <details id="scenarios" class="panel" open>
+      <summary class="panel-head">
+        <div class="panel-title-wrap">
+          <h2>情境推演與監控</h2>
+        </div>
+        <div class="badge-row"><span class='badge badge-plain'>回測洗盤</span><span class='badge badge-plain'>箱體震盪整理</span></div>
+      </summary>
+      <div class="panel-body">
+        
+      <div class="grid-2">
+        <section class="mini-card">
+          <h4>未來 1 週</h4>
+          <div class="grid-2" style="margin-top:12px;">
+    <article class="scenario-card">
+      <div class="scenario-head">
+        <h4>強勢續攻</h4>
+        <div class="badge-row">
+          <span class='badge badge-plain'>1週</span>
+          <span class='badge badge-good'>18%</span>
+          <span class='badge badge-warn'>中低</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>快速站回37.10至37.56，並放量突破37.95。</p>
+      <p><strong>目標：</strong>38.5~39.85</p>
+      <p><strong>失效：</strong>跌回36.80以下且無法收復37.10。</p>
+      <p><strong>驅動：</strong>事件營收題材延續、外資賣壓停止。</p>
+      <p class="muted">觀察2026-04-17月營收/財報事件後續與04月營收預期。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li><li>02_事件與基本面摘要.json</li><li>03_技術結構摘要.json</li><li>04_錨點候選集.json</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>latest_close</li><li>institutional_flow</li><li>event_window</li><li>primary_avwap</li><li>candidates</li><li>session_vwap</li><li>raw_section_snapshots.price_legal_margin</li></ul></div><div><h5>推導方法</h5><p>綜合收盤、AVWAP、事件窗、籌碼與近期高低點推估情境機率。</p></div></div></details>
+    </article>
+    
+    <article class="scenario-card">
+      <div class="scenario-head">
+        <h4>高檔整理</h4>
+        <div class="badge-row">
+          <span class='badge badge-plain'>1週</span>
+          <span class='badge badge-good'>27%</span>
+          <span class='badge badge-warn'>中</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>價格在35.85至37.95間震盪，量能低於04/16爆量。</p>
+      <p><strong>目標：</strong>35.85~37.95</p>
+      <p><strong>失效：</strong>日收跌破34.35。</p>
+      <p><strong>驅動：</strong>成本帶上方賣壓與下方支撐並存。</p>
+      <p class="muted">觀察外資是否由1日賣超轉回買超。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li><li>02_事件與基本面摘要.json</li><li>03_技術結構摘要.json</li><li>04_錨點候選集.json</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>latest_close</li><li>institutional_flow</li><li>event_window</li><li>primary_avwap</li><li>candidates</li><li>session_vwap</li><li>raw_section_snapshots.price_legal_margin</li></ul></div><div><h5>推導方法</h5><p>綜合收盤、AVWAP、事件窗、籌碼與近期高低點推估情境機率。</p></div></div></details>
+    </article>
+    
+    <article class="scenario-card">
+      <div class="scenario-head">
+        <h4>回測洗盤</h4>
+        <div class="badge-row">
+          <span class='badge badge-plain'>1週</span>
+          <span class='badge badge-good'>35%</span>
+          <span class='badge badge-warn'>中</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>回測34.05至35.20支撐區但未日收跌破34.05。</p>
+      <p><strong>目標：</strong>34.05~35.2</p>
+      <p><strong>失效：</strong>日收跌破34.05。</p>
+      <p><strong>驅動：</strong>雙AVWAP失守後，短線籌碼洗盤與當沖降溫。</p>
+      <p class="muted">觀察借券賣出與當沖比是否下降。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li><li>02_事件與基本面摘要.json</li><li>03_技術結構摘要.json</li><li>04_錨點候選集.json</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>latest_close</li><li>institutional_flow</li><li>event_window</li><li>primary_avwap</li><li>candidates</li><li>session_vwap</li><li>raw_section_snapshots.price_legal_margin</li></ul></div><div><h5>推導方法</h5><p>綜合收盤、AVWAP、事件窗、籌碼與近期高低點推估情境機率。</p></div></div></details>
+    </article>
+    
+    <article class="scenario-card">
+      <div class="scenario-head">
+        <h4>轉弱下破</h4>
+        <div class="badge-row">
+          <span class='badge badge-plain'>1週</span>
+          <span class='badge badge-good'>20%</span>
+          <span class='badge badge-warn'>中低</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>放量跌破34.05，反彈無法站回34.35至35.20。</p>
+      <p><strong>目標：</strong>32.7~33.25</p>
+      <p><strong>失效：</strong>重新站回35.90並收復36.80。</p>
+      <p><strong>驅動：</strong>事件題材降溫、法人續賣、支撐失守。</p>
+      <p class="muted">觀察2026-04-20完整EOD與隔日法人籌碼。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li><li>02_事件與基本面摘要.json</li><li>03_技術結構摘要.json</li><li>04_錨點候選集.json</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>latest_close</li><li>institutional_flow</li><li>event_window</li><li>primary_avwap</li><li>candidates</li><li>session_vwap</li><li>raw_section_snapshots.price_legal_margin</li></ul></div><div><h5>推導方法</h5><p>綜合收盤、AVWAP、事件窗、籌碼與近期高低點推估情境機率。</p></div></div></details>
+    </article>
+    </div>
+        </section>
+        <section class="mini-card">
+          <h4>未來 1 月</h4>
+          <div class="grid-2" style="margin-top:12px;">
+    <article class="scenario-card">
+      <div class="scenario-head">
+        <h4>主升延續</h4>
+        <div class="badge-row">
+          <span class='badge badge-plain'>1月</span>
+          <span class='badge badge-good'>25%</span>
+          <span class='badge badge-warn'>中低</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>日/週線站回37.56並有效突破39.85前高。</p>
+      <p><strong>目標：</strong>41.7~41.9；44.1~44.35</p>
+      <p><strong>失效：</strong>突破後跌回38.50以下。</p>
+      <p><strong>驅動：</strong>3月營收改善被延續驗證，DOCSIS4.0/Wi-Fi 7與10G寬頻題材持續發酵。</p>
+      <p class="muted">2026-04月營收、2026-05-15法說/IR。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li><li>02_事件與基本面摘要.json</li><li>03_技術結構摘要.json</li><li>04_錨點候選集.json</li><li>07_EOD_context_原始摘要.json</li><li>05_技術圖_日週月季年合併.png</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>latest_close</li><li>institutional_flow</li><li>event_window</li><li>primary_avwap</li><li>candidates</li><li>session_vwap</li><li>raw_section_snapshots.price_legal_margin</li><li>月K.high</li><li>週K.RSI</li></ul></div><div><h5>推導方法</h5><p>以39.85突破與延伸目標推估。</p></div></div></details>
+    </article>
+    
+    <article class="scenario-card">
+      <div class="scenario-head">
+        <h4>箱體震盪整理</h4>
+        <div class="badge-row">
+          <span class='badge badge-plain'>1月</span>
+          <span class='badge badge-good'>35%</span>
+          <span class='badge badge-warn'>中</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>32.70至39.85大箱體內震盪，37.10至37.56反覆爭奪。</p>
+      <p><strong>目標：</strong>32.7~39.85</p>
+      <p><strong>失效：</strong>日收跌破32.70或週收突破39.85。</p>
+      <p><strong>驅動：</strong>事件題材與獲利疑慮並存，籌碼換手。</p>
+      <p class="muted">觀察後續月營收與法人3/5日趨勢是否延續。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li><li>02_事件與基本面摘要.json</li><li>03_技術結構摘要.json</li><li>04_錨點候選集.json</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>latest_close</li><li>institutional_flow</li><li>event_window</li><li>primary_avwap</li><li>candidates</li><li>session_vwap</li><li>raw_section_snapshots.price_legal_margin</li></ul></div><div><h5>推導方法</h5><p>綜合收盤、AVWAP、事件窗、籌碼與近期高低點推估情境機率。</p></div></div></details>
+    </article>
+    
+    <article class="scenario-card">
+      <div class="scenario-head">
+        <h4>高位派發轉弱</h4>
+        <div class="badge-row">
+          <span class='badge badge-plain'>1月</span>
+          <span class='badge badge-good'>25%</span>
+          <span class='badge badge-warn'>中低</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>反彈不過37.10至37.95，且外資/三大法人連續賣超。</p>
+      <p><strong>目標：</strong>32.7~33.25</p>
+      <p><strong>失效：</strong>重新站回37.56並放量突破38.50。</p>
+      <p><strong>驅動：</strong>當沖與借券偏高，事件後追價買盤不足。</p>
+      <p class="muted">觀察借券賣出餘額與當沖比是否維持高檔。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li><li>02_事件與基本面摘要.json</li><li>03_技術結構摘要.json</li><li>04_錨點候選集.json</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>latest_close</li><li>institutional_flow</li><li>event_window</li><li>primary_avwap</li><li>candidates</li><li>session_vwap</li><li>raw_section_snapshots.price_legal_margin</li></ul></div><div><h5>推導方法</h5><p>綜合收盤、AVWAP、事件窗、籌碼與近期高低點推估情境機率。</p></div></div></details>
+    </article>
+    
+    <article class="scenario-card">
+      <div class="scenario-head">
+        <h4>破位進入修正</h4>
+        <div class="badge-row">
+          <span class='badge badge-plain'>1月</span>
+          <span class='badge badge-good'>15%</span>
+          <span class='badge badge-bad'>低</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>跌破32.70且週線無法收回33.25。</p>
+      <p><strong>目標：</strong>30.25~31.9</p>
+      <p><strong>失效：</strong>重新站回34.35並量縮止跌。</p>
+      <p><strong>驅動：</strong>事件波段失敗後回測3月前段平台。</p>
+      <p class="muted">觀察2026-04月營收是否能支持估值。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>06_Goodinfo整合報表.html</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>raw_section_snapshots.price_legal_margin[2026-03-17].close</li><li>raw_section_snapshots.price_legal_margin[2026-03-25].close</li><li>raw_section_snapshots.price_legal_margin[2026-03-20].low</li></ul></div><div><h5>推導方法</h5><p>以前段3月平台30.25至31.90作破位後修正參考。</p></div></div></details>
+    </article>
+    </div>
+        </section>
+      </div>
+      <section class="mini-card" style="margin-top:14px;">
+        <h4>監控清單</h4>
+        <div class="grid-2" style="margin-top:12px;">
+    <article class="watch-card">
+      <div class="watch-head">
+        <h4>37.10至37.56事件/突破AVWAP成本帶是否收復</h4>
+        <div class="badge-row">
+          <span class='badge badge-plain'>日K/事件AVWAP</span>
+          <span class='badge badge-good'>中高</span>
+        </div>
+      </div>
+      <p>站回才恢復偏多追蹤；未站回則先視為反彈壓力。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>03_技術結構摘要.json</li><li>04_錨點候選集.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>primary_avwap.avwap</li><li>candidates[0].anchor_price</li><li>candidates[1].anchor_price</li></ul></div><div><h5>推導方法</h5><p>以雙AVWAP作多方成本帶。</p></div></div></details>
+    </article>
+    
+    <article class="watch-card">
+      <div class="watch-head">
+        <h4>34.05至35.20支撐帶是否日收失守</h4>
+        <div class="badge-row">
+          <span class='badge badge-plain'>日K</span>
+          <span class='badge badge-warn'>中</span>
+        </div>
+      </div>
+      <p>跌破34.05後，第一回測目標轉向32.70至33.25。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>06_Goodinfo整合報表.html</li><li>07_EOD_context_原始摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>raw_section_snapshots.price_legal_margin[2026-04-14].low</li><li>raw_section_snapshots.price_legal_margin[2026-04-16].low</li></ul></div><div><h5>推導方法</h5><p>以近期低點與突破日低點作支撐帶。</p></div></div></details>
+    </article>
+    
+    <article class="watch-card">
+      <div class="watch-head">
+        <h4>外資與三大法人是否由一日賣超轉回3/5日延續買超</h4>
+        <div class="badge-row">
+          <span class='badge badge-plain'>EOD</span>
+          <span class='badge badge-good'>高</span>
+        </div>
+      </div>
+      <p>若連續賣超，37.10至37.95壓力會加重。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>institutional_flow.foreign_net_1d</li><li>institutional_flow.foreign_net_3d</li><li>institutional_flow.total_institutional_net_1d</li><li>institutional_flow.total_institutional_net_5d</li></ul></div><div><h5>推導方法</h5><p>直接追蹤法人買賣超欄位。</p></div></div></details>
+    </article>
+    
+    <article class="watch-card">
+      <div class="watch-head">
+        <h4>借券賣出增加與當沖比是否降溫</h4>
+        <div class="badge-row">
+          <span class='badge badge-plain'>EOD</span>
+          <span class='badge badge-good'>高</span>
+        </div>
+      </div>
+      <p>目前借券增加143張、當沖比35.7%，短線籌碼敏感。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>01_市場快照.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>margin_short_borrow.borrow_sell_delta</li><li>margin_short_borrow.borrow_sell_balance</li><li>day_trade_state.day_trade_ratio_pct</li><li>day_trade_state.day_trade_ratio_5d_avg_pct</li></ul></div><div><h5>推導方法</h5><p>直接追蹤借券與當沖欄位。</p></div></div></details>
+    </article>
+    
+    <article class="watch-card">
+      <div class="watch-head">
+        <h4>月營收與法說事件能否驗證基本面修復</h4>
+        <div class="badge-row">
+          <span class='badge badge-plain'>事件/基本面</span>
+          <span class='badge badge-good'>中高</span>
+        </div>
+      </div>
+      <p>3月營收強但Q4 EPS為負，下一步需看毛利率與訂單能見度。</p>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>02_事件與基本面摘要.json</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>month_revenue.latest_month</li><li>financial_report</li><li>earnings_call.next_date</li><li>news</li></ul></div><div><h5>推導方法</h5><p>追蹤月營收、財報與法說事件資料。</p></div></div></details>
+    </article>
+    </div>
+      </section>
+    
+      </div>
+    </details>
+    
+      
+    <details id="governance" class="panel" open>
+      <summary class="panel-head">
+        <div class="panel-title-wrap">
+          <h2>校正、回測與治理</h2>
+        </div>
+        <div class="badge-row"><span class='badge badge-plain'>延後觀察</span><span class='badge badge-plain'>維持不變</span></div>
+      </summary>
+      <div class="panel-body">
+        
+    <details class="subpanel" open>
+      <summary class="subpanel-head">
+        <h3>資料完整性</h3>
+        <div class="badge-row"><span class='badge badge-good'>標的一致：通過</span></div>
+      </summary>
+      <div class="subpanel-body">
+        
+      <p>正式分析；標的代號與名稱在市場快照、事件摘要、技術摘要與錨點候選集中一致。需區分收盤基準表的36.80與2026-04-20分K最新34.65，不混成同一時點。</p>
+      <p class="muted">01/02/03/04檔案資料日期為2026-04-20；Goodinfo/技術圖可定位的最新收盤列為2026-04-17收36.80；03/04分K與session VWAP為2026-04-20盤中資料，僅作短線風險層使用。</p>
+      <div class="grid-3">
+        <article class="mini-card"><h4>第一層核心資料</h4><p>通過：symbol=2419、stock_name=仲琦於主要JSON檔一致。</p></article>
+        <article class="mini-card"><h4>第二層強化資料</h4><p>通過但有日期分層：EOD/籌碼欄位採01與07摘要；事件欄位採02摘要；AVWAP與分K採03/04摘要。</p></article>
+        <article class="mini-card"><h4>第三層增強資料</h4><p>技術圖可輔助多週期判讀；分K樣本含大量補平bar，intraday訊號信心需下修。</p></article>
+      </div>
+      <div class="grid-2">
+        <article class="mini-card"><h4>高信心欄位</h4><ul class='bullet-list'><li>symbol</li><li>stock_name</li><li>market_snapshot_eod.close</li><li>market_snapshot_eod.volume_lot</li><li>institutional_flow</li><li>month_revenue.latest_month</li><li>financial_report</li><li>avwap_candidates</li></ul></article>
+        <article class="mini-card"><h4>中信心欄位</h4><ul class='bullet-list'><li>multi_timeframe_indicators_from_chart</li><li>key_levels_from_recent_ohlc_and_avwap</li><li>scenario_probabilities</li><li>stage_assessment</li></ul></article>
+        <article class="mini-card"><h4>低信心欄位</h4><ul class='bullet-list'><li>intraday_60m_30m_donchian_atr_due_sample_shortage</li><li>rss_news_interpretation_without_manual_confirmation</li><li>extension_targets</li></ul></article>
+        <article class="mini-card"><h4>未確認欄位</h4><ul class='bullet-list'><li>2026-04-20完整EOD正式收盤列</li><li>Cable/PON產品占比與訂單能見度</li><li>broker_top_buyers_sellers</li><li>重大訊息正式公告逐條人工複核</li></ul></article>
+      </div>
+    
+      </div>
+    </details>
+    
+    <details class="subpanel" open>
+      <summary class="subpanel-head">
+        <h3>回測與缺口</h3>
+        <div class="badge-row"><span class='badge badge-warn'>未提供</span></div>
+      </summary>
+      <div class="subpanel-body">
+        
+      <p>未提供先前分析、進出場紀錄或實現績效，本區不做正式回測審計。</p>
+      <div class="grid-2">
+        <article class="mini-card"><h4>缺口</h4><ul class='bullet-list'><li>缺少上一版分析結論與實際走勢對照。</li><li>缺少策略執行紀錄、滑價與停損停利規則。</li></ul></article>
+        <article class="mini-card"><h4>下一輪最佳假設</h4><ul class='bullet-list'><li>驗證37.10至37.56成本帶收復是否能提升勝率。</li><li>驗證34.05至35.20支撐帶跌破後是否會回測32.70至33.25。</li><li>追蹤營收事件後3至10日的法人買賣超是否決定箱體方向。</li></ul></article>
+      </div>
+    
+      </div>
+    </details>
+    
+    <details class="subpanel" open>
+      <summary class="subpanel-head">
+        <h3>固定設定卡回測校正</h3>
+        <div class="badge-row"><span class='badge badge-warn'>維持不變</span><span class='badge badge-warn'>中</span></div>
+      </summary>
+      <div class="subpanel-body">
+        
+      <p>本次資料顯示DOCSIS4.0、Wi-Fi 7、10G寬頻、企業/工業網通投資與月營收事件，與既有固定設定卡的Cable/FTTx/寬頻接取、營運商專案、企業網路升級與事件Beta框架相符；單次Perle投資新聞與短線波動不足以證明股性或核心主線已持續性改變。</p>
+      <div class="grid-2">
+        <article class="mini-card"><h4>變動欄位</h4><p class='muted'>資料不足</p></article>
+        <article class="mini-card"><h4>建議覆寫內容</h4><p class='muted'>本輪沒有 proposed_profile 更新內容。</p></article>
+      </div>
+      <details class='source-basis'><summary>來源與推導依據</summary><div class='source-grid'><div><h5>來源檔案</h5><ul class='bullet-list'><li>02_事件與基本面摘要.json</li><li>08_2419_仲琦_GPT54Pro_結構化JSON提示詞_v1.md</li></ul></div><div><h5>使用欄位</h5><ul class='bullet-list'><li>earnings_call.summary</li><li>news[1].title</li><li>news[2].title</li><li>固定設定卡.核心主線</li><li>固定設定卡.事件Beta</li></ul></div><div><h5>推導方法</h5><p>比對本次事件/新聞與固定設定卡主線，未發現需自動覆寫的持續性證據。</p></div></div></details>
+    
+      </div>
+    </details>
+    
+    <details class="subpanel" open>
+      <summary class="subpanel-head">
+        <h3>專屬校正框架</h3>
+        <div class="badge-row"><span class='badge badge-warn'>延後觀察</span><span class='badge badge-warn'>中</span></div>
+      </summary>
+      <div class="subpanel-body">
+        
+      <p><strong>本輪結論：</strong>未發現需要升級專屬提示詞段落結構的連續性證據。</p>
+      <p><strong>判斷理由：</strong>本次變化主要是事件窗、月營收與短線技術/籌碼波動；尚無同類型失準重複、核心主線持續改變或固定設定卡失效證據。</p>
+      <div class="grid-2">
+        <article class="mini-card">
+          <h4>檢視範圍</h4>
+          <ul class='bullet-list'><li>觸發原因：本次為例行正式分析，未提供先前失準案例或回測審計資料。</li><li>固定設定狀態：mature</li><li>框架成熟度：iterating</li></ul>
+        </article>
+        <article class="mini-card">
+          <h4>證據視窗</h4>
+          <ul class='bullet-list'><li>關鍵事件：2026-03月營收MoM 100.60%、YoY 54.96%</li><li>關鍵事件：2025Q4 EPS -0.36、毛利率18.81%</li><li>關鍵事件：2026-02-26法說提及DOCSIS4.0與Wi-Fi 7出貨走揚</li><li>關鍵事件：2026-04月新聞包含10G寬頻、Perle Systems投資與WiFi7/DOCSIS題材</li></ul>
+        </article>
+      </div>
+      <div class="grid-3">
+        <article class="mini-card"><h4>段落修補建議</h4><p class='muted'>本輪沒有 section_patches。</p></article>
+        <article class="mini-card"><h4>權重調整建議</h4><p class='muted'>本輪沒有 weight_adjustments。</p></article>
+        <article class="mini-card"><h4>切換規則更新</h4><p class='muted'>本輪沒有 switch_rule_updates。</p></article>
+      </div>
+      <div class="grid-2">
+        <article class="mini-card"><h4>下一輪必驗證</h4><ul class='bullet-list'><li>37.10至37.56成本帶收復與否是否決定一週方向。</li><li>34.05至35.20支撐帶失守後是否回測32.70至33.25。</li><li>月營收改善是否延續至下一次營收公布與法說內容。</li></ul></article>
+        <article class="mini-card"><h4>保留規則</h4><ul class='bullet-list'><li>單日新聞、單日爆量或單日漲停不得觸發框架升級。</li><li>分K補平bar過多時不得主導波段框架判斷。</li></ul></article>
+        <article class="mini-card"><h4>成功判準</h4><ul class='bullet-list'><li>下一輪若收復37.56且突破39.85，主升延續劇本需被驗證。</li><li>若跌破34.05且回測32.70至33.25，回測洗盤轉修正劇本需被驗證。</li></ul></article>
+        <article class="mini-card"><h4>失敗判準</h4><ul class='bullet-list'><li>若價格方向與37.10至37.56成本帶關係連續失準兩次以上，才考慮新增狀態切換規則。</li><li>若營收/法說事件持續無法解釋股價反應，再檢討事件Beta權重。</li></ul></article>
+      </div>
+    
+      </div>
+    </details>
+    <details class='full-json'><summary>完整結構化 JSON</summary><pre class='json-block'>{
+  &quot;meta&quot;: {
+    &quot;schema_version&quot;: &quot;v1&quot;,
+    &quot;prompt_version&quot;: &quot;json_v1&quot;,
+    &quot;symbol&quot;: &quot;2419&quot;,
+    &quot;stock_name&quot;: &quot;仲琦&quot;,
+    &quot;data_date&quot;: &quot;2026-04-20&quot;,
+    &quot;technical_intraday_latest_stamp&quot;: &quot;2026-04-20&quot;,
+    &quot;analysis_status&quot;: &quot;formal&quot;,
+    &quot;analysis_mode&quot;: &quot;C&quot;,
+    &quot;language&quot;: &quot;zh-TW&quot;
+  },
+  &quot;integrity&quot;: {
+    &quot;status_note&quot;: &quot;正式分析；標的代號與名稱在市場快照、事件摘要、技術摘要與錨點候選集中一致。需區分收盤基準表的36.80與2026-04-20分K最新34.65，不混成同一時點。&quot;,
+    &quot;symbol_match_passed&quot;: true,
+    &quot;date_layering_note&quot;: &quot;01/02/03/04檔案資料日期為2026-04-20；Goodinfo/技術圖可定位的最新收盤列為2026-04-17收36.80；03/04分K與session VWAP為2026-04-20盤中資料，僅作短線風險層使用。&quot;,
+    &quot;tier_1_status&quot;: &quot;通過：symbol=2419、stock_name=仲琦於主要JSON檔一致。&quot;,
+    &quot;tier_2_status&quot;: &quot;通過但有日期分層：EOD/籌碼欄位採01與07摘要；事件欄位採02摘要；AVWAP與分K採03/04摘要。&quot;,
+    &quot;tier_3_status&quot;: &quot;技術圖可輔助多週期判讀；分K樣本含大量補平bar，intraday訊號信心需下修。&quot;,
+    &quot;high_confidence_fields&quot;: [
+      &quot;symbol&quot;,
+      &quot;stock_name&quot;,
+      &quot;market_snapshot_eod.close&quot;,
+      &quot;market_snapshot_eod.volume_lot&quot;,
+      &quot;institutional_flow&quot;,
+      &quot;month_revenue.latest_month&quot;,
+      &quot;financial_report&quot;,
+      &quot;avwap_candidates&quot;
+    ],
+    &quot;medium_confidence_fields&quot;: [
+      &quot;multi_timeframe_indicators_from_chart&quot;,
+      &quot;key_levels_from_recent_ohlc_and_avwap&quot;,
+      &quot;scenario_probabilities&quot;,
+      &quot;stage_assessment&quot;
+    ],
+    &quot;low_confidence_fields&quot;: [
+      &quot;intraday_60m_30m_donchian_atr_due_sample_shortage&quot;,
+      &quot;rss_news_interpretation_without_manual_confirmation&quot;,
+      &quot;extension_targets&quot;
+    ],
+    &quot;unconfirmed_fields&quot;: [
+      &quot;2026-04-20完整EOD正式收盤列&quot;,
+      &quot;Cable/PON產品占比與訂單能見度&quot;,
+      &quot;broker_top_buyers_sellers&quot;,
+      &quot;重大訊息正式公告逐條人工複核&quot;
+    ]
+  },
+  &quot;facts_gaps_inference&quot;: {
+    &quot;known_facts&quot;: [
+      &quot;2419仲琦在01市場快照與02/03/04摘要中代號名稱一致。&quot;,
+      &quot;收盤基準摘要顯示最新收盤36.80、跌0.95元、跌幅2.52%、成交量12,911張、成交值4.79億元、量比5日均量0.93。&quot;,
+      &quot;法人籌碼呈現一日轉賣：外資1日賣超3,195張、三大法人1日賣超3,412張；但3日與5日三大法人仍分別買超4,466張與4,589張。&quot;,
+      &quot;2026-03月營收1,007,693千元，MoM 100.60%、YoY 54.96%，備註為配合客戶需求出貨量增加。&quot;,
+      &quot;2025Q4財報EPS為-0.36、毛利率18.81%、營業利益率1.5%，顯示營收事件偏正面但獲利品質仍需追蹤。&quot;,
+      &quot;AVWAP候選顯示突破段起漲AVWAP為37.5578、月營收出表AVWAP為37.1001；36.80收盤已低於兩者。&quot;,
+      &quot;2026-04-20分K最新價34.65低於session VWAP 35.9061，但分K資料含大量補平bar，僅作短線警訊。&quot;
+    ],
+    &quot;missing_or_to_verify&quot;: [
+      &quot;2026-04-20完整EOD正式收盤與當日法人籌碼尚需補入，避免用盤中34.65覆蓋收盤36.80。&quot;,
+      &quot;新聞來源多為RSS彙整，4月重大訊息與投資Perle Systems等事項需人工核對正式公告內容與金額條件。&quot;,
+      &quot;固定設定卡要求的Cable/PON占比、營運商專案、庫存與訂單能見度，本次資料包沒有完整量化資料。&quot;,
+      &quot;分K Donchian與ATR多處樣本不足或補平bar過多，不能作為波段主結論。&quot;
+    ],
+    &quot;inferences&quot;: [
+      &quot;目前較像事件題材推升後的高檔回測期，而非乾淨主升追價點；37.10至37.56成本帶是否收復是多方再確認核心。&quot;,
+      &quot;3月營收明顯轉強與DOCSIS4.0/Wi-Fi 7題材可上調事件Beta，但Q4 EPS仍為負使基本面修復結論不能過度延伸。&quot;,
+      &quot;一日外資大賣、借券賣出增加與當沖比重偏高，代表短線波動與洗盤/派發辨識要優先於單純看多。&quot;,
+      &quot;若34.05至35.20支撐帶守住並站回35.90，仍有回到37.10至39.85箱體上緣的機會；若日收跌破34.05，則修正目標會轉向32.70至33.25。&quot;
+    ]
+  },
+  &quot;topline&quot;: {
+    &quot;current_state&quot;: &quot;事件題材推升後進入高檔回測；04/17收盤36.80已低於37.10至37.56事件/突破AVWAP成本帶，04/20盤中分K34.65又低於session VWAP，短線防守權重上升。&quot;,
+    &quot;primary_stage&quot;: &quot;事件驅動後高檔回測期&quot;,
+    &quot;secondary_stage&quot;: &quot;成本帶失守後再確認期&quot;,
+    &quot;stage_reason&quot;: &quot;月營收與題材事件偏正面，日週月技術動能仍在多頭側；但收盤低於雙AVWAP、一日法人轉賣、借券賣出增加與當沖比重偏高，使追價品質下降，必須等待成本帶收復或支撐止跌。&quot;,
+    &quot;entry_summary&quot;: {
+      &quot;overall_status&quot;: &quot;partial&quot;,
+      &quot;strongest_setup&quot;: &quot;回測34.05至35.20不破，且重新站回35.90 session VWAP與37.10事件AVWAP。&quot;,
+      &quot;weaker_setup&quot;: &quot;未收復37.10至37.56前直接追高，或僅依單日新聞題材追價。&quot;
+    },
+    &quot;exit_summary&quot;: {
+      &quot;overall_status&quot;: &quot;partial&quot;,
+      &quot;active_warning&quot;: &quot;36.80已低於兩條AVWAP，04/20分K34.65低於session VWAP；若跌破34.05，回測轉修正的機率升高。&quot;,
+      &quot;formal_exit_trigger&quot;: &quot;日收跌破34.05，或反彈無法站回35.90且放量跌破34.35。&quot;
+    },
+    &quot;one_week_main_scenario&quot;: &quot;回測洗盤&quot;,
+    &quot;one_month_main_scenario&quot;: &quot;箱體震盪整理&quot;,
+    &quot;action_note&quot;: &quot;以37.10至37.56作多方成本帶、34.05至35.20作防守帶；成本帶未收復前不把事件題材視為已恢復主升。&quot;,
+    &quot;conviction&quot;: &quot;medium&quot;
+  },
+  &quot;key_levels&quot;: {
+    &quot;core_cost_zone&quot;: {
+      &quot;range_group&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 37.1,
+            &quot;high&quot;: 37.56
+          }
+        ]
+      },
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;03_技術結構摘要.json&quot;,
+          &quot;04_錨點候選集.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;primary_avwap.avwap&quot;,
+          &quot;candidates[0].anchor_price&quot;,
+          &quot;candidates[1].anchor_price&quot;
+        ],
+        &quot;calc_method&quot;: &quot;以突破段起漲AVWAP 37.5578與月營收出表AVWAP 37.1001組成核心成本帶。&quot;
+      },
+      &quot;timeframe&quot;: &quot;日K/事件AVWAP&quot;,
+      &quot;anchors&quot;: [
+        {
+          &quot;label&quot;: &quot;月營收出表AVWAP&quot;,
+          &quot;date&quot;: &quot;2026-04-17&quot;,
+          &quot;price&quot;: 37.1001
+        },
+        {
+          &quot;label&quot;: &quot;突破段起漲AVWAP&quot;,
+          &quot;date&quot;: &quot;2026-04-16&quot;,
+          &quot;price&quot;: 37.5578
+        }
+      ],
+      &quot;trigger_condition&quot;: &quot;收復37.10且最好站穩37.56，才視為事件成本帶重新轉強。&quot;,
+      &quot;confidence&quot;: &quot;medium_high&quot;
+    },
+    &quot;add_zone&quot;: {
+      &quot;range_group&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 35.85,
+            &quot;high&quot;: 36.8
+          }
+        ]
+      },
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;01_市場快照.json&quot;,
+          &quot;03_技術結構摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;latest_close&quot;,
+          &quot;session_vwap&quot;,
+          &quot;timeframes.5m.session_vwap&quot;
+        ],
+        &quot;calc_method&quot;: &quot;以04/17收盤36.80與04/20 session VWAP 35.9061形成短線再站回觀察區。&quot;
+      },
+      &quot;timeframe&quot;: &quot;日K/分K&quot;,
+      &quot;anchors&quot;: [
+        {
+          &quot;label&quot;: &quot;04/17收盤&quot;,
+          &quot;date&quot;: &quot;2026-04-17&quot;,
+          &quot;price&quot;: 36.8
+        },
+        {
+          &quot;label&quot;: &quot;2026-04-20 session VWAP&quot;,
+          &quot;date&quot;: &quot;2026-04-20&quot;,
+          &quot;price&quot;: 35.9061
+        }
+      ],
+      &quot;trigger_condition&quot;: &quot;僅在價格重新站回35.90且量縮止跌時成立；跌破35.85則不視為加碼區。&quot;,
+      &quot;confidence&quot;: &quot;medium_low&quot;
+    },
+    &quot;invalidation_zone&quot;: {
+      &quot;range_group&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 34.05,
+            &quot;high&quot;: 34.35
+          }
+        ]
+      },
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;06_Goodinfo整合報表.html&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-14].low&quot;,
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-14].close&quot;,
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-15].low&quot;
+        ],
+        &quot;calc_method&quot;: &quot;以04/14低點34.05、04/14收盤34.35與04/15低點34.25作短線破位防守帶。&quot;
+      },
+      &quot;timeframe&quot;: &quot;日K&quot;,
+      &quot;anchors&quot;: [
+        {
+          &quot;label&quot;: &quot;2026-04-14低點&quot;,
+          &quot;date&quot;: &quot;2026-04-14&quot;,
+          &quot;price&quot;: 34.05
+        },
+        {
+          &quot;label&quot;: &quot;2026-04-14收盤&quot;,
+          &quot;date&quot;: &quot;2026-04-14&quot;,
+          &quot;price&quot;: 34.35
+        },
+        {
+          &quot;label&quot;: &quot;2026-04-15低點&quot;,
+          &quot;date&quot;: &quot;2026-04-15&quot;,
+          &quot;price&quot;: 34.25
+        }
+      ],
+      &quot;trigger_condition&quot;: &quot;日收跌破34.05或跌破後反彈無法站回34.35，視為回測轉修正。&quot;,
+      &quot;confidence&quot;: &quot;medium&quot;
+    },
+    &quot;first_resistance_zone&quot;: {
+      &quot;range_group&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 37.1,
+            &quot;high&quot;: 37.95
+          }
+        ]
+      },
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;03_技術結構摘要.json&quot;,
+          &quot;04_錨點候選集.json&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;candidates[1].anchor_price&quot;,
+          &quot;primary_avwap.avwap&quot;,
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-17].high&quot;
+        ],
+        &quot;calc_method&quot;: &quot;以月營收AVWAP 37.1001、突破AVWAP 37.5578與04/17高點37.95組成第一壓力。&quot;
+      },
+      &quot;timeframe&quot;: &quot;日K/事件AVWAP&quot;,
+      &quot;anchors&quot;: [
+        {
+          &quot;label&quot;: &quot;月營收出表AVWAP&quot;,
+          &quot;date&quot;: &quot;2026-04-17&quot;,
+          &quot;price&quot;: 37.1001
+        },
+        {
+          &quot;label&quot;: &quot;突破段起漲AVWAP&quot;,
+          &quot;date&quot;: &quot;2026-04-16&quot;,
+          &quot;price&quot;: 37.5578
+        },
+        {
+          &quot;label&quot;: &quot;2026-04-17高點&quot;,
+          &quot;date&quot;: &quot;2026-04-17&quot;,
+          &quot;price&quot;: 37.95
+        }
+      ],
+      &quot;trigger_condition&quot;: &quot;反彈到此區若量縮或外資續賣，容易形成賣壓；放量站穩才轉強。&quot;,
+      &quot;confidence&quot;: &quot;medium_high&quot;
+    },
+    &quot;main_target_zone&quot;: {
+      &quot;range_group&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 38.5,
+            &quot;high&quot;: 39.85
+          }
+        ]
+      },
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;05_技術圖_日週月季年合併.png&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;日K.2026-04-16.high&quot;,
+          &quot;日K.2026-04-09.high&quot;,
+          &quot;月K.high&quot;
+        ],
+        &quot;calc_method&quot;: &quot;以04/16高點38.50與04/09/月K高點39.85作主壓力與前高挑戰區。&quot;
+      },
+      &quot;timeframe&quot;: &quot;日K/月K&quot;,
+      &quot;anchors&quot;: [
+        {
+          &quot;label&quot;: &quot;2026-04-16高點&quot;,
+          &quot;date&quot;: &quot;2026-04-16&quot;,
+          &quot;price&quot;: 38.5
+        },
+        {
+          &quot;label&quot;: &quot;2026-04-09高點&quot;,
+          &quot;date&quot;: &quot;2026-04-09&quot;,
+          &quot;price&quot;: 39.85
+        }
+      ],
+      &quot;trigger_condition&quot;: &quot;須先站回37.56並維持量價不背離，才有機會挑戰。&quot;,
+      &quot;confidence&quot;: &quot;medium&quot;
+    },
+    &quot;support_zone&quot;: {
+      &quot;range_group&quot;: {
+        &quot;range_type&quot;: &quot;multi&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 34.05,
+            &quot;high&quot;: 35.2
+          },
+          {
+            &quot;low&quot;: 32.7,
+            &quot;high&quot;: 33.25
+          }
+        ]
+      },
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;06_Goodinfo整合報表.html&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-16].low&quot;,
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-14].low&quot;,
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-02].low&quot;,
+          &quot;raw_section_snapshots.price_legal_margin[2026-03-26].close&quot;
+        ],
+        &quot;calc_method&quot;: &quot;第一組以34.05至35.20近期低檔與突破日低點組成；第二組以04/02低點32.70與03/26收盤33.25組成。&quot;
+      },
+      &quot;timeframe&quot;: &quot;日K&quot;,
+      &quot;anchors&quot;: [
+        {
+          &quot;label&quot;: &quot;2026-04-16低點&quot;,
+          &quot;date&quot;: &quot;2026-04-16&quot;,
+          &quot;price&quot;: 35.2
+        },
+        {
+          &quot;label&quot;: &quot;2026-04-14低點&quot;,
+          &quot;date&quot;: &quot;2026-04-14&quot;,
+          &quot;price&quot;: 34.05
+        },
+        {
+          &quot;label&quot;: &quot;2026-04-02低點&quot;,
+          &quot;date&quot;: &quot;2026-04-02&quot;,
+          &quot;price&quot;: 32.7
+        }
+      ],
+      &quot;trigger_condition&quot;: &quot;第一支撐失守後，下個防守帶轉向32.70至33.25。&quot;,
+      &quot;confidence&quot;: &quot;medium&quot;
+    },
+    &quot;first_short_target&quot;: {
+      &quot;range_group&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 32.7,
+            &quot;high&quot;: 33.25
+          }
+        ]
+      },
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;06_Goodinfo整合報表.html&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-02].low&quot;,
+          &quot;raw_section_snapshots.price_legal_margin[2026-03-26].close&quot;
+        ],
+        &quot;calc_method&quot;: &quot;若34.05失守，以前次事件起漲後低點32.70與漲停收盤33.25為第一回測目標。&quot;
+      },
+      &quot;timeframe&quot;: &quot;日K&quot;,
+      &quot;anchors&quot;: [
+        {
+          &quot;label&quot;: &quot;2026-04-02低點&quot;,
+          &quot;date&quot;: &quot;2026-04-02&quot;,
+          &quot;price&quot;: 32.7
+        },
+        {
+          &quot;label&quot;: &quot;2026-03-26收盤&quot;,
+          &quot;date&quot;: &quot;2026-03-26&quot;,
+          &quot;price&quot;: 33.25
+        }
+      ],
+      &quot;trigger_condition&quot;: &quot;日收跌破34.05或跌破34.35後反彈不過35.20時啟用。&quot;,
+      &quot;confidence&quot;: &quot;medium&quot;
+    },
+    &quot;first_main_target&quot;: {
+      &quot;range_group&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 37.1,
+            &quot;high&quot;: 37.56
+          }
+        ]
+      },
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;03_技術結構摘要.json&quot;,
+          &quot;04_錨點候選集.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;candidates[0].anchor_price&quot;,
+          &quot;candidates[1].anchor_price&quot;
+        ],
+        &quot;calc_method&quot;: &quot;多方若由支撐反彈，第一目標先看雙AVWAP成本帶收復，而非直接看前高。&quot;
+      },
+      &quot;timeframe&quot;: &quot;日K/事件AVWAP&quot;,
+      &quot;anchors&quot;: [
+        {
+          &quot;label&quot;: &quot;月營收出表AVWAP&quot;,
+          &quot;date&quot;: &quot;2026-04-17&quot;,
+          &quot;price&quot;: 37.1001
+        },
+        {
+          &quot;label&quot;: &quot;突破段起漲AVWAP&quot;,
+          &quot;date&quot;: &quot;2026-04-16&quot;,
+          &quot;price&quot;: 37.5578
+        }
+      ],
+      &quot;trigger_condition&quot;: &quot;34.05至35.20止跌後，先以37.10至37.56為第一回補目標。&quot;,
+      &quot;confidence&quot;: &quot;medium_high&quot;
+    },
+    &quot;extension_1272&quot;: {
+      &quot;range_group&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 41.7,
+            &quot;high&quot;: 41.9
+          }
+        ]
+      },
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;06_Goodinfo整合報表.html&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-02].low&quot;,
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-09].high&quot;
+        ],
+        &quot;calc_method&quot;: &quot;以04/02低點32.70至04/09高點39.85作區間，32.70 + (39.85-32.70) × 1.272 ≈ 41.79。&quot;
+      },
+      &quot;timeframe&quot;: &quot;日K延伸&quot;,
+      &quot;anchors&quot;: [
+        {
+          &quot;label&quot;: &quot;2026-04-02低點&quot;,
+          &quot;date&quot;: &quot;2026-04-02&quot;,
+          &quot;price&quot;: 32.7
+        },
+        {
+          &quot;label&quot;: &quot;2026-04-09高點&quot;,
+          &quot;date&quot;: &quot;2026-04-09&quot;,
+          &quot;price&quot;: 39.85
+        }
+      ],
+      &quot;trigger_condition&quot;: &quot;只有有效突破39.85並站穩後才啟用。&quot;,
+      &quot;confidence&quot;: &quot;low&quot;
+    },
+    &quot;extension_1618&quot;: {
+      &quot;range_group&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 44.1,
+            &quot;high&quot;: 44.35
+          }
+        ]
+      },
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;06_Goodinfo整合報表.html&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-02].low&quot;,
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-09].high&quot;
+        ],
+        &quot;calc_method&quot;: &quot;以04/02低點32.70至04/09高點39.85作區間，32.70 + (39.85-32.70) × 1.618 ≈ 44.27。&quot;
+      },
+      &quot;timeframe&quot;: &quot;日K延伸&quot;,
+      &quot;anchors&quot;: [
+        {
+          &quot;label&quot;: &quot;2026-04-02低點&quot;,
+          &quot;date&quot;: &quot;2026-04-02&quot;,
+          &quot;price&quot;: 32.7
+        },
+        {
+          &quot;label&quot;: &quot;2026-04-09高點&quot;,
+          &quot;date&quot;: &quot;2026-04-09&quot;,
+          &quot;price&quot;: 39.85
+        }
+      ],
+      &quot;trigger_condition&quot;: &quot;須先突破39.85且量價續強，否則不啟用。&quot;,
+      &quot;confidence&quot;: &quot;low&quot;
+    }
+  },
+  &quot;market_snapshot&quot;: {
+    &quot;items&quot;: [
+      {
+        &quot;label&quot;: &quot;收盤與漲跌&quot;,
+        &quot;value_text&quot;: &quot;36.80，-0.95，-2.52%&quot;,
+        &quot;data_type&quot;: &quot;fact&quot;,
+        &quot;source_basis&quot;: {
+          &quot;source_file_ids&quot;: [
+            &quot;01_市場快照.json&quot;,
+            &quot;07_EOD_context_原始摘要.json&quot;
+          ],
+          &quot;source_fields&quot;: [
+            &quot;latest_close&quot;,
+            &quot;change&quot;,
+            &quot;change_pct&quot;,
+            &quot;market_snapshot_eod.close&quot;,
+            &quot;market_snapshot_eod.change_pct&quot;
+          ],
+          &quot;calc_method&quot;: &quot;直接引用市場快照與EOD摘要欄位。&quot;
+        },
+        &quot;timeframe&quot;: &quot;EOD&quot;,
+        &quot;confidence&quot;: &quot;high&quot;,
+        &quot;note&quot;: &quot;Goodinfo可定位最新收盤列為2026-04-17。&quot;
+      },
+      {
+        &quot;label&quot;: &quot;成交量與量比&quot;,
+        &quot;value_text&quot;: &quot;12,911張；5日均量13,827.75張；量比0.93&quot;,
+        &quot;data_type&quot;: &quot;fact&quot;,
+        &quot;source_basis&quot;: {
+          &quot;source_file_ids&quot;: [
+            &quot;01_市場快照.json&quot;
+          ],
+          &quot;source_fields&quot;: [
+            &quot;volume_lot&quot;,
+            &quot;avg_volume_5d_lot&quot;,
+            &quot;volume_ratio_5d&quot;
+          ],
+          &quot;calc_method&quot;: &quot;直接引用市場快照成交量欄位。&quot;
+        },
+        &quot;timeframe&quot;: &quot;EOD&quot;,
+        &quot;confidence&quot;: &quot;high&quot;,
+        &quot;note&quot;: null
+      },
+      {
+        &quot;label&quot;: &quot;成交值與週轉率&quot;,
+        &quot;value_text&quot;: &quot;4.79億元；週轉率4.02%&quot;,
+        &quot;data_type&quot;: &quot;fact&quot;,
+        &quot;source_basis&quot;: {
+          &quot;source_file_ids&quot;: [
+            &quot;01_市場快照.json&quot;
+          ],
+          &quot;source_fields&quot;: [
+            &quot;turnover_100m&quot;,
+            &quot;turnover_rate_pct&quot;
+          ],
+          &quot;calc_method&quot;: &quot;直接引用市場快照欄位。&quot;
+        },
+        &quot;timeframe&quot;: &quot;EOD&quot;,
+        &quot;confidence&quot;: &quot;high&quot;,
+        &quot;note&quot;: null
+      },
+      {
+        &quot;label&quot;: &quot;外資買賣超&quot;,
+        &quot;value_text&quot;: &quot;1日-3,195張；3日+4,512張；5日+4,824張&quot;,
+        &quot;data_type&quot;: &quot;fact&quot;,
+        &quot;source_basis&quot;: {
+          &quot;source_file_ids&quot;: [
+            &quot;01_市場快照.json&quot;
+          ],
+          &quot;source_fields&quot;: [
+            &quot;institutional_flow.foreign_net_1d&quot;,
+            &quot;institutional_flow.foreign_net_3d&quot;,
+            &quot;institutional_flow.foreign_net_5d&quot;
+          ],
+          &quot;calc_method&quot;: &quot;直接引用法人籌碼欄位。&quot;
+        },
+        &quot;timeframe&quot;: &quot;EOD&quot;,
+        &quot;confidence&quot;: &quot;high&quot;,
+        &quot;note&quot;: &quot;一日轉賣與3/5日仍偏多並存。&quot;
+      },
+      {
+        &quot;label&quot;: &quot;三大法人合計&quot;,
+        &quot;value_text&quot;: &quot;1日-3,412張；3日+4,466張；5日+4,589張&quot;,
+        &quot;data_type&quot;: &quot;fact&quot;,
+        &quot;source_basis&quot;: {
+          &quot;source_file_ids&quot;: [
+            &quot;01_市場快照.json&quot;
+          ],
+          &quot;source_fields&quot;: [
+            &quot;institutional_flow.total_institutional_net_1d&quot;,
+            &quot;institutional_flow.total_institutional_net_3d&quot;,
+            &quot;institutional_flow.total_institutional_net_5d&quot;
+          ],
+          &quot;calc_method&quot;: &quot;直接引用法人籌碼欄位。&quot;
+        },
+        &quot;timeframe&quot;: &quot;EOD&quot;,
+        &quot;confidence&quot;: &quot;high&quot;,
+        &quot;note&quot;: null
+      },
+      {
+        &quot;label&quot;: &quot;融資與融券&quot;,
+        &quot;value_text&quot;: &quot;融資餘額7,539張、減45張；融券餘額145張、減29張；券資比1.92%&quot;,
+        &quot;data_type&quot;: &quot;fact&quot;,
+        &quot;source_basis&quot;: {
+          &quot;source_file_ids&quot;: [
+            &quot;01_市場快照.json&quot;
+          ],
+          &quot;source_fields&quot;: [
+            &quot;margin_short_borrow.margin_balance&quot;,
+            &quot;margin_short_borrow.margin_change&quot;,
+            &quot;margin_short_borrow.short_balance&quot;,
+            &quot;margin_short_borrow.short_change&quot;,
+            &quot;margin_short_borrow.short_margin_ratio&quot;
+          ],
+          &quot;calc_method&quot;: &quot;直接引用融資融券欄位。&quot;
+        },
+        &quot;timeframe&quot;: &quot;EOD&quot;,
+        &quot;confidence&quot;: &quot;high&quot;,
+        &quot;note&quot;: null
+      },
+      {
+        &quot;label&quot;: &quot;借券賣出&quot;,
+        &quot;value_text&quot;: &quot;借券賣出增加143張；餘額8,608張；使用率0.18%&quot;,
+        &quot;data_type&quot;: &quot;fact&quot;,
+        &quot;source_basis&quot;: {
+          &quot;source_file_ids&quot;: [
+            &quot;01_市場快照.json&quot;
+          ],
+          &quot;source_fields&quot;: [
+            &quot;margin_short_borrow.borrow_sell_delta&quot;,
+            &quot;margin_short_borrow.borrow_sell_balance&quot;,
+            &quot;margin_short_borrow.borrow_usage_ratio&quot;
+          ],
+          &quot;calc_method&quot;: &quot;直接引用借券欄位。&quot;
+        },
+        &quot;timeframe&quot;: &quot;EOD&quot;,
+        &quot;confidence&quot;: &quot;high&quot;,
+        &quot;note&quot;: &quot;借券增加為短線風險旗標之一。&quot;
+      },
+      {
+        &quot;label&quot;: &quot;現股當沖&quot;,
+        &quot;value_text&quot;: &quot;當沖量4,604張；當沖比35.7%；5日均比42.48%&quot;,
+        &quot;data_type&quot;: &quot;fact&quot;,
+        &quot;source_basis&quot;: {
+          &quot;source_file_ids&quot;: [
+            &quot;01_市場快照.json&quot;
+          ],
+          &quot;source_fields&quot;: [
+            &quot;day_trade_state.day_trade_volume_lot&quot;,
+            &quot;day_trade_state.day_trade_ratio_pct&quot;,
+            &quot;day_trade_state.day_trade_ratio_5d_avg_pct&quot;
+          ],
+          &quot;calc_method&quot;: &quot;直接引用當沖欄位。&quot;
+        },
+        &quot;timeframe&quot;: &quot;EOD&quot;,
+        &quot;confidence&quot;: &quot;high&quot;,
+        &quot;note&quot;: &quot;當沖比仍高，代表短線籌碼較敏感。&quot;
+      },
+      {
+        &quot;label&quot;: &quot;事件窗&quot;,
+        &quot;value_text&quot;: &quot;月營收/季報/EPS/毛利率/法說/IR/重大訊息/新聞；freshness_days=3&quot;,
+        &quot;data_type&quot;: &quot;fact&quot;,
+        &quot;source_basis&quot;: {
+          &quot;source_file_ids&quot;: [
+            &quot;01_市場快照.json&quot;,
+            &quot;02_事件與基本面摘要.json&quot;
+          ],
+          &quot;source_fields&quot;: [
+            &quot;event_window.active&quot;,
+            &quot;event_window.type&quot;,
+            &quot;event_window.freshness_days&quot;
+          ],
+          &quot;calc_method&quot;: &quot;直接引用事件窗欄位。&quot;
+        },
+        &quot;timeframe&quot;: &quot;事件&quot;,
+        &quot;confidence&quot;: &quot;high&quot;,
+        &quot;note&quot;: &quot;事件窗進行中，題材Beta上調但需驗證。&quot;
+      },
+      {
+        &quot;label&quot;: &quot;3月營收&quot;,
+        &quot;value_text&quot;: &quot;1,007,693千元；MoM 100.60%；YoY 54.96%；YTD YoY 9.46%&quot;,
+        &quot;data_type&quot;: &quot;fact&quot;,
+        &quot;source_basis&quot;: {
+          &quot;source_file_ids&quot;: [
+            &quot;02_事件與基本面摘要.json&quot;
+          ],
+          &quot;source_fields&quot;: [
+            &quot;month_revenue.latest_month.revenue&quot;,
+            &quot;month_revenue.latest_month.mom_pct&quot;,
+            &quot;month_revenue.latest_month.yoy_pct&quot;,
+            &quot;month_revenue.latest_month.ytd_yoy_pct&quot;
+          ],
+          &quot;calc_method&quot;: &quot;直接引用月營收欄位並四捨五入顯示。&quot;
+        },
+        &quot;timeframe&quot;: &quot;2026-03&quot;,
+        &quot;confidence&quot;: &quot;high&quot;,
+        &quot;note&quot;: &quot;備註：配合客戶需求出貨量增加。&quot;
+      },
+      {
+        &quot;label&quot;: &quot;2025Q4財報&quot;,
+        &quot;value_text&quot;: &quot;EPS -0.36；毛利率18.81%；營益率1.5%&quot;,
+        &quot;data_type&quot;: &quot;fact&quot;,
+        &quot;source_basis&quot;: {
+          &quot;source_file_ids&quot;: [
+            &quot;02_事件與基本面摘要.json&quot;
+          ],
+          &quot;source_fields&quot;: [
+            &quot;financial_report.eps&quot;,
+            &quot;financial_report.gross_margin_pct&quot;,
+            &quot;financial_report.operating_margin_pct&quot;
+          ],
+          &quot;calc_method&quot;: &quot;直接引用財報欄位。&quot;
+        },
+        &quot;timeframe&quot;: &quot;2025Q4&quot;,
+        &quot;confidence&quot;: &quot;high&quot;,
+        &quot;note&quot;: &quot;營收事件偏正面但獲利仍需驗證。&quot;
+      }
+    ]
+  },
+  &quot;multi_timeframe&quot;: {
+    &quot;overall_classification&quot;: &quot;中期事件多頭仍在，但短線成本帶失守、盤中偏弱，屬高檔震盪回測而非乾淨主升。&quot;,
+    &quot;items&quot;: [
+      {
+        &quot;label&quot;: &quot;日K結構&quot;,
+        &quot;value_text&quot;: &quot;04/17收36.80，KDJ K53.26/D52.86/J54.07，RSI6 60.45，MACD OSC 0.33，DI+30.47大於DI-10.41，ADX 40.93&quot;,
+        &quot;data_type&quot;: &quot;derived&quot;,
+        &quot;source_basis&quot;: {
+          &quot;source_file_ids&quot;: [
+            &quot;05_技術圖_日週月季年合併.png&quot;
+          ],
+          &quot;source_fields&quot;: [
+            &quot;日K.header&quot;,
+            &quot;日K.KD&quot;,
+            &quot;日K.RSI&quot;,
+            &quot;日K.MACD&quot;,
+            &quot;日K.DM&quot;
+          ],
+          &quot;calc_method&quot;: &quot;由上傳日K圖讀取指標與收盤資訊。&quot;
+        },
+        &quot;timeframe&quot;: &quot;日K&quot;,
+        &quot;confidence&quot;: &quot;medium&quot;,
+        &quot;note&quot;: &quot;動能仍正，但已低於37.10至37.56事件成本帶。&quot;
+      },
+      {
+        &quot;label&quot;: &quot;週K結構&quot;,
+        &quot;value_text&quot;: &quot;週K收36.80，週高38.50；RSI6 75.1、RSI12 71.4；MACD OSC 1.58；ADX 48.89&quot;,
+        &quot;data_type&quot;: &quot;derived&quot;,
+        &quot;source_basis&quot;: {
+          &quot;source_file_ids&quot;: [
+            &quot;05_技術圖_日週月季年合併.png&quot;
+          ],
+          &quot;source_fields&quot;: [
+            &quot;週K.header&quot;,
+            &quot;週K.RSI&quot;,
+            &quot;週K.MACD&quot;,
+            &quot;週K.DM&quot;
+          ],
+          &quot;calc_method&quot;: &quot;由上傳週K圖讀取指標。&quot;
+        },
+        &quot;timeframe&quot;: &quot;週K&quot;,
+        &quot;confidence&quot;: &quot;medium&quot;,
+        &quot;note&quot;: &quot;週線趨勢強，但RSI偏高，容易震盪。&quot;
+      },
+      {
+        &quot;label&quot;: &quot;月K結構&quot;,
+        &quot;value_text&quot;: &quot;2026/04月K暫收36.80，月漲13.41%；月高39.85；RSI6 83.18；KDJ J94.45；MACD OSC 2.38&quot;,
+        &quot;data_type&quot;: &quot;derived&quot;,
+        &quot;source_basis&quot;: {
+          &quot;source_file_ids&quot;: [
+            &quot;05_技術圖_日週月季年合併.png&quot;
+          ],
+          &quot;source_fields&quot;: [
+            &quot;月K.header&quot;,
+            &quot;月K.KD&quot;,
+            &quot;月K.RSI&quot;,
+            &quot;月K.MACD&quot;
+          ],
+          &quot;calc_method&quot;: &quot;由上傳月K圖讀取指標。&quot;
+        },
+        &quot;timeframe&quot;: &quot;月K&quot;,
+        &quot;confidence&quot;: &quot;medium&quot;,
+        &quot;note&quot;: &quot;月線強勢但過熱，前高39.85是重要上緣。&quot;
+      },
+      {
+        &quot;label&quot;: &quot;季K結構&quot;,
+        &quot;value_text&quot;: &quot;2026Q2暫收36.80，季漲13.41%；KDJ K49.05/D34.48/J78.19；ADX 34.55&quot;,
+        &quot;data_type&quot;: &quot;derived&quot;,
+        &quot;source_basis&quot;: {
+          &quot;source_file_ids&quot;: [
+            &quot;05_技術圖_日週月季年合併.png&quot;
+          ],
+          &quot;source_fields&quot;: [
+            &quot;季K.header&quot;,
+            &quot;季K.KD&quot;,
+            &quot;季K.DM&quot;
+          ],
+          &quot;calc_method&quot;: &quot;由上傳季K圖讀取指標。&quot;
+        },
+        &quot;timeframe&quot;: &quot;季K&quot;,
+        &quot;confidence&quot;: &quot;medium&quot;,
+        &quot;note&quot;: &quot;季線轉強但仍需確認能否突破39.85。&quot;
+      },
+      {
+        &quot;label&quot;: &quot;年K結構&quot;,
+        &quot;value_text&quot;: &quot;2026年暫收36.80，年漲52.38%；年高39.85；RSI6 65.74；ADX 74.05&quot;,
+        &quot;data_type&quot;: &quot;derived&quot;,
+        &quot;source_basis&quot;: {
+          &quot;source_file_ids&quot;: [
+            &quot;05_技術圖_日週月季年合併.png&quot;
+          ],
+          &quot;source_fields&quot;: [
+            &quot;年K.header&quot;,
+            &quot;年K.RSI&quot;,
+            &quot;年K.DM&quot;
+          ],
+          &quot;calc_method&quot;: &quot;由上傳年K圖讀取指標。&quot;
+        },
+        &quot;timeframe&quot;: &quot;年K&quot;,
+        &quot;confidence&quot;: &quot;medium&quot;,
+        &quot;note&quot;: &quot;長週期轉強，但距離年高仍需突破確認。&quot;
+      },
+      {
+        &quot;label&quot;: &quot;分K結構&quot;,
+        &quot;value_text&quot;: &quot;04/20分K最新約34.65，低於session VWAP 35.9061；5m/1m Donchian上中下皆34.65且width 0&quot;,
+        &quot;data_type&quot;: &quot;fact&quot;,
+        &quot;source_basis&quot;: {
+          &quot;source_file_ids&quot;: [
+            &quot;03_技術結構摘要.json&quot;
+          ],
+          &quot;source_fields&quot;: [
+            &quot;session_vwap&quot;,
+            &quot;timeframes.60m.latest_close&quot;,
+            &quot;timeframes.5m.latest_close&quot;,
+            &quot;timeframes.5m.donchian20&quot;,
+            &quot;technical_context_notes&quot;
+          ],
+          &quot;calc_method&quot;: &quot;直接引用分K摘要；因大量補平bar，僅作短線警訊。&quot;
+        },
+        &quot;timeframe&quot;: &quot;分K&quot;,
+        &quot;confidence&quot;: &quot;medium_low&quot;,
+        &quot;note&quot;: &quot;不可用分K單獨推翻日週月架構，但可提升防守權重。&quot;
+      }
+    ]
+  },
+  &quot;stage_assessment&quot;: {
+    &quot;primary_stage&quot;: &quot;事件驅動後高檔回測期&quot;,
+    &quot;secondary_stage&quot;: &quot;成本帶失守再確認期&quot;,
+    &quot;upgrade_conditions&quot;: [
+      &quot;日收重新站回37.10至37.56雙AVWAP成本帶。&quot;,
+      &quot;站回成本帶後，成交量維持高於5日均量且外資/三大法人不再連續賣超。&quot;,
+      &quot;放量突破39.85前高，且隔日不跌回38.50以下。&quot;
+    ],
+    &quot;downgrade_conditions&quot;: [
+      &quot;反彈到37.10至37.95區間量縮或留下上影，且外資續賣。&quot;,
+      &quot;分K持續低於35.90 session VWAP，日K無法回到35.20以上。&quot;,
+      &quot;當沖比與借券賣出同步上升，價格卻無法收復36.80。&quot;
+    ],
+    &quot;invalidation_conditions&quot;: [
+      &quot;日收跌破34.05。&quot;,
+      &quot;跌破34.35後反彈不過35.20，且量能放大。&quot;,
+      &quot;32.70至33.25支撐帶再失守，表示事件波段回到修正。&quot;
+    ],
+    &quot;data_type&quot;: &quot;derived&quot;,
+    &quot;source_basis&quot;: {
+      &quot;source_file_ids&quot;: [
+        &quot;01_市場快照.json&quot;,
+        &quot;03_技術結構摘要.json&quot;,
+        &quot;04_錨點候選集.json&quot;,
+        &quot;05_技術圖_日週月季年合併.png&quot;,
+        &quot;07_EOD_context_原始摘要.json&quot;
+      ],
+      &quot;source_fields&quot;: [
+        &quot;latest_close&quot;,
+        &quot;institutional_flow&quot;,
+        &quot;session_vwap&quot;,
+        &quot;candidates&quot;,
+        &quot;日K/週K/月K指標&quot;,
+        &quot;raw_section_snapshots.price_legal_margin&quot;
+      ],
+      &quot;calc_method&quot;: &quot;綜合收盤/籌碼、AVWAP、分K與多週期技術圖判定階段。&quot;
+    },
+    &quot;timeframe&quot;: &quot;日K/週K/分K&quot;,
+    &quot;confidence&quot;: &quot;medium&quot;
+  },
+  &quot;entry_signals&quot;: [
+    {
+      &quot;name&quot;: &quot;收復事件/突破AVWAP成本帶&quot;,
+      &quot;status&quot;: &quot;not_confirmed&quot;,
+      &quot;strength&quot;: &quot;medium_high&quot;,
+      &quot;trigger_zone&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 37.1,
+            &quot;high&quot;: 37.56
+          }
+        ]
+      },
+      &quot;invalid_condition&quot;: &quot;日收再跌回36.80以下或站上後隔日失守37.10。&quot;,
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;03_技術結構摘要.json&quot;,
+          &quot;04_錨點候選集.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;primary_avwap.avwap&quot;,
+          &quot;candidates[0].anchor_price&quot;,
+          &quot;candidates[1].anchor_price&quot;
+        ],
+        &quot;calc_method&quot;: &quot;以雙AVWAP作進場確認帶。&quot;
+      },
+      &quot;timeframe&quot;: &quot;日K/事件AVWAP&quot;,
+      &quot;confidence&quot;: &quot;medium_high&quot;
+    },
+    {
+      &quot;name&quot;: &quot;支撐帶止跌反彈&quot;,
+      &quot;status&quot;: &quot;partial&quot;,
+      &quot;strength&quot;: &quot;medium&quot;,
+      &quot;trigger_zone&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 34.05,
+            &quot;high&quot;: 35.2
+          }
+        ]
+      },
+      &quot;invalid_condition&quot;: &quot;日收跌破34.05。&quot;,
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;03_技術結構摘要.json&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;timeframes.60m.latest_close&quot;,
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-14].low&quot;,
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-16].low&quot;
+        ],
+        &quot;calc_method&quot;: &quot;04/20分K已靠近支撐帶，但尚未確認反彈。&quot;
+      },
+      &quot;timeframe&quot;: &quot;日K/分K&quot;,
+      &quot;confidence&quot;: &quot;medium_low&quot;
+    },
+    {
+      &quot;name&quot;: &quot;突破39.85前高&quot;,
+      &quot;status&quot;: &quot;not_confirmed&quot;,
+      &quot;strength&quot;: &quot;high&quot;,
+      &quot;trigger_zone&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 39.85,
+            &quot;high&quot;: 39.85
+          }
+        ]
+      },
+      &quot;invalid_condition&quot;: &quot;突破後跌回38.50以下。&quot;,
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;05_技術圖_日週月季年合併.png&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;月K.high&quot;,
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-09].high&quot;
+        ],
+        &quot;calc_method&quot;: &quot;以前高39.85作主升延續確認。&quot;
+      },
+      &quot;timeframe&quot;: &quot;日K/月K&quot;,
+      &quot;confidence&quot;: &quot;medium&quot;
+    }
+  ],
+  &quot;exit_signals&quot;: [
+    {
+      &quot;name&quot;: &quot;事件成本帶失守警訊&quot;,
+      &quot;status&quot;: &quot;confirmed&quot;,
+      &quot;strength&quot;: &quot;medium&quot;,
+      &quot;trigger_zone&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 37.1,
+            &quot;high&quot;: 37.56
+          }
+        ]
+      },
+      &quot;invalid_condition&quot;: &quot;日收重新站回37.56，且隔日不跌回37.10。&quot;,
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;01_市場快照.json&quot;,
+          &quot;03_技術結構摘要.json&quot;,
+          &quot;04_錨點候選集.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;latest_close&quot;,
+          &quot;primary_avwap.avwap&quot;,
+          &quot;candidates[1].anchor_price&quot;
+        ],
+        &quot;calc_method&quot;: &quot;36.80低於37.10與37.56，視為成本帶失守警訊。&quot;
+      },
+      &quot;timeframe&quot;: &quot;日K/事件AVWAP&quot;,
+      &quot;confidence&quot;: &quot;medium_high&quot;
+    },
+    {
+      &quot;name&quot;: &quot;盤中session VWAP失守&quot;,
+      &quot;status&quot;: &quot;partial&quot;,
+      &quot;strength&quot;: &quot;medium_low&quot;,
+      &quot;trigger_zone&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 35.85,
+            &quot;high&quot;: 35.91
+          }
+        ]
+      },
+      &quot;invalid_condition&quot;: &quot;分K重新站回35.9061且日內不再失守。&quot;,
+      &quot;data_type&quot;: &quot;fact&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;03_技術結構摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;session_vwap&quot;,
+          &quot;timeframes.60m.latest_close&quot;,
+          &quot;timeframes.5m.latest_close&quot;
+        ],
+        &quot;calc_method&quot;: &quot;04/20分K最新34.65低於session VWAP 35.9061，但樣本含大量補平bar。&quot;
+      },
+      &quot;timeframe&quot;: &quot;分K&quot;,
+      &quot;confidence&quot;: &quot;medium_low&quot;
+    },
+    {
+      &quot;name&quot;: &quot;短線防守帶跌破&quot;,
+      &quot;status&quot;: &quot;not_confirmed&quot;,
+      &quot;strength&quot;: &quot;high&quot;,
+      &quot;trigger_zone&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 34.05,
+            &quot;high&quot;: 34.35
+          }
+        ]
+      },
+      &quot;invalid_condition&quot;: &quot;重新站回35.20並收復35.90。&quot;,
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;06_Goodinfo整合報表.html&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-14].low&quot;,
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-14].close&quot;
+        ],
+        &quot;calc_method&quot;: &quot;以34.05至34.35作正式破位判斷。&quot;
+      },
+      &quot;timeframe&quot;: &quot;日K&quot;,
+      &quot;confidence&quot;: &quot;medium&quot;
+    }
+  ],
+  &quot;core_scores&quot;: [
+    {
+      &quot;label&quot;: &quot;趨勢結構&quot;,
+      &quot;score_band&quot;: &quot;medium_high&quot;,
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;05_技術圖_日週月季年合併.png&quot;,
+          &quot;03_技術結構摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;日K.RSI/MACD/DM&quot;,
+          &quot;週K.RSI/MACD/DM&quot;,
+          &quot;月K.header&quot;,
+          &quot;primary_avwap.avwap&quot;
+        ],
+        &quot;calc_method&quot;: &quot;綜合引用欄位評分。&quot;
+      },
+      &quot;reason&quot;: &quot;多週期動能仍偏多，週/月線強，但收盤低於事件成本帶使短線趨勢扣分。&quot;
+    },
+    {
+      &quot;label&quot;: &quot;籌碼結構&quot;,
+      &quot;score_band&quot;: &quot;medium&quot;,
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;01_市場快照.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;institutional_flow.foreign_net_1d&quot;,
+          &quot;institutional_flow.foreign_net_3d&quot;,
+          &quot;institutional_flow.total_institutional_net_1d&quot;,
+          &quot;institutional_flow.total_institutional_net_5d&quot;
+        ],
+        &quot;calc_method&quot;: &quot;綜合引用欄位評分。&quot;
+      },
+      &quot;reason&quot;: &quot;1日外資與三大法人轉賣，但3日/5日累計仍正，判為中性偏多但不穩。&quot;
+    },
+    {
+      &quot;label&quot;: &quot;量能與流動性&quot;,
+      &quot;score_band&quot;: &quot;medium&quot;,
+      &quot;data_type&quot;: &quot;fact&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;01_市場快照.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;volume_lot&quot;,
+          &quot;volume_ratio_5d&quot;,
+          &quot;turnover_100m&quot;,
+          &quot;turnover_rate_pct&quot;
+        ],
+        &quot;calc_method&quot;: &quot;綜合引用欄位評分。&quot;
+      },
+      &quot;reason&quot;: &quot;成交量約低於5日均量，流動性仍高但追價動能未延續。&quot;
+    },
+    {
+      &quot;label&quot;: &quot;事件與基本面&quot;,
+      &quot;score_band&quot;: &quot;medium_high&quot;,
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;02_事件與基本面摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;month_revenue.latest_month.mom_pct&quot;,
+          &quot;month_revenue.latest_month.yoy_pct&quot;,
+          &quot;financial_report.eps&quot;,
+          &quot;financial_report.gross_margin_pct&quot;,
+          &quot;earnings_call.summary&quot;
+        ],
+        &quot;calc_method&quot;: &quot;綜合引用欄位評分。&quot;
+      },
+      &quot;reason&quot;: &quot;3月營收明顯改善與法說題材加分；Q4 EPS仍負與毛利率18.81%限制評分。&quot;
+    },
+    {
+      &quot;label&quot;: &quot;短線風險控制&quot;,
+      &quot;score_band&quot;: &quot;medium_low&quot;,
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;01_市場快照.json&quot;,
+          &quot;03_技術結構摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;day_trade_state.day_trade_ratio_pct&quot;,
+          &quot;margin_short_borrow.borrow_sell_delta&quot;,
+          &quot;session_vwap&quot;,
+          &quot;timeframes.5m.latest_close&quot;
+        ],
+        &quot;calc_method&quot;: &quot;綜合引用欄位評分。&quot;
+      },
+      &quot;reason&quot;: &quot;當沖比高、借券賣出增加、分K低於session VWAP，短線風險偏高。&quot;
+    },
+    {
+      &quot;label&quot;: &quot;進場品質&quot;,
+      &quot;score_band&quot;: &quot;medium_low&quot;,
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;03_技術結構摘要.json&quot;,
+          &quot;04_錨點候選集.json&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;primary_avwap.avwap&quot;,
+          &quot;candidates&quot;,
+          &quot;raw_section_snapshots.price_legal_margin&quot;
+        ],
+        &quot;calc_method&quot;: &quot;綜合引用欄位評分。&quot;
+      },
+      &quot;reason&quot;: &quot;目前未收復37.10至37.56，支撐止跌也未確認，進場品質不如等待觸發。&quot;
+    }
+  ],
+  &quot;target_model&quot;: {
+    &quot;anchor_validity&quot;: {
+      &quot;overall_status&quot;: &quot;primary_anchor_under_pressure&quot;,
+      &quot;primary_anchor&quot;: {
+        &quot;label&quot;: &quot;突破段起漲AVWAP&quot;,
+        &quot;date&quot;: &quot;2026-04-16&quot;,
+        &quot;price&quot;: 37.5578
+      },
+      &quot;secondary_anchor&quot;: {
+        &quot;label&quot;: &quot;月營收出表AVWAP&quot;,
+        &quot;date&quot;: &quot;2026-04-17&quot;,
+        &quot;price&quot;: 37.1001
+      },
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;03_技術結構摘要.json&quot;,
+          &quot;04_錨點候選集.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;primary_avwap&quot;,
+          &quot;candidates[0]&quot;,
+          &quot;candidates[1]&quot;,
+          &quot;candidates[2]&quot;
+        ],
+        &quot;calc_method&quot;: &quot;以AVWAP候選集判斷事件成本帶有效性，並以session VWAP作盤中輔助。&quot;
+      },
+      &quot;timeframe&quot;: &quot;事件AVWAP/分K&quot;,
+      &quot;anchors&quot;: [
+        {
+          &quot;label&quot;: &quot;突破段起漲AVWAP&quot;,
+          &quot;date&quot;: &quot;2026-04-16&quot;,
+          &quot;price&quot;: 37.5578
+        },
+        {
+          &quot;label&quot;: &quot;月營收出表AVWAP&quot;,
+          &quot;date&quot;: &quot;2026-04-17&quot;,
+          &quot;price&quot;: 37.1001
+        },
+        {
+          &quot;label&quot;: &quot;2026-04-20 session VWAP&quot;,
+          &quot;date&quot;: &quot;2026-04-20&quot;,
+          &quot;price&quot;: 35.9061
+        }
+      ],
+      &quot;trigger_condition&quot;: &quot;收盤36.80已低於37.10與37.56，04/20分K34.65也低於35.9061；成本帶須被收復才可恢復主升模型。&quot;,
+      &quot;confidence&quot;: &quot;medium&quot;
+    },
+    &quot;model_note&quot;: &quot;主錨點尚未完全失效，但已受壓；短線先看34.05至35.20是否守住，再看35.90、37.10與37.56是否依序收復。&quot;
+  },
+  &quot;scenario_1w&quot;: [
+    {
+      &quot;name&quot;: &quot;強勢續攻&quot;,
+      &quot;probability_pct&quot;: 18.0,
+      &quot;trigger_condition&quot;: &quot;快速站回37.10至37.56，並放量突破37.95。&quot;,
+      &quot;target_zone&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 38.5,
+            &quot;high&quot;: 39.85
+          }
+        ]
+      },
+      &quot;invalid_condition&quot;: &quot;跌回36.80以下且無法收復37.10。&quot;,
+      &quot;driver&quot;: &quot;事件營收題材延續、外資賣壓停止。&quot;,
+      &quot;event_window_to_watch&quot;: &quot;觀察2026-04-17月營收/財報事件後續與04月營收預期。&quot;,
+      &quot;data_type&quot;: &quot;inferred&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;01_市場快照.json&quot;,
+          &quot;02_事件與基本面摘要.json&quot;,
+          &quot;03_技術結構摘要.json&quot;,
+          &quot;04_錨點候選集.json&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;latest_close&quot;,
+          &quot;institutional_flow&quot;,
+          &quot;event_window&quot;,
+          &quot;primary_avwap&quot;,
+          &quot;candidates&quot;,
+          &quot;session_vwap&quot;,
+          &quot;raw_section_snapshots.price_legal_margin&quot;
+        ],
+        &quot;calc_method&quot;: &quot;綜合收盤、AVWAP、事件窗、籌碼與近期高低點推估情境機率。&quot;
+      },
+      &quot;confidence&quot;: &quot;medium_low&quot;
+    },
+    {
+      &quot;name&quot;: &quot;高檔整理&quot;,
+      &quot;probability_pct&quot;: 27.0,
+      &quot;trigger_condition&quot;: &quot;價格在35.85至37.95間震盪，量能低於04/16爆量。&quot;,
+      &quot;target_zone&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 35.85,
+            &quot;high&quot;: 37.95
+          }
+        ]
+      },
+      &quot;invalid_condition&quot;: &quot;日收跌破34.35。&quot;,
+      &quot;driver&quot;: &quot;成本帶上方賣壓與下方支撐並存。&quot;,
+      &quot;event_window_to_watch&quot;: &quot;觀察外資是否由1日賣超轉回買超。&quot;,
+      &quot;data_type&quot;: &quot;inferred&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;01_市場快照.json&quot;,
+          &quot;02_事件與基本面摘要.json&quot;,
+          &quot;03_技術結構摘要.json&quot;,
+          &quot;04_錨點候選集.json&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;latest_close&quot;,
+          &quot;institutional_flow&quot;,
+          &quot;event_window&quot;,
+          &quot;primary_avwap&quot;,
+          &quot;candidates&quot;,
+          &quot;session_vwap&quot;,
+          &quot;raw_section_snapshots.price_legal_margin&quot;
+        ],
+        &quot;calc_method&quot;: &quot;綜合收盤、AVWAP、事件窗、籌碼與近期高低點推估情境機率。&quot;
+      },
+      &quot;confidence&quot;: &quot;medium&quot;
+    },
+    {
+      &quot;name&quot;: &quot;回測洗盤&quot;,
+      &quot;probability_pct&quot;: 35.0,
+      &quot;trigger_condition&quot;: &quot;回測34.05至35.20支撐區但未日收跌破34.05。&quot;,
+      &quot;target_zone&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 34.05,
+            &quot;high&quot;: 35.2
+          }
+        ]
+      },
+      &quot;invalid_condition&quot;: &quot;日收跌破34.05。&quot;,
+      &quot;driver&quot;: &quot;雙AVWAP失守後，短線籌碼洗盤與當沖降溫。&quot;,
+      &quot;event_window_to_watch&quot;: &quot;觀察借券賣出與當沖比是否下降。&quot;,
+      &quot;data_type&quot;: &quot;inferred&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;01_市場快照.json&quot;,
+          &quot;02_事件與基本面摘要.json&quot;,
+          &quot;03_技術結構摘要.json&quot;,
+          &quot;04_錨點候選集.json&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;latest_close&quot;,
+          &quot;institutional_flow&quot;,
+          &quot;event_window&quot;,
+          &quot;primary_avwap&quot;,
+          &quot;candidates&quot;,
+          &quot;session_vwap&quot;,
+          &quot;raw_section_snapshots.price_legal_margin&quot;
+        ],
+        &quot;calc_method&quot;: &quot;綜合收盤、AVWAP、事件窗、籌碼與近期高低點推估情境機率。&quot;
+      },
+      &quot;confidence&quot;: &quot;medium&quot;
+    },
+    {
+      &quot;name&quot;: &quot;轉弱下破&quot;,
+      &quot;probability_pct&quot;: 20.0,
+      &quot;trigger_condition&quot;: &quot;放量跌破34.05，反彈無法站回34.35至35.20。&quot;,
+      &quot;target_zone&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 32.7,
+            &quot;high&quot;: 33.25
+          }
+        ]
+      },
+      &quot;invalid_condition&quot;: &quot;重新站回35.90並收復36.80。&quot;,
+      &quot;driver&quot;: &quot;事件題材降溫、法人續賣、支撐失守。&quot;,
+      &quot;event_window_to_watch&quot;: &quot;觀察2026-04-20完整EOD與隔日法人籌碼。&quot;,
+      &quot;data_type&quot;: &quot;inferred&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;01_市場快照.json&quot;,
+          &quot;02_事件與基本面摘要.json&quot;,
+          &quot;03_技術結構摘要.json&quot;,
+          &quot;04_錨點候選集.json&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;latest_close&quot;,
+          &quot;institutional_flow&quot;,
+          &quot;event_window&quot;,
+          &quot;primary_avwap&quot;,
+          &quot;candidates&quot;,
+          &quot;session_vwap&quot;,
+          &quot;raw_section_snapshots.price_legal_margin&quot;
+        ],
+        &quot;calc_method&quot;: &quot;綜合收盤、AVWAP、事件窗、籌碼與近期高低點推估情境機率。&quot;
+      },
+      &quot;confidence&quot;: &quot;medium_low&quot;
+    }
+  ],
+  &quot;scenario_1m&quot;: [
+    {
+      &quot;name&quot;: &quot;主升延續&quot;,
+      &quot;probability_pct&quot;: 25.0,
+      &quot;trigger_condition&quot;: &quot;日/週線站回37.56並有效突破39.85前高。&quot;,
+      &quot;target_zone&quot;: {
+        &quot;range_type&quot;: &quot;multi&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 41.7,
+            &quot;high&quot;: 41.9
+          },
+          {
+            &quot;low&quot;: 44.1,
+            &quot;high&quot;: 44.35
+          }
+        ]
+      },
+      &quot;invalid_condition&quot;: &quot;突破後跌回38.50以下。&quot;,
+      &quot;driver&quot;: &quot;3月營收改善被延續驗證，DOCSIS4.0/Wi-Fi 7與10G寬頻題材持續發酵。&quot;,
+      &quot;event_window_to_watch&quot;: &quot;2026-04月營收、2026-05-15法說/IR。&quot;,
+      &quot;data_type&quot;: &quot;inferred&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;01_市場快照.json&quot;,
+          &quot;02_事件與基本面摘要.json&quot;,
+          &quot;03_技術結構摘要.json&quot;,
+          &quot;04_錨點候選集.json&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;,
+          &quot;05_技術圖_日週月季年合併.png&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;latest_close&quot;,
+          &quot;institutional_flow&quot;,
+          &quot;event_window&quot;,
+          &quot;primary_avwap&quot;,
+          &quot;candidates&quot;,
+          &quot;session_vwap&quot;,
+          &quot;raw_section_snapshots.price_legal_margin&quot;,
+          &quot;月K.high&quot;,
+          &quot;週K.RSI&quot;
+        ],
+        &quot;calc_method&quot;: &quot;以39.85突破與延伸目標推估。&quot;
+      },
+      &quot;confidence&quot;: &quot;medium_low&quot;
+    },
+    {
+      &quot;name&quot;: &quot;箱體震盪整理&quot;,
+      &quot;probability_pct&quot;: 35.0,
+      &quot;trigger_condition&quot;: &quot;32.70至39.85大箱體內震盪，37.10至37.56反覆爭奪。&quot;,
+      &quot;target_zone&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 32.7,
+            &quot;high&quot;: 39.85
+          }
+        ]
+      },
+      &quot;invalid_condition&quot;: &quot;日收跌破32.70或週收突破39.85。&quot;,
+      &quot;driver&quot;: &quot;事件題材與獲利疑慮並存，籌碼換手。&quot;,
+      &quot;event_window_to_watch&quot;: &quot;觀察後續月營收與法人3/5日趨勢是否延續。&quot;,
+      &quot;data_type&quot;: &quot;inferred&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;01_市場快照.json&quot;,
+          &quot;02_事件與基本面摘要.json&quot;,
+          &quot;03_技術結構摘要.json&quot;,
+          &quot;04_錨點候選集.json&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;latest_close&quot;,
+          &quot;institutional_flow&quot;,
+          &quot;event_window&quot;,
+          &quot;primary_avwap&quot;,
+          &quot;candidates&quot;,
+          &quot;session_vwap&quot;,
+          &quot;raw_section_snapshots.price_legal_margin&quot;
+        ],
+        &quot;calc_method&quot;: &quot;綜合收盤、AVWAP、事件窗、籌碼與近期高低點推估情境機率。&quot;
+      },
+      &quot;confidence&quot;: &quot;medium&quot;
+    },
+    {
+      &quot;name&quot;: &quot;高位派發轉弱&quot;,
+      &quot;probability_pct&quot;: 25.0,
+      &quot;trigger_condition&quot;: &quot;反彈不過37.10至37.95，且外資/三大法人連續賣超。&quot;,
+      &quot;target_zone&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 32.7,
+            &quot;high&quot;: 33.25
+          }
+        ]
+      },
+      &quot;invalid_condition&quot;: &quot;重新站回37.56並放量突破38.50。&quot;,
+      &quot;driver&quot;: &quot;當沖與借券偏高，事件後追價買盤不足。&quot;,
+      &quot;event_window_to_watch&quot;: &quot;觀察借券賣出餘額與當沖比是否維持高檔。&quot;,
+      &quot;data_type&quot;: &quot;inferred&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;01_市場快照.json&quot;,
+          &quot;02_事件與基本面摘要.json&quot;,
+          &quot;03_技術結構摘要.json&quot;,
+          &quot;04_錨點候選集.json&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;latest_close&quot;,
+          &quot;institutional_flow&quot;,
+          &quot;event_window&quot;,
+          &quot;primary_avwap&quot;,
+          &quot;candidates&quot;,
+          &quot;session_vwap&quot;,
+          &quot;raw_section_snapshots.price_legal_margin&quot;
+        ],
+        &quot;calc_method&quot;: &quot;綜合收盤、AVWAP、事件窗、籌碼與近期高低點推估情境機率。&quot;
+      },
+      &quot;confidence&quot;: &quot;medium_low&quot;
+    },
+    {
+      &quot;name&quot;: &quot;破位進入修正&quot;,
+      &quot;probability_pct&quot;: 15.0,
+      &quot;trigger_condition&quot;: &quot;跌破32.70且週線無法收回33.25。&quot;,
+      &quot;target_zone&quot;: {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 30.25,
+            &quot;high&quot;: 31.9
+          }
+        ]
+      },
+      &quot;invalid_condition&quot;: &quot;重新站回34.35並量縮止跌。&quot;,
+      &quot;driver&quot;: &quot;事件波段失敗後回測3月前段平台。&quot;,
+      &quot;event_window_to_watch&quot;: &quot;觀察2026-04月營收是否能支持估值。&quot;,
+      &quot;data_type&quot;: &quot;inferred&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;06_Goodinfo整合報表.html&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;raw_section_snapshots.price_legal_margin[2026-03-17].close&quot;,
+          &quot;raw_section_snapshots.price_legal_margin[2026-03-25].close&quot;,
+          &quot;raw_section_snapshots.price_legal_margin[2026-03-20].low&quot;
+        ],
+        &quot;calc_method&quot;: &quot;以前段3月平台30.25至31.90作破位後修正參考。&quot;
+      },
+      &quot;confidence&quot;: &quot;low&quot;
+    }
+  ],
+  &quot;backtest_review&quot;: {
+    &quot;backtest_provided&quot;: false,
+    &quot;review_note&quot;: &quot;未提供先前分析、進出場紀錄或實現績效，本區不做正式回測審計。&quot;,
+    &quot;gaps&quot;: [
+      &quot;缺少上一版分析結論與實際走勢對照。&quot;,
+      &quot;缺少策略執行紀錄、滑價與停損停利規則。&quot;
+    ],
+    &quot;best_next_hypotheses&quot;: [
+      &quot;驗證37.10至37.56成本帶收復是否能提升勝率。&quot;,
+      &quot;驗證34.05至35.20支撐帶跌破後是否會回測32.70至33.25。&quot;,
+      &quot;追蹤營收事件後3至10日的法人買賣超是否決定箱體方向。&quot;
+    ]
+  },
+  &quot;fixed_profile_review&quot;: {
+    &quot;review_status&quot;: &quot;unchanged&quot;,
+    &quot;review_reason&quot;: &quot;本次資料顯示DOCSIS4.0、Wi-Fi 7、10G寬頻、企業/工業網通投資與月營收事件，與既有固定設定卡的Cable/FTTx/寬頻接取、營運商專案、企業網路升級與事件Beta框架相符；單次Perle投資新聞與短線波動不足以證明股性或核心主線已持續性改變。&quot;,
+    &quot;changed_fields&quot;: [],
+    &quot;data_type&quot;: &quot;inferred&quot;,
+    &quot;source_basis&quot;: {
+      &quot;source_file_ids&quot;: [
+        &quot;02_事件與基本面摘要.json&quot;,
+        &quot;08_2419_仲琦_GPT54Pro_結構化JSON提示詞_v1.md&quot;
+      ],
+      &quot;source_fields&quot;: [
+        &quot;earnings_call.summary&quot;,
+        &quot;news[1].title&quot;,
+        &quot;news[2].title&quot;,
+        &quot;固定設定卡.核心主線&quot;,
+        &quot;固定設定卡.事件Beta&quot;
+      ],
+      &quot;calc_method&quot;: &quot;比對本次事件/新聞與固定設定卡主線，未發現需自動覆寫的持續性證據。&quot;
+    },
+    &quot;confidence&quot;: &quot;medium&quot;,
+    &quot;proposed_profile&quot;: {}
+  },
+  &quot;specialized_framework_review&quot;: {
+    &quot;meta&quot;: {
+      &quot;schema_version&quot;: &quot;v1&quot;,
+      &quot;review_type&quot;: &quot;specialized_framework_review&quot;,
+      &quot;symbol&quot;: &quot;2419&quot;,
+      &quot;stock_name&quot;: &quot;仲琦&quot;,
+      &quot;review_date&quot;: &quot;2026-04-20&quot;,
+      &quot;data_date&quot;: &quot;2026-04-20&quot;,
+      &quot;technical_intraday_latest_stamp&quot;: &quot;2026-04-20&quot;,
+      &quot;current_prompt_version&quot;: &quot;json_v1&quot;,
+      &quot;previous_framework_version&quot;: null
+    },
+    &quot;review_scope&quot;: {
+      &quot;trigger_reason&quot;: &quot;本次為例行正式分析，未提供先前失準案例或回測審計資料。&quot;,
+      &quot;current_profile_state&quot;: &quot;mature&quot;,
+      &quot;current_framework_maturity&quot;: &quot;iterating&quot;,
+      &quot;affected_blocks&quot;: []
+    },
+    &quot;evidence_window&quot;: {
+      &quot;prior_analysis_dates&quot;: [],
+      &quot;realized_window_start&quot;: null,
+      &quot;realized_window_end&quot;: null,
+      &quot;repeated_case_count&quot;: 0,
+      &quot;key_events_reviewed&quot;: [
+        &quot;2026-03月營收MoM 100.60%、YoY 54.96%&quot;,
+        &quot;2025Q4 EPS -0.36、毛利率18.81%&quot;,
+        &quot;2026-02-26法說提及DOCSIS4.0與Wi-Fi 7出貨走揚&quot;,
+        &quot;2026-04月新聞包含10G寬頻、Perle Systems投資與WiFi7/DOCSIS題材&quot;
+      ],
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;02_事件與基本面摘要.json&quot;,
+          &quot;08_2419_仲琦_GPT54Pro_結構化JSON提示詞_v1.md&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;month_revenue.latest_month&quot;,
+          &quot;financial_report&quot;,
+          &quot;earnings_call&quot;,
+          &quot;news&quot;,
+          &quot;專屬校正框架升級規則&quot;
+        ],
+        &quot;calc_method&quot;: &quot;依固定設定卡校正規則檢查是否有1至3個月結構性改變或重複失準。&quot;
+      }
+    },
+    &quot;overall_decision&quot;: {
+      &quot;framework_status&quot;: &quot;defer&quot;,
+      &quot;summary&quot;: &quot;未發現需要升級專屬提示詞段落結構的連續性證據。&quot;,
+      &quot;rationale&quot;: &quot;本次變化主要是事件窗、月營收與短線技術/籌碼波動；尚無同類型失準重複、核心主線持續改變或固定設定卡失效證據。&quot;,
+      &quot;confidence&quot;: &quot;medium&quot;
+    },
+    &quot;miss_attribution&quot;: {
+      &quot;miss_detected&quot;: false,
+      &quot;miss_type&quot;: &quot;none&quot;,
+      &quot;miss_summary&quot;: null,
+      &quot;root_causes&quot;: [],
+      &quot;is_framework_issue&quot;: false
+    },
+    &quot;section_patches&quot;: [],
+    &quot;weight_adjustments&quot;: [],
+    &quot;switch_rule_updates&quot;: [],
+    &quot;validation_plan&quot;: {
+      &quot;must_validate_next&quot;: [
+        &quot;37.10至37.56成本帶收復與否是否決定一週方向。&quot;,
+        &quot;34.05至35.20支撐帶失守後是否回測32.70至33.25。&quot;,
+        &quot;月營收改善是否延續至下一次營收公布與法說內容。&quot;
+      ],
+      &quot;holdout_rules&quot;: [
+        &quot;單日新聞、單日爆量或單日漲停不得觸發框架升級。&quot;,
+        &quot;分K補平bar過多時不得主導波段框架判斷。&quot;
+      ],
+      &quot;no_change_fields&quot;: [
+        &quot;stock_nature_premise&quot;,
+        &quot;core_lines&quot;,
+        &quot;compare_basket&quot;,
+        &quot;theme_beta_rules&quot;,
+        &quot;limits_and_principles&quot;
+      ],
+      &quot;success_criteria&quot;: [
+        &quot;下一輪若收復37.56且突破39.85，主升延續劇本需被驗證。&quot;,
+        &quot;若跌破34.05且回測32.70至33.25，回測洗盤轉修正劇本需被驗證。&quot;
+      ],
+      &quot;failure_criteria&quot;: [
+        &quot;若價格方向與37.10至37.56成本帶關係連續失準兩次以上，才考慮新增狀態切換規則。&quot;,
+        &quot;若營收/法說事件持續無法解釋股價反應，再檢討事件Beta權重。&quot;
+      ]
+    }
+  },
+  &quot;position_plan&quot;: {
+    &quot;position_context_note&quot;: &quot;未提供實際持倉成本與部位大小，以下僅為條件式波段管理框架。&quot;,
+    &quot;hold_conditions&quot;: [
+      &quot;34.05至35.20支撐帶不被日收跌破。&quot;,
+      &quot;價格重新站回35.90，並嘗試收復37.10至37.56成本帶。&quot;,
+      &quot;外資或三大法人不再連續放大賣超，借券賣出增加幅度收斂。&quot;
+    ],
+    &quot;reduce_zones&quot;: [
+      {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 37.1,
+            &quot;high&quot;: 37.56
+          }
+        ]
+      },
+      {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 38.5,
+            &quot;high&quot;: 39.85
+          }
+        ]
+      },
+      {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 41.7,
+            &quot;high&quot;: 41.9
+          }
+        ]
+      }
+    ],
+    &quot;defense_zones&quot;: [
+      {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 35.85,
+            &quot;high&quot;: 36.8
+          }
+        ]
+      },
+      {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 34.05,
+            &quot;high&quot;: 35.2
+          }
+        ]
+      },
+      {
+        &quot;range_type&quot;: &quot;single&quot;,
+        &quot;ranges&quot;: [
+          {
+            &quot;low&quot;: 32.7,
+            &quot;high&quot;: 33.25
+          }
+        ]
+      }
+    ]
+  },
+  &quot;watchlist&quot;: [
+    {
+      &quot;name&quot;: &quot;37.10至37.56事件/突破AVWAP成本帶是否收復&quot;,
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;03_技術結構摘要.json&quot;,
+          &quot;04_錨點候選集.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;primary_avwap.avwap&quot;,
+          &quot;candidates[0].anchor_price&quot;,
+          &quot;candidates[1].anchor_price&quot;
+        ],
+        &quot;calc_method&quot;: &quot;以雙AVWAP作多方成本帶。&quot;
+      },
+      &quot;timeframe&quot;: &quot;日K/事件AVWAP&quot;,
+      &quot;confidence&quot;: &quot;medium_high&quot;,
+      &quot;note&quot;: &quot;站回才恢復偏多追蹤；未站回則先視為反彈壓力。&quot;
+    },
+    {
+      &quot;name&quot;: &quot;34.05至35.20支撐帶是否日收失守&quot;,
+      &quot;data_type&quot;: &quot;derived&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;06_Goodinfo整合報表.html&quot;,
+          &quot;07_EOD_context_原始摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-14].low&quot;,
+          &quot;raw_section_snapshots.price_legal_margin[2026-04-16].low&quot;
+        ],
+        &quot;calc_method&quot;: &quot;以近期低點與突破日低點作支撐帶。&quot;
+      },
+      &quot;timeframe&quot;: &quot;日K&quot;,
+      &quot;confidence&quot;: &quot;medium&quot;,
+      &quot;note&quot;: &quot;跌破34.05後，第一回測目標轉向32.70至33.25。&quot;
+    },
+    {
+      &quot;name&quot;: &quot;外資與三大法人是否由一日賣超轉回3/5日延續買超&quot;,
+      &quot;data_type&quot;: &quot;fact&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;01_市場快照.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;institutional_flow.foreign_net_1d&quot;,
+          &quot;institutional_flow.foreign_net_3d&quot;,
+          &quot;institutional_flow.total_institutional_net_1d&quot;,
+          &quot;institutional_flow.total_institutional_net_5d&quot;
+        ],
+        &quot;calc_method&quot;: &quot;直接追蹤法人買賣超欄位。&quot;
+      },
+      &quot;timeframe&quot;: &quot;EOD&quot;,
+      &quot;confidence&quot;: &quot;high&quot;,
+      &quot;note&quot;: &quot;若連續賣超，37.10至37.95壓力會加重。&quot;
+    },
+    {
+      &quot;name&quot;: &quot;借券賣出增加與當沖比是否降溫&quot;,
+      &quot;data_type&quot;: &quot;fact&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;01_市場快照.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;margin_short_borrow.borrow_sell_delta&quot;,
+          &quot;margin_short_borrow.borrow_sell_balance&quot;,
+          &quot;day_trade_state.day_trade_ratio_pct&quot;,
+          &quot;day_trade_state.day_trade_ratio_5d_avg_pct&quot;
+        ],
+        &quot;calc_method&quot;: &quot;直接追蹤借券與當沖欄位。&quot;
+      },
+      &quot;timeframe&quot;: &quot;EOD&quot;,
+      &quot;confidence&quot;: &quot;high&quot;,
+      &quot;note&quot;: &quot;目前借券增加143張、當沖比35.7%，短線籌碼敏感。&quot;
+    },
+    {
+      &quot;name&quot;: &quot;月營收與法說事件能否驗證基本面修復&quot;,
+      &quot;data_type&quot;: &quot;fact&quot;,
+      &quot;source_basis&quot;: {
+        &quot;source_file_ids&quot;: [
+          &quot;02_事件與基本面摘要.json&quot;
+        ],
+        &quot;source_fields&quot;: [
+          &quot;month_revenue.latest_month&quot;,
+          &quot;financial_report&quot;,
+          &quot;earnings_call.next_date&quot;,
+          &quot;news&quot;
+        ],
+        &quot;calc_method&quot;: &quot;追蹤月營收、財報與法說事件資料。&quot;
+      },
+      &quot;timeframe&quot;: &quot;事件/基本面&quot;,
+      &quot;confidence&quot;: &quot;medium_high&quot;,
+      &quot;note&quot;: &quot;3月營收強但Q4 EPS為負，下一步需看毛利率與訂單能見度。&quot;
+    }
+  ]
+}</pre></details>
+      </div>
+    </details>
+    
+    </div>
+
+    <p class="footer-note">這是單股版原型頁。主真源為驗證後 JSON；股性與固定設定卡由最新專屬提示詞補足。這版優先驗證資料架構與區塊分類，尚未直接取代現行自動匯入鏈。</p>
+  </main>
+</body>
+</html>
