@@ -816,16 +816,6 @@
       font-weight: 500;
     }
     @media (max-width: 860px) {
-      .sticky-panel {
-        position: static;
-        top: auto;
-        z-index: auto;
-        backdrop-filter: none;
-        box-shadow: 0 10px 24px rgba(35, 26, 17, 0.08);
-      }
-      .filter-grid {
-        grid-template-columns: 1fr;
-      }
       .brand-row {
         flex-direction: column;
         align-items: start;
@@ -849,9 +839,6 @@
       }
     }
     @media (max-width: 720px) {
-      .sticky-panel {
-        box-shadow: 0 8px 18px rgba(35, 26, 17, 0.06);
-      }
       .shell {
         padding: 14px 12px 28px;
       }
@@ -1007,13 +994,6 @@
     .meta-card-split .meta-block + .meta-block {
       margin-top: 0;
     }
-    .sticky-panel {
-      position: sticky;
-      top: 8px;
-      z-index: 30;
-      backdrop-filter: blur(16px);
-      box-shadow: 0 18px 40px rgba(35, 26, 17, 0.14);
-    }
     .nav-panel {
       padding: 16px;
       margin-bottom: 14px;
@@ -1029,10 +1009,47 @@
       font-size: 14px;
       line-height: 1.76;
     }
-    .filter-grid {
+    .filter-toolbar {
+      display: grid;
+      gap: 12px;
+      margin-top: 0;
+    }
+    .filter-toolbar-main {
+      display: grid;
       grid-template-columns: 1fr;
       gap: 10px;
-      margin-top: 0;
+      align-items: end;
+    }
+    .filter-toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .filter-drawer-trigger,
+    .filter-drawer-close {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 0 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(39,72,63,.12);
+      background: rgba(255,252,246,.9);
+      color: var(--forest-deep);
+      font: inherit;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      cursor: pointer;
+      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
+      box-shadow: 0 10px 24px rgba(35, 26, 17, 0.06);
+    }
+    .filter-drawer-trigger:hover,
+    .filter-drawer-close:hover {
+      transform: translateY(-1px);
+      border-color: rgba(180,123,63,.26);
+      background: rgba(255,250,242,.98);
     }
     .search-field {
       grid-column: 1 / -1;
@@ -1053,14 +1070,155 @@
     }
     .favorite-filter {
       min-height: 52px;
-      font-size: 16px;
-      border-radius: 18px;
-      box-shadow: none;
+      padding: 0 18px;
+      font-size: 15px;
+      border-radius: 16px;
+      box-shadow: 0 10px 24px rgba(35, 26, 17, 0.06);
+    }
+    .favorite-filter .star {
+      font-size: 18px;
+    }
+    .active-filter-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      min-height: 32px;
+    }
+    .active-filter-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(39,72,63,.08);
+      color: var(--forest-deep);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+    .active-filter-empty {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+      font-weight: 600;
     }
     .filter-status {
       margin-top: 10px;
       font-size: 12px;
       line-height: 1.7;
+    }
+    .filter-drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 16, 12, 0.42);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .24s ease;
+      z-index: 58;
+    }
+    .filter-drawer {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      bottom: 16px;
+      width: min(540px, calc(100vw - 32px));
+      padding: 18px;
+      border-radius: 28px;
+      border: 1px solid rgba(39,72,63,.12);
+      background: linear-gradient(180deg, rgba(255,252,246,.98), rgba(247,239,227,.96));
+      box-shadow: 0 30px 64px rgba(21, 17, 13, 0.22);
+      opacity: 0;
+      transform: translateX(26px);
+      pointer-events: none;
+      transition: transform .28s ease, opacity .22s ease;
+      z-index: 59;
+      overflow: auto;
+      overscroll-behavior: contain;
+    }
+    body.filter-drawer-open {
+      overflow: hidden;
+    }
+    body.filter-drawer-open .filter-drawer-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    body.filter-drawer-open .filter-drawer {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+    .filter-drawer-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .filter-drawer-head h3 {
+      margin: 4px 0 0;
+      color: var(--forest-deep);
+      font-size: 28px;
+      line-height: 1.05;
+      font-family: var(--serif);
+      font-weight: 700;
+    }
+    .filter-drawer-copy {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.72;
+      font-weight: 500;
+      max-width: 34ch;
+    }
+    .filter-drawer-close {
+      min-height: 40px;
+      padding: 0 14px;
+      font-size: 13px;
+      flex: 0 0 auto;
+    }
+    .filter-drawer-body {
+      display: grid;
+      gap: 12px;
+    }
+    .filter-drawer-section {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(39,72,63,.08);
+      background: rgba(255,255,255,.56);
+    }
+    .filter-drawer-section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .filter-drawer-section-title {
+      margin: 4px 0 0;
+      color: var(--forest);
+      font-size: 20px;
+      line-height: 1.1;
+      font-family: var(--serif);
+      font-weight: 700;
+    }
+    .filter-drawer-section-note {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.66;
+      font-weight: 500;
+    }
+    .filter-drawer-section-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .filter-option-grid {
+      display: grid;
+      gap: 8px;
     }
     .stage-nav-wrap {
       margin-top: 12px;
@@ -1367,12 +1525,9 @@
       .nav-panel {
         padding: 20px;
       }
-      .filter-grid {
-        grid-template-columns: minmax(0, 1.5fr) minmax(180px, .9fr) minmax(160px, .8fr) minmax(220px, 1fr) 180px;
+      .filter-toolbar-main {
+        grid-template-columns: minmax(0, 1.6fr) auto;
         gap: 12px;
-      }
-      .search-field {
-        grid-column: auto;
       }
       .stage-nav {
         display: flex;
@@ -1380,7 +1535,7 @@
         overflow: visible;
       }
       .favorite-filter {
-        width: 100%;
+        width: auto;
       }
       .card-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1398,6 +1553,20 @@
     @media (min-width: 1180px) {
       .card-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 860px) {
+      .filter-drawer {
+        left: 12px;
+        right: 12px;
+        top: auto;
+        bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+        width: auto;
+        max-height: min(78svh, 760px);
+        transform: translateY(calc(100% + 24px));
+      }
+      body.filter-drawer-open .filter-drawer {
+        transform: translateY(0);
       }
     }
     @keyframes rise-in {
@@ -1448,72 +1617,29 @@
       </div>
     </section>
 
-    <section class="panel nav-panel sticky-panel">
+    <section class="panel nav-panel">
       <div class="nav-head">
         <div>
-          <h2>快速定位</h2>
-          <div class="nav-copy">先篩再看。首頁只做三件事：找階段、看把握度、分股性，最後再進個股頁。</div>
+          <h2>搜尋與篩選</h2>
+          <div class="nav-copy">首頁只保留精簡工具列。先搜尋，再視需要展開完整條件面板，最後直接進入單一個股 V3 儀表板。</div>
         </div>
       </div>
-      <div class="filter-grid">
+      <div class="filter-toolbar">
+        <div class="filter-toolbar-main">
         <div class="field search-field">
           <label for="stock-search">搜尋個股</label>
           <input id="stock-search" type="search" placeholder="輸入代號、名稱、狀態或操作建議">
         </div>
-        <div class="field">
-          <label for="stage-filter-toggle">階段篩選</label>
-          <details class="stage-filter-box" id="stage-filter">
-            <summary class="stage-filter-toggle" id="stage-filter-toggle">
-              <strong id="stage-filter-label">全部階段</strong>
-              <span>⌄</span>
-            </summary>
-            <div class="stage-filter-menu">
-              <div class="stage-filter-actions">
-                <button class="stage-filter-action" id="stage-filter-select-all" type="button">全選</button>
-                <button class="stage-filter-action" id="stage-filter-clear" type="button">清除</button>
-              </div>
-              <label class="stage-option"><input type="checkbox" value="G" data-stage-option><span>G. 延伸噴出</span></label><label class="stage-option"><input type="checkbox" value="F" data-stage-option><span>F. 主升二波</span></label><label class="stage-option"><input type="checkbox" value="D" data-stage-option><span>D. 主升一波</span></label><label class="stage-option"><input type="checkbox" value="E" data-stage-option><span>E. 高位震盪洗盤</span></label><label class="stage-option"><input type="checkbox" value="C" data-stage-option><span>C. 突破確認</span></label><label class="stage-option"><input type="checkbox" value="H" data-stage-option><span>H. 派發 / 鈍化</span></label><label class="stage-option"><input type="checkbox" value="I" data-stage-option><span>I. 破位轉弱</span></label><label class="stage-option"><input type="checkbox" value="?" data-stage-option><span>未分類 / 待補資料</span></label>
-            </div>
-          </details>
-        </div>
-        <div class="field">
-          <label for="confidence-filter-toggle">把握度</label>
-          <details class="stage-filter-box" id="confidence-filter">
-            <summary class="stage-filter-toggle" id="confidence-filter-toggle">
-              <strong id="confidence-filter-label">全部把握度</strong>
-              <span>⌄</span>
-            </summary>
-            <div class="stage-filter-menu">
-              <div class="stage-filter-actions">
-                <button class="stage-filter-action" id="confidence-filter-select-all" type="button">全選</button>
-                <button class="stage-filter-action" id="confidence-filter-clear" type="button">清除</button>
-              </div>
-              <label class="stage-option"><input type="checkbox" value="medium_high" data-confidence-option><span>中高</span></label><label class="stage-option"><input type="checkbox" value="medium" data-confidence-option><span>中</span></label><label class="stage-option"><input type="checkbox" value="medium_low" data-confidence-option><span>中低</span></label>
-            </div>
-          </details>
-        </div>
-        <div class="field">
-          <label for="nature-filter-toggle">股性分類</label>
-          <details class="stage-filter-box" id="nature-filter">
-            <summary class="stage-filter-toggle" id="nature-filter-toggle">
-              <strong id="nature-filter-label">全部股性</strong>
-              <span>⌄</span>
-            </summary>
-            <div class="stage-filter-menu">
-              <div class="stage-filter-actions">
-                <button class="stage-filter-action" id="nature-filter-select-all" type="button">全選</button>
-                <button class="stage-filter-action" id="nature-filter-clear" type="button">清除</button>
-              </div>
-              <label class="stage-option"><input type="checkbox" value="景氣修復 / 題材重評" data-nature-option><span>景氣修復 / 題材重評</span></label><label class="stage-option"><input type="checkbox" value="成長趨勢 / 修復" data-nature-option><span>成長趨勢 / 修復</span></label><label class="stage-option"><input type="checkbox" value="權值平台" data-nature-option><span>權值平台</span></label><label class="stage-option"><input type="checkbox" value="半導體循環" data-nature-option><span>半導體循環</span></label><label class="stage-option"><input type="checkbox" value="網通設備" data-nature-option><span>網通設備</span></label><label class="stage-option"><input type="checkbox" value="工具機自動化" data-nature-option><span>工具機自動化</span></label><label class="stage-option"><input type="checkbox" value="電子零組件" data-nature-option><span>電子零組件</span></label><label class="stage-option"><input type="checkbox" value="光電" data-nature-option><span>光電</span></label><label class="stage-option"><input type="checkbox" value="電腦週邊" data-nature-option><span>電腦週邊</span></label><label class="stage-option"><input type="checkbox" value="汽車零組件" data-nature-option><span>汽車零組件</span></label><label class="stage-option"><input type="checkbox" value="傳產循環" data-nature-option><span>傳產循環</span></label><label class="stage-option"><input type="checkbox" value="景氣修復" data-nature-option><span>景氣修復</span></label><label class="stage-option"><input type="checkbox" value="其他" data-nature-option><span>其他</span></label>
-            </div>
-          </details>
-        </div>
-        <div class="toggle-field">
-          <label for="favorite-filter">收藏檢視</label>
+        <div class="filter-toolbar-actions">
+          <button class="filter-drawer-trigger" id="filter-drawer-open" type="button" aria-expanded="false" aria-controls="filter-drawer">展開篩選</button>
           <button class="favorite-filter" id="favorite-filter" type="button" aria-pressed="false">
             <span class="star">★</span>
             <span>只看收藏</span>
           </button>
+        </div>
+        </div>
+        <div class="active-filter-strip" id="active-filter-summary">
+          <span class="active-filter-empty">目前未套用條件。</span>
         </div>
       </div>
       <div class="filter-status" id="filter-status">目前顯示全部標的。</div>
@@ -1521,6 +1647,68 @@
         <div class="stage-nav"><a class='stage-chip' href='#stage-G' data-stage-jump='G'><em>G</em><span>延伸噴出</span><strong>1</strong></a><a class='stage-chip' href='#stage-F' data-stage-jump='F'><em>F</em><span>主升二波</span><strong>1</strong></a><a class='stage-chip' href='#stage-D' data-stage-jump='D'><em>D</em><span>主升一波</span><strong>9</strong></a><a class='stage-chip' href='#stage-E' data-stage-jump='E'><em>E</em><span>高檔整理</span><strong>22</strong></a><a class='stage-chip' href='#stage-C' data-stage-jump='C'><em>C</em><span>突破</span><strong>1</strong></a><a class='stage-chip' href='#stage-H' data-stage-jump='H'><em>H</em><span>派發鈍化</span><strong>1</strong></a><a class='stage-chip' href='#stage-I' data-stage-jump='I'><em>I</em><span>破位轉弱</span><strong>1</strong></a><a class='stage-chip' href='#stage-?' data-stage-jump='?'><em>?</em><span>待補</span><strong>7</strong></a></div>
       </div>
     </section>
+
+    <div class="filter-drawer-backdrop" id="filter-drawer-backdrop"></div>
+    <aside class="filter-drawer" id="filter-drawer" aria-hidden="true">
+      <div class="filter-drawer-head">
+        <div>
+          <p class="section-kicker">條件面板</p>
+          <h3>完整篩選</h3>
+          <p class="filter-drawer-copy">桌機與手機共用同一套篩選面板。股性改為完整選項區，不再被窄欄下拉選單截斷。</p>
+        </div>
+        <button class="filter-drawer-close" id="filter-drawer-close" type="button">關閉</button>
+      </div>
+      <div class="filter-drawer-body">
+        <section class="filter-drawer-section">
+          <div class="filter-drawer-section-head">
+            <div>
+              <p class="section-kicker">條件一</p>
+              <div class="filter-drawer-section-title">階段</div>
+              <p class="filter-drawer-section-note">用主階段先切分整體分布。</p>
+            </div>
+            <div class="filter-drawer-section-actions">
+              <button class="stage-filter-action" id="stage-filter-select-all" type="button">全選</button>
+              <button class="stage-filter-action" id="stage-filter-clear" type="button">清除</button>
+            </div>
+          </div>
+          <div class="filter-option-grid">
+            <label class="stage-option"><input type="checkbox" value="G" data-stage-option><span>G. 延伸噴出</span></label><label class="stage-option"><input type="checkbox" value="F" data-stage-option><span>F. 主升二波</span></label><label class="stage-option"><input type="checkbox" value="D" data-stage-option><span>D. 主升一波</span></label><label class="stage-option"><input type="checkbox" value="E" data-stage-option><span>E. 高位震盪洗盤</span></label><label class="stage-option"><input type="checkbox" value="C" data-stage-option><span>C. 突破確認</span></label><label class="stage-option"><input type="checkbox" value="H" data-stage-option><span>H. 派發 / 鈍化</span></label><label class="stage-option"><input type="checkbox" value="I" data-stage-option><span>I. 破位轉弱</span></label><label class="stage-option"><input type="checkbox" value="?" data-stage-option><span>未分類 / 待補資料</span></label>
+          </div>
+        </section>
+        <section class="filter-drawer-section">
+          <div class="filter-drawer-section-head">
+            <div>
+              <p class="section-kicker">條件二</p>
+              <div class="filter-drawer-section-title">把握度</div>
+              <p class="filter-drawer-section-note">用信心層級縮小閱讀名單。</p>
+            </div>
+            <div class="filter-drawer-section-actions">
+              <button class="stage-filter-action" id="confidence-filter-select-all" type="button">全選</button>
+              <button class="stage-filter-action" id="confidence-filter-clear" type="button">清除</button>
+            </div>
+          </div>
+          <div class="filter-option-grid">
+            <label class="stage-option"><input type="checkbox" value="medium_high" data-confidence-option><span>中高</span></label><label class="stage-option"><input type="checkbox" value="medium" data-confidence-option><span>中</span></label><label class="stage-option"><input type="checkbox" value="medium_low" data-confidence-option><span>中低</span></label>
+          </div>
+        </section>
+        <section class="filter-drawer-section">
+          <div class="filter-drawer-section-head">
+            <div>
+              <p class="section-kicker">條件三</p>
+              <div class="filter-drawer-section-title">股性</div>
+              <p class="filter-drawer-section-note">完整顯示全部股性分類，避免桌機窄欄下拉截斷。</p>
+            </div>
+            <div class="filter-drawer-section-actions">
+              <button class="stage-filter-action" id="nature-filter-select-all" type="button">全選</button>
+              <button class="stage-filter-action" id="nature-filter-clear" type="button">清除</button>
+            </div>
+          </div>
+          <div class="filter-option-grid">
+            <label class="stage-option"><input type="checkbox" value="景氣修復 / 題材重評" data-nature-option><span>景氣修復 / 題材重評</span></label><label class="stage-option"><input type="checkbox" value="成長趨勢 / 修復" data-nature-option><span>成長趨勢 / 修復</span></label><label class="stage-option"><input type="checkbox" value="權值平台" data-nature-option><span>權值平台</span></label><label class="stage-option"><input type="checkbox" value="半導體循環" data-nature-option><span>半導體循環</span></label><label class="stage-option"><input type="checkbox" value="網通設備" data-nature-option><span>網通設備</span></label><label class="stage-option"><input type="checkbox" value="工具機自動化" data-nature-option><span>工具機自動化</span></label><label class="stage-option"><input type="checkbox" value="電子零組件" data-nature-option><span>電子零組件</span></label><label class="stage-option"><input type="checkbox" value="光電" data-nature-option><span>光電</span></label><label class="stage-option"><input type="checkbox" value="電腦週邊" data-nature-option><span>電腦週邊</span></label><label class="stage-option"><input type="checkbox" value="汽車零組件" data-nature-option><span>汽車零組件</span></label><label class="stage-option"><input type="checkbox" value="傳產循環" data-nature-option><span>傳產循環</span></label><label class="stage-option"><input type="checkbox" value="景氣修復" data-nature-option><span>景氣修復</span></label><label class="stage-option"><input type="checkbox" value="其他" data-nature-option><span>其他</span></label>
+          </div>
+        </section>
+      </div>
+    </aside>
 
     <section class="panel favorite-spotlight" id="favorite-spotlight">
       <div class="spotlight-head">
@@ -3383,11 +3571,8 @@
   </main>
   <script>
     const searchInput = document.getElementById('stock-search');
-    const stageFilterLabel = document.getElementById('stage-filter-label');
     const stageOptions = Array.from(document.querySelectorAll('[data-stage-option]'));
-    const confidenceFilterLabel = document.getElementById('confidence-filter-label');
     const confidenceOptions = Array.from(document.querySelectorAll('[data-confidence-option]'));
-    const natureFilterLabel = document.getElementById('nature-filter-label');
     const natureOptions = Array.from(document.querySelectorAll('[data-nature-option]'));
     const stageFilterSelectAll = document.getElementById('stage-filter-select-all');
     const stageFilterClear = document.getElementById('stage-filter-clear');
@@ -3404,6 +3589,11 @@
     const favoriteSpotlightGrid = document.getElementById('favorite-spotlight-grid');
     const favoriteSpotlightEmpty = document.getElementById('favorite-spotlight-empty');
     const favoriteSpotlightCount = document.getElementById('favorite-spotlight-count');
+    const activeFilterSummary = document.getElementById('active-filter-summary');
+    const filterDrawer = document.getElementById('filter-drawer');
+    const filterDrawerOpen = document.getElementById('filter-drawer-open');
+    const filterDrawerClose = document.getElementById('filter-drawer-close');
+    const filterDrawerBackdrop = document.getElementById('filter-drawer-backdrop');
 
     function getFavoriteButtons() {
       return Array.from(document.querySelectorAll('[data-favorite-toggle]'));
@@ -3446,25 +3636,55 @@
       return options.filter((option) => option.checked).map((option) => option.value);
     }
 
-    function syncFilterLabel(options, labelNode, emptyLabel, unitLabel) {
-      if (!labelNode) return;
+    function getNormalizedSelectedValues(options) {
       const selected = getSelectedValues(options);
-      if (!selected.length) {
-        labelNode.textContent = emptyLabel;
-        return;
+      if (!options.length || selected.length === options.length) {
+        return [];
       }
-      if (selected.length === 1) {
-        const optionLabel = options.find((option) => option.value === selected[0])?.parentElement?.textContent?.trim();
-        labelNode.textContent = optionLabel || selected[0];
-        return;
-      }
-      labelNode.textContent = `已選 ${selected.length} ${unitLabel}`;
+      return selected;
     }
 
-    function syncAllFilterLabels() {
-      syncFilterLabel(stageOptions, stageFilterLabel, '全部階段', '個階段');
-      syncFilterLabel(confidenceOptions, confidenceFilterLabel, '全部把握度', '項把握度');
-      syncFilterLabel(natureOptions, natureFilterLabel, '全部股性', '種股性');
+    function getSelectedLabels(options) {
+      return options
+        .filter((option) => option.checked)
+        .map((option) => option.parentElement?.textContent?.trim() || option.value);
+    }
+
+    function renderActiveFilterSummary() {
+      if (!activeFilterSummary) return;
+      const pills = [];
+      const query = (searchInput?.value || '').trim();
+      const selectedStages = getNormalizedSelectedValues(stageOptions);
+      const selectedConfidence = getNormalizedSelectedValues(confidenceOptions);
+      const selectedNature = getNormalizedSelectedValues(natureOptions);
+      const favoritesOnly = favoriteFilter?.classList.contains('active');
+
+      if (query) pills.push(`搜尋：${query}`);
+      if (selectedStages.length) pills.push(...getSelectedLabels(stageOptions).map((label) => `階段：${label}`));
+      if (selectedConfidence.length) pills.push(...getSelectedLabels(confidenceOptions).map((label) => `把握度：${label}`));
+      if (selectedNature.length) pills.push(...getSelectedLabels(natureOptions).map((label) => `股性：${label}`));
+      if (favoritesOnly) pills.push('只看收藏');
+
+      if (!pills.length) {
+        activeFilterSummary.innerHTML = '<span class="active-filter-empty">目前未套用條件。</span>';
+        return;
+      }
+
+      activeFilterSummary.innerHTML = pills
+        .map((label) => `<span class="active-filter-pill">${label}</span>`)
+        .join('');
+    }
+
+    function openFilterDrawer() {
+      document.body.classList.add('filter-drawer-open');
+      filterDrawer?.setAttribute('aria-hidden', 'false');
+      filterDrawerOpen?.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeFilterDrawer() {
+      document.body.classList.remove('filter-drawer-open');
+      filterDrawer?.setAttribute('aria-hidden', 'true');
+      filterDrawerOpen?.setAttribute('aria-expanded', 'false');
     }
 
     function renderFavoriteSpotlight() {
@@ -3501,9 +3721,9 @@
 
     function applyFilters() {
       const query = (searchInput?.value || '').trim().toLowerCase();
-      const selectedStages = getSelectedValues(stageOptions);
-      const selectedConfidence = getSelectedValues(confidenceOptions);
-      const selectedNature = getSelectedValues(natureOptions);
+      const selectedStages = getNormalizedSelectedValues(stageOptions);
+      const selectedConfidence = getNormalizedSelectedValues(confidenceOptions);
+      const selectedNature = getNormalizedSelectedValues(natureOptions);
       const favoritesOnly = favoriteFilter?.classList.contains('active');
       let visibleCount = 0;
 
@@ -3544,34 +3764,19 @@
       } else {
         const parts = [];
         if (query) parts.push(`關鍵字「${query}」`);
-        if (selectedStages.length) {
-          const selectedLabels = stageOptions
-            .filter((option) => option.checked)
-            .map((option) => option.parentElement?.textContent?.trim() || option.value);
-          parts.push(`階段 ${selectedLabels.join('、')}`);
-        }
-        if (selectedConfidence.length) {
-          const selectedLabels = confidenceOptions
-            .filter((option) => option.checked)
-            .map((option) => option.parentElement?.textContent?.trim() || option.value);
-          parts.push(`把握度 ${selectedLabels.join('、')}`);
-        }
-        if (selectedNature.length) {
-          const selectedLabels = natureOptions
-            .filter((option) => option.checked)
-            .map((option) => option.parentElement?.textContent?.trim() || option.value);
-          parts.push(`股性 ${selectedLabels.join('、')}`);
-        }
+        if (selectedStages.length) parts.push(`階段 ${getSelectedLabels(stageOptions).join('、')}`);
+        if (selectedConfidence.length) parts.push(`把握度 ${getSelectedLabels(confidenceOptions).join('、')}`);
+        if (selectedNature.length) parts.push(`股性 ${getSelectedLabels(natureOptions).join('、')}`);
         if (favoritesOnly) parts.push('只看收藏');
         statusText.textContent = `目前顯示 ${visibleCount} 檔，條件：${parts.join('、')}。`;
       }
+      renderActiveFilterSummary();
     }
 
     searchInput?.addEventListener('input', applyFilters);
     [stageOptions, confidenceOptions, natureOptions].forEach((options) => {
       options.forEach((option) => {
         option.addEventListener('change', () => {
-          syncAllFilterLabels();
           applyFilters();
         });
       });
@@ -3580,42 +3785,36 @@
       stageOptions.forEach((option) => {
         option.checked = true;
       });
-      syncAllFilterLabels();
       applyFilters();
     });
     stageFilterClear?.addEventListener('click', () => {
       stageOptions.forEach((option) => {
         option.checked = false;
       });
-      syncAllFilterLabels();
       applyFilters();
     });
     confidenceFilterSelectAll?.addEventListener('click', () => {
       confidenceOptions.forEach((option) => {
         option.checked = true;
       });
-      syncAllFilterLabels();
       applyFilters();
     });
     confidenceFilterClear?.addEventListener('click', () => {
       confidenceOptions.forEach((option) => {
         option.checked = false;
       });
-      syncAllFilterLabels();
       applyFilters();
     });
     natureFilterSelectAll?.addEventListener('click', () => {
       natureOptions.forEach((option) => {
         option.checked = true;
       });
-      syncAllFilterLabels();
       applyFilters();
     });
     natureFilterClear?.addEventListener('click', () => {
       natureOptions.forEach((option) => {
         option.checked = false;
       });
-      syncAllFilterLabels();
       applyFilters();
     });
     [favoriteFilter].forEach((button) => {
@@ -3624,6 +3823,17 @@
         syncFavoriteFilterButtons();
         applyFilters();
       });
+    });
+    filterDrawerOpen?.addEventListener('click', openFilterDrawer);
+    filterDrawerClose?.addEventListener('click', closeFilterDrawer);
+    filterDrawerBackdrop?.addEventListener('click', closeFilterDrawer);
+    document.querySelectorAll('[data-stage-jump]').forEach((button) => {
+      button.addEventListener('click', closeFilterDrawer);
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeFilterDrawer();
+      }
     });
 
     getFavoriteButtons().forEach((button) => {
@@ -3644,7 +3854,7 @@
 
     syncFavoriteButtons();
     syncFavoriteFilterButtons();
-    syncAllFilterLabels();
+    renderActiveFilterSummary();
     renderFavoriteSpotlight();
     applyFilters();
   </script>
