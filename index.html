@@ -1,0 +1,2201 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>波段觀測站 | 台股波段分析總覽</title>
+  <style>
+    :root {
+      --bg: #efe7da;
+      --paper: rgba(253, 248, 240, 0.92);
+      --paper-strong: rgba(255, 252, 246, 0.98);
+      --ink: #1c160f;
+      --muted: #6f6358;
+      --forest: #27483f;
+      --forest-deep: #173129;
+      --gold: #b47b3f;
+      --clay: #c76d42;
+      --line: rgba(28, 22, 15, 0.1);
+      --shadow: 0 24px 80px rgba(35, 26, 17, 0.12);
+      --shadow-strong: 0 32px 90px rgba(35, 26, 17, 0.18);
+      --sand: #e9dac1;
+      --serif: "Iowan Old Style", "Noto Serif TC", "PingFang TC", serif;
+      --sans: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", "Avenir Next", sans-serif;
+      --mono: "SFMono-Regular", "Menlo", monospace;
+      --text-xs: 12px;
+      --text-sm: 13px;
+      --text-md: 16px;
+      --text-lg: 18px;
+      --text-xl: 20px;
+      --text-2xl: 24px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: var(--text-md);
+      line-height: 1.75;
+      background:
+        radial-gradient(circle at 10% 12%, rgba(183, 122, 63, .22), transparent 24%),
+        radial-gradient(circle at 88% 18%, rgba(39, 72, 63, .18), transparent 28%),
+        linear-gradient(180deg, #fbf6ef 0%, #efe4d6 52%, #e9ddcf 100%);
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .08;
+      background-image:
+        linear-gradient(rgba(31, 22, 15, .08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31, 22, 15, .08) 1px, transparent 1px);
+      background-size: 120px 120px;
+    }
+    a {
+      color: var(--forest);
+      text-decoration: none;
+      font-weight: 800;
+      transition: transform .22s ease, color .22s ease, opacity .22s ease;
+    }
+    a:hover {
+      color: var(--forest-deep);
+    }
+    .shell { max-width: 1560px; margin: 0 auto; padding: 24px 20px 40px; }
+    .hero, .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 38px;
+      margin-bottom: 18px;
+      background:
+        linear-gradient(135deg, rgba(255,252,246,.96) 0%, rgba(247,239,226,.88) 58%, rgba(235,223,205,.92) 100%);
+      box-shadow: var(--shadow-strong);
+    }
+    .hero::selection {
+      background: rgba(180,123,63,.25);
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: -120px auto auto -60px;
+      width: 380px;
+      height: 380px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(199,109,66,.2) 0%, rgba(199,109,66,0) 68%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      top: -40px;
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(39,72,63,.18) 0%, rgba(39,72,63,0) 68%);
+      pointer-events: none;
+    }
+    .hero::marker {
+      display: none;
+    }
+    .hero > * {
+      position: relative;
+      z-index: 1;
+    }
+    .site-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .nav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 250, 242, 0.72);
+      border: 1px solid rgba(39, 72, 63, 0.14);
+      color: var(--forest);
+      font-weight: 800;
+      backdrop-filter: blur(10px);
+    }
+    .nav-pill.current {
+      background: linear-gradient(135deg, rgba(39,72,63,.14), rgba(180,123,63,.16));
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(320px, .75fr);
+      gap: 24px;
+      align-items: end;
+    }
+    .hero-main {
+      max-width: 760px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(39,72,63,.12), rgba(180,123,63,.16));
+      color: var(--forest-deep);
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-size: var(--text-xs);
+    }
+    .brand-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+    .brand-copy {
+      color: var(--muted);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      text-align: right;
+      line-height: 1.7;
+    }
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(38px, 5vw, 68px);
+      line-height: 1.02;
+      letter-spacing: -.04em;
+      font-family: var(--serif);
+      font-weight: 700;
+      max-width: 11ch;
+    }
+    .hero-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.9;
+      max-width: 760px;
+      font-weight: 500;
+    }
+    .hero-meta {
+      display: grid;
+      gap: 12px;
+      align-self: stretch;
+    }
+    .meta-card {
+      background: linear-gradient(180deg, rgba(255,252,246,.94), rgba(250,244,235,.9));
+      border: 1px solid rgba(39, 72, 63, 0.12);
+      border-radius: 24px;
+      padding: 18px 20px;
+      box-shadow: 0 16px 36px rgba(35, 26, 17, 0.06);
+      position: relative;
+      overflow: hidden;
+    }
+    .meta-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: linear-gradient(180deg, rgba(199,109,66,.7), rgba(39,72,63,.7));
+      opacity: .9;
+    }
+    .meta-card span {
+      display: block;
+      color: var(--muted);
+      font-size: var(--text-sm);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .meta-card strong {
+      display: block;
+      font-size: 22px;
+      line-height: 1.45;
+      word-break: break-word;
+      font-weight: 700;
+    }
+    .meta-card .meta-block + .meta-block {
+      margin-top: 18px;
+    }
+    .meta-card strong.meta-date {
+      font-size: 30px;
+      line-height: 1.2;
+      font-family: var(--serif);
+      letter-spacing: -.02em;
+    }
+    .meta-card strong.meta-total {
+      color: var(--forest);
+    }
+    .nav-panel {
+      padding: 22px 22px 20px;
+      margin-bottom: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,250,242,.94), rgba(248,240,227,.9));
+    }
+    .nav-panel h2 {
+      margin: 0;
+      color: var(--forest);
+      font-size: 24px;
+      font-family: var(--serif);
+      line-height: 1.15;
+      font-weight: 700;
+    }
+    .nav-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    .nav-copy {
+      color: var(--muted);
+      font-size: var(--text-md);
+      line-height: 1.8;
+      max-width: 620px;
+      font-weight: 500;
+    }
+    .filter-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr) minmax(220px, 260px);
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+    .field label {
+      color: var(--muted);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .field input,
+    .stage-filter-toggle {
+      width: 100%;
+      border: 1px solid rgba(39,72,63,.12);
+      background: rgba(255, 252, 246, 0.82);
+      border-radius: 16px;
+      padding: 14px 16px;
+      color: var(--ink);
+      font: inherit;
+      outline: none;
+    }
+    .field input:focus,
+    .stage-filter-toggle:focus {
+      border-color: rgba(180,123,63,.55);
+      box-shadow: 0 0 0 4px rgba(180,123,63,.12);
+    }
+    .stage-filter-box {
+      position: relative;
+    }
+    .stage-filter-box[open] {
+      z-index: 4;
+    }
+    .stage-filter-box summary {
+      list-style: none;
+    }
+    .stage-filter-box summary::-webkit-details-marker {
+      display: none;
+    }
+    .stage-filter-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 600;
+    }
+    .stage-filter-toggle strong {
+      font: inherit;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .stage-filter-toggle span {
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1;
+      transition: transform .2s ease;
+    }
+    .stage-filter-box[open] .stage-filter-toggle span {
+      transform: rotate(180deg);
+    }
+    .stage-filter-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      padding: 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(39,72,63,.12);
+      background: rgba(255, 252, 246, 0.98);
+      box-shadow: 0 22px 48px rgba(35, 26, 17, 0.12);
+      display: grid;
+      gap: 8px;
+    }
+    .stage-filter-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(39,72,63,.08);
+    }
+    .stage-filter-action {
+      border: 0;
+      background: transparent;
+      color: var(--forest);
+      font: inherit;
+      font-size: var(--text-sm);
+      font-weight: 700;
+      padding: 4px 0;
+      cursor: pointer;
+    }
+    .stage-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.6);
+      border: 1px solid rgba(39,72,63,.06);
+      cursor: pointer;
+    }
+    .stage-option:hover {
+      background: rgba(180,123,63,.09);
+    }
+    .stage-option input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--forest);
+      margin: 0;
+      flex: 0 0 auto;
+    }
+    .stage-option span {
+      color: var(--ink);
+      font-size: var(--text-md);
+      line-height: 1.5;
+      font-weight: 600;
+    }
+    .filter-status {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: var(--text-sm);
+      line-height: 1.75;
+      font-weight: 500;
+    }
+    .toggle-field {
+      display: grid;
+      gap: 8px;
+      align-content: end;
+    }
+    .favorite-filter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 68px;
+      padding: 0 24px;
+      border-radius: 28px;
+      border: 1px solid rgba(39,72,63,.12);
+      background: linear-gradient(180deg, rgba(255, 252, 246, 0.96), rgba(248, 238, 224, 0.92));
+      color: var(--forest-deep);
+      font: inherit;
+      font-weight: 800;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 14px 32px rgba(35, 26, 17, 0.08);
+      transition: transform .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+    .favorite-filter.active {
+      background: linear-gradient(135deg, rgba(39,72,63,.14), rgba(180,123,63,.18));
+      border-color: rgba(180,123,63,.32);
+    }
+    .favorite-filter:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 20px 40px rgba(35, 26, 17, 0.12);
+    }
+    .favorite-filter .star {
+      color: var(--forest);
+      font-size: 26px;
+      line-height: 1;
+    }
+    .stage-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .stage-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(255, 250, 242, 0.82);
+      border: 1px solid rgba(39, 72, 63, 0.12);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+    .stage-chip:hover {
+      transform: translateY(-1px);
+      border-color: rgba(180,123,63,.28);
+      box-shadow: 0 12px 24px rgba(35, 26, 17, 0.08);
+    }
+    .stage-chip span { color: var(--ink); }
+    .stage-chip strong {
+      display: inline-flex;
+      min-width: 28px;
+      justify-content: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(31,79,64,.1);
+      color: var(--forest);
+      font-family: var(--serif);
+    }
+    .stage-stack {
+      display: grid;
+      gap: 20px;
+    }
+    .stage-panel { padding: 24px; }
+    .stage-panel {
+      background:
+        linear-gradient(180deg, rgba(255,252,246,.96), rgba(249,242,232,.92));
+      position: relative;
+      overflow: hidden;
+    }
+    .stage-panel::after {
+      content: "";
+      position: absolute;
+      right: -40px;
+      bottom: -40px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, color-mix(in srgb, var(--stage-soft) 68%, transparent), transparent 68%);
+      pointer-events: none;
+      opacity: .55;
+    }
+    .stage-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 6px;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--stage-tone) 70%, white), var(--stage-tone));
+      opacity: .92;
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .section-kicker {
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: var(--text-sm);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .section-head h2 {
+      margin: 0;
+      color: var(--stage-tone);
+      font-size: 34px;
+      font-family: var(--serif);
+      line-height: 1.02;
+      font-weight: 700;
+    }
+    .section-deck {
+      margin-top: 10px;
+      color: color-mix(in srgb, var(--stage-tone) 82%, #3d3327);
+      font-size: 14px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+    .count-pill {
+      display: inline-flex;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--stage-soft) 82%, white), color-mix(in srgb, var(--stage-tone) 18%, white));
+      color: var(--stage-tone);
+      font-weight: 800;
+    }
+    .chapter-intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(260px, .6fr);
+      gap: 18px;
+      margin-bottom: 20px;
+      padding: 18px 0 22px;
+      border-top: 1px solid rgba(28,22,15,.08);
+      border-bottom: 1px solid rgba(28,22,15,.08);
+    }
+    .chapter-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: var(--text-md);
+      line-height: 1.9;
+      max-width: 58ch;
+      font-weight: 500;
+    }
+    .chapter-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .chapter-stats > div {
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,.62), rgba(247,240,230,.54));
+      border: 1px solid rgba(39,72,63,.08);
+    }
+    .chapter-stats span {
+      display: block;
+      color: var(--muted);
+      font-size: var(--text-xs);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .chapter-stats strong {
+      display: block;
+      color: var(--stage-tone);
+      font-family: var(--serif);
+      font-size: 26px;
+      line-height: 1.05;
+      font-weight: 700;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+    .stock-card {
+      background: linear-gradient(180deg, rgba(255,252,246,.99), rgba(251,244,235,.95));
+      border: 1px solid rgba(39,72,63,.08);
+      border-radius: 26px;
+      padding: 22px;
+      box-shadow: 0 18px 32px rgba(35, 26, 17, 0.055);
+      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease, background .22s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .stock-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--stage-tone), color-mix(in srgb, var(--stage-soft) 65%, white));
+      opacity: .9;
+    }
+    .stock-card::after {
+      content: "";
+      position: absolute;
+      right: -28px;
+      top: -28px;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, color-mix(in srgb, var(--stage-soft) 68%, white), transparent 68%);
+      opacity: .55;
+      pointer-events: none;
+    }
+    .stock-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 26px 46px rgba(35, 26, 17, 0.11);
+      border-color: rgba(180,123,63,.22);
+    }
+    .stock-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 14px;
+    }
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: end;
+    }
+    .stock-head h3 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      line-height: 1.02;
+      letter-spacing: -.02em;
+      font-family: var(--serif);
+      font-weight: 700;
+    }
+    .stage-badge {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--stage-soft) 84%, white), color-mix(in srgb, var(--stage-tone) 12%, white));
+      color: var(--stage-tone);
+      border: 1px solid color-mix(in srgb, var(--stage-tone) 18%, transparent);
+      font-size: var(--text-xs);
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .stage-detail {
+      margin: 0;
+      color: var(--muted);
+      font-size: var(--text-md);
+      line-height: 1.75;
+      max-width: 32ch;
+      font-weight: 500;
+    }
+    .research-summary {
+      margin: 0 0 16px;
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,.54), rgba(248,240,230,.5));
+      border: 1px solid rgba(39,72,63,.06);
+    }
+    .summary-label {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: var(--text-xs);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+    .summary-copy {
+      margin: 0;
+      color: var(--forest-deep);
+      font-size: var(--text-md);
+      line-height: 1.8;
+      font-weight: 600;
+    }
+    .confidence {
+      white-space: nowrap;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(39,72,63,.1), rgba(199,109,66,.14));
+      color: var(--forest-deep);
+      font-weight: 800;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+    }
+    .favorite-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(39,72,63,.12);
+      background: rgba(255,255,255,.6);
+      color: var(--forest-deep);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .2s ease, background .2s ease, border-color .2s ease;
+    }
+    .favorite-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(180,123,63,.12);
+    }
+    .favorite-btn.active {
+      background: linear-gradient(135deg, rgba(199,109,66,.18), rgba(180,123,63,.22));
+      border-color: rgba(180,123,63,.34);
+    }
+    .favorite-icon {
+      color: var(--gold);
+      font-size: 15px;
+      line-height: 1;
+    }
+    .detail-grid {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .detail-grid > div {
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.46);
+      border: 1px solid rgba(39,72,63,.06);
+    }
+    .detail-grid span {
+      display: block;
+      color: var(--muted);
+      font-size: var(--text-sm);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .detail-grid strong {
+      display: block;
+      font-size: var(--text-md);
+      line-height: 1.75;
+      word-break: break-word;
+      font-family: var(--sans);
+      font-weight: 600;
+    }
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+    .links a {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(39,72,63,.07);
+      border: 1px solid rgba(39,72,63,.1);
+    }
+    .links a:hover {
+      transform: translateY(-1px);
+      background: rgba(180,123,63,.12);
+    }
+    .muted { color: var(--muted); font-weight: 700; }
+    .favorite-spotlight {
+      display: block;
+      padding: 24px;
+      margin-bottom: 18px;
+      background:
+        radial-gradient(circle at 88% 14%, rgba(39,72,63,.11), transparent 24%),
+        linear-gradient(180deg, rgba(255,252,246,.99), rgba(247,238,225,.94));
+    }
+    .favorite-spotlight::before {
+      content: "";
+      display: block;
+      width: 96px;
+      height: 2px;
+      margin-bottom: 18px;
+      background: linear-gradient(90deg, var(--clay), rgba(39,72,63,.28));
+    }
+    .spotlight-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .spotlight-head h2 {
+      margin: 0;
+      color: var(--forest-deep);
+      font-size: 30px;
+      line-height: 1.08;
+      font-family: var(--serif);
+      font-weight: 700;
+    }
+    .spotlight-copy {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: var(--text-md);
+      line-height: 1.8;
+      font-weight: 500;
+    }
+    .spotlight-empty {
+      padding: 20px;
+      border-radius: 22px;
+      border: 1px dashed rgba(39,72,63,.18);
+      color: var(--muted);
+      background: rgba(255,255,255,.42);
+      line-height: 1.8;
+    }
+    .site-footer {
+      padding: 18px 6px 0;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: var(--text-sm);
+      line-height: 1.8;
+      font-weight: 500;
+    }
+    @media (max-width: 860px) {
+      .brand-row {
+        flex-direction: column;
+        align-items: start;
+      }
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+      .brand-copy {
+        text-align: left;
+      }
+      .stock-head {
+        flex-direction: row;
+        align-items: flex-start;
+      }
+      .section-head {
+        flex-direction: column;
+        align-items: start;
+      }
+      .chapter-intro {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 720px) {
+      .shell {
+        padding: 14px 12px 28px;
+      }
+      .hero {
+        padding: 20px 16px;
+        border-radius: 22px;
+      }
+      .panel {
+        border-radius: 22px;
+      }
+      .site-nav {
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .nav-pill {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 14px;
+      }
+      .brand-row {
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      h1 {
+        margin: 10px 0 10px;
+        font-size: clamp(30px, 10vw, 42px);
+      }
+      .hero-copy,
+      .hero-note,
+      .nav-copy,
+      .chapter-copy,
+      .spotlight-copy {
+        font-size: 15px;
+        line-height: 1.82;
+      }
+      .hero-meta,
+      .chapter-stats,
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+      .meta-card,
+      .stock-card,
+      .favorite-spotlight,
+      .nav-panel,
+      .stage-panel {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      .meta-card strong {
+        font-size: 22px;
+      }
+      .meta-card strong.meta-date {
+        font-size: 22px;
+      }
+      .nav-panel h2,
+      .spotlight-head h2 {
+        font-size: 22px;
+      }
+      .stage-chip {
+        width: auto;
+        justify-content: space-between;
+      }
+      .favorite-filter {
+        width: 100%;
+        min-height: 58px;
+        font-size: 18px;
+      }
+      .section-head h2 {
+        font-size: 26px;
+      }
+      .count-pill {
+        padding: 8px 12px;
+      }
+      .stock-head h3 {
+        font-size: 24px;
+      }
+      .stage-detail,
+      .brief-line strong {
+        font-size: 15px;
+        line-height: 1.75;
+      }
+      .brief-line {
+        padding: 10px 12px;
+      }
+      .links {
+        gap: 8px;
+      }
+      .links a {
+        flex: 1 1 100%;
+        justify-content: center;
+        padding: 12px 14px;
+      }
+      .spotlight-head {
+        gap: 10px;
+      }
+      .site-footer {
+        padding: 12px 2px 0;
+      }
+    }
+    /* V3 overview redesign overrides */
+    .shell {
+      max-width: 1360px;
+      padding: 14px 12px 34px;
+    }
+    .hero {
+      padding: 18px 16px;
+      margin-bottom: 14px;
+      border-radius: 24px;
+      box-shadow: 0 20px 48px rgba(35, 26, 17, 0.12);
+    }
+    .brand-row {
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .brand-copy {
+      font-size: 12px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .hero-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+    .hero-main {
+      max-width: none;
+    }
+    h1 {
+      max-width: none;
+      margin: 8px 0 10px;
+      font-size: clamp(32px, 9vw, 58px);
+      line-height: .98;
+    }
+    .hero-copy {
+      max-width: none;
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.82;
+    }
+    .hero-meta {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .meta-card {
+      padding: 14px 16px;
+      border-radius: 20px;
+    }
+    .meta-card-split {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .meta-card-split .meta-block + .meta-block {
+      margin-top: 0;
+    }
+    .nav-panel {
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .nav-head {
+      margin-bottom: 10px;
+    }
+    .nav-panel h2 {
+      font-size: 22px;
+    }
+    .nav-copy {
+      max-width: none;
+      font-size: 14px;
+      line-height: 1.76;
+    }
+    .filter-toolbar {
+      display: grid;
+      gap: 12px;
+      margin-top: 0;
+    }
+    .filter-toolbar-main {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      align-items: end;
+    }
+    .filter-toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .filter-drawer-trigger,
+    .filter-drawer-close {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 0 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(39,72,63,.12);
+      background: rgba(255,252,246,.9);
+      color: var(--forest-deep);
+      font: inherit;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      cursor: pointer;
+      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
+      box-shadow: 0 10px 24px rgba(35, 26, 17, 0.06);
+    }
+    .filter-drawer-trigger:hover,
+    .filter-drawer-close:hover {
+      transform: translateY(-1px);
+      border-color: rgba(180,123,63,.26);
+      background: rgba(255,250,242,.98);
+    }
+    .search-field {
+      grid-column: 1 / -1;
+    }
+    .field label,
+    .toggle-field label {
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+    .field input,
+    .stage-filter-toggle {
+      min-height: 52px;
+      padding: 12px 14px;
+      border-radius: 15px;
+    }
+    .favorite-filter {
+      min-height: 52px;
+      padding: 0 18px;
+      font-size: 15px;
+      border-radius: 16px;
+      box-shadow: 0 10px 24px rgba(35, 26, 17, 0.06);
+    }
+    .favorite-filter .star {
+      font-size: 18px;
+    }
+    .active-filter-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      min-height: 32px;
+    }
+    .active-filter-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(39,72,63,.08);
+      color: var(--forest-deep);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+    .active-filter-empty {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+      font-weight: 600;
+    }
+    .filter-status {
+      margin-top: 10px;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    .filter-drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 16, 12, 0.42);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .24s ease;
+      z-index: 58;
+    }
+    .filter-drawer {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      bottom: 16px;
+      width: min(540px, calc(100vw - 32px));
+      padding: 18px;
+      border-radius: 28px;
+      border: 1px solid rgba(39,72,63,.12);
+      background: linear-gradient(180deg, rgba(255,252,246,.98), rgba(247,239,227,.96));
+      box-shadow: 0 30px 64px rgba(21, 17, 13, 0.22);
+      opacity: 0;
+      transform: translateX(26px);
+      pointer-events: none;
+      transition: transform .28s ease, opacity .22s ease;
+      z-index: 59;
+      overflow: auto;
+      overscroll-behavior: contain;
+    }
+    body.filter-drawer-open {
+      overflow: hidden;
+    }
+    body.filter-drawer-open .filter-drawer-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    body.filter-drawer-open .filter-drawer {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+    .filter-drawer-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .filter-drawer-head h3 {
+      margin: 4px 0 0;
+      color: var(--forest-deep);
+      font-size: 28px;
+      line-height: 1.05;
+      font-family: var(--serif);
+      font-weight: 700;
+    }
+    .filter-drawer-copy {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.72;
+      font-weight: 500;
+      max-width: 34ch;
+    }
+    .filter-drawer-close {
+      min-height: 40px;
+      padding: 0 14px;
+      font-size: 13px;
+      flex: 0 0 auto;
+    }
+    .filter-drawer-body {
+      display: grid;
+      gap: 12px;
+    }
+    .filter-drawer-section {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(39,72,63,.08);
+      background: rgba(255,255,255,.56);
+    }
+    .filter-drawer-section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .filter-drawer-section-title {
+      margin: 4px 0 0;
+      color: var(--forest);
+      font-size: 20px;
+      line-height: 1.1;
+      font-family: var(--serif);
+      font-weight: 700;
+    }
+    .filter-drawer-section-note {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.66;
+      font-weight: 500;
+    }
+    .filter-drawer-section-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .filter-option-grid {
+      display: grid;
+      gap: 8px;
+    }
+    .stage-nav-wrap {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(28, 22, 15, 0.08);
+    }
+    .stage-nav {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: max-content;
+      gap: 10px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .stage-nav::-webkit-scrollbar {
+      display: none;
+    }
+    .stage-chip {
+      min-width: max-content;
+      padding: 10px 12px;
+      gap: 8px;
+      scroll-snap-align: start;
+    }
+    .stage-chip em {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: rgba(39, 72, 63, 0.08);
+      color: var(--forest-deep);
+      font-style: normal;
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: .06em;
+    }
+    .stage-chip span {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .favorite-spotlight {
+      padding: 18px 16px;
+      margin-bottom: 14px;
+    }
+    .spotlight-head {
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .spotlight-head h2 {
+      font-size: 24px;
+    }
+    .spotlight-copy {
+      font-size: 14px;
+      line-height: 1.76;
+    }
+    .stage-stack {
+      gap: 14px;
+    }
+    .stage-panel {
+      padding: 18px 16px;
+    }
+    .section-title-wrap {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .section-stage-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--stage-soft) 80%, white), color-mix(in srgb, var(--stage-tone) 20%, white));
+      color: var(--stage-tone);
+      font-family: var(--serif);
+      font-size: 20px;
+      font-weight: 700;
+      flex: 0 0 auto;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+    }
+    .section-head {
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+    .section-head h2 {
+      font-size: 26px;
+      line-height: 1;
+    }
+    .section-deck {
+      margin-top: 8px;
+      font-size: 12px;
+      letter-spacing: .08em;
+    }
+    .count-pill {
+      padding: 8px 11px;
+      font-size: 13px;
+    }
+    .chapter-intro {
+      display: block;
+      margin-bottom: 14px;
+      padding: 12px 0 14px;
+    }
+    .chapter-copy {
+      max-width: none;
+      font-size: 14px;
+      line-height: 1.82;
+    }
+    .card-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .stock-card {
+      padding: 0;
+      border-radius: 22px;
+      box-shadow: 0 10px 20px rgba(35, 26, 17, 0.04);
+    }
+    .stock-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 28px rgba(35, 26, 17, 0.08);
+    }
+    .stock-shell {
+      display: grid;
+      gap: 10px;
+      padding: 16px;
+    }
+    .stock-head {
+      flex-direction: row;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0;
+    }
+    .stock-identity {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+    .stock-topline {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .stock-head h3 {
+      font-size: 24px;
+      margin: 0;
+      line-height: 1.04;
+    }
+    .stock-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .stage-badge {
+      margin-bottom: 0;
+      padding: 5px 9px;
+      font-size: 11px;
+    }
+    .stage-detail {
+      max-width: none;
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--muted);
+    }
+    .meta-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(39,72,63,.08);
+      color: var(--forest-deep);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .nature-pill {
+      color: #65543d;
+      background: rgba(233, 218, 193, 0.46);
+      border-color: rgba(180,123,63,.12);
+    }
+    .confidence-pill.high {
+      background: rgba(164, 72, 35, 0.16);
+      color: #8f3318;
+      border-color: rgba(164,72,35,.16);
+    }
+    .confidence-pill.medium_high {
+      background: rgba(180, 123, 63, 0.18);
+      color: #8a5a21;
+      border-color: rgba(180,123,63,.18);
+    }
+    .confidence-pill.medium {
+      background: rgba(39, 72, 63, 0.1);
+      color: var(--forest);
+      border-color: rgba(39,72,63,.12);
+    }
+    .confidence-pill.medium_low,
+    .confidence-pill.low,
+    .confidence-pill.unknown {
+      background: rgba(111, 99, 88, 0.12);
+      color: #6f6358;
+      border-color: rgba(111,99,88,.12);
+    }
+    .favorite-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      min-height: 34px;
+      padding: 0;
+      border-radius: 999px;
+    }
+    .brief-stack {
+      display: grid;
+      gap: 8px;
+    }
+    .brief-line {
+      display: grid;
+      gap: 4px;
+      padding: 11px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.48);
+      border: 1px solid rgba(39,72,63,.06);
+    }
+    .brief-line span {
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+    .brief-line strong {
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      font-size: 15px;
+      line-height: 1.6;
+      font-weight: 700;
+    }
+    .detail-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .detail-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(39,72,63,.06);
+      color: var(--forest);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .detail-chip-muted {
+      background: rgba(111,99,88,.08);
+      color: var(--muted);
+    }
+    .links {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      padding-top: 0;
+      border-top: 0;
+    }
+    .links a {
+      justify-content: center;
+      min-height: 42px;
+      padding: 10px 12px;
+      border-radius: 14px;
+    }
+    .site-footer {
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    @media (min-width: 861px) {
+      .shell {
+        padding: 24px 20px 40px;
+      }
+      .hero {
+        padding: 28px;
+        margin-bottom: 18px;
+      }
+      .hero-grid {
+        grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+        gap: 18px;
+        align-items: end;
+      }
+      .nav-panel {
+        padding: 20px;
+      }
+      .filter-toolbar-main {
+        grid-template-columns: minmax(0, 1.6fr) auto;
+        gap: 12px;
+      }
+      .stage-nav {
+        display: flex;
+        flex-wrap: wrap;
+        overflow: visible;
+      }
+      .favorite-filter {
+        width: auto;
+      }
+      .card-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .stock-shell {
+        gap: 12px;
+      }
+      .stock-head h3 {
+        font-size: 26px;
+      }
+      .brief-stack {
+        grid-template-columns: 1.15fr .95fr;
+      }
+    }
+    @media (min-width: 1180px) {
+      .card-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 860px) {
+      .filter-drawer {
+        left: 12px;
+        right: 12px;
+        top: auto;
+        bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+        width: auto;
+        max-height: min(78svh, 760px);
+        transform: translateY(calc(100% + 24px));
+      }
+      body.filter-drawer-open .filter-drawer {
+        transform: translateY(0);
+      }
+    }
+    @keyframes rise-in {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .hero, .nav-panel, .stage-panel {
+      animation: rise-in .55s ease both;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="brand-row">
+        <div class="eyebrow">波段觀測站 / V3</div>
+        <div class="brand-copy">手機優先索引站<br>先定位階段，再進個股頁</div>
+      </div>
+      <div class="hero-grid">
+        <div class="hero-main">
+          <h1>台股波段 V3 總覽</h1>
+          <p class="hero-copy">這一頁是交易索引頁，不是完整報告。先用階段、把握度、股性與搜尋縮小範圍，再直接進入單一個股 V3 儀表板。</p>
+        </div>
+        <div class="hero-meta">
+          <article class="meta-card">
+            <div class="meta-block">
+              <span>最近更新</span>
+              <strong class="meta-date">2026-04-23</strong>
+            </div>
+          </article>
+          <article class="meta-card meta-card-split">
+            <div class="meta-block">
+              <span>正式 V3</span>
+              <strong class="meta-total">4 檔</strong>
+            </div>
+            <div class="meta-block">
+              <span>目前最多</span>
+              <strong>高位震盪洗盤 · 4 檔</strong>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel nav-panel">
+      <div class="nav-head">
+        <div>
+          <h2>搜尋與篩選</h2>
+          <div class="nav-copy">首頁只保留精簡工具列。先搜尋，再視需要展開完整條件面板，最後直接進入單一個股 V3 儀表板。</div>
+        </div>
+      </div>
+      <div class="filter-toolbar">
+        <div class="filter-toolbar-main">
+        <div class="field search-field">
+          <label for="stock-search">搜尋個股</label>
+          <input id="stock-search" type="search" placeholder="輸入代號、名稱、狀態或操作建議">
+        </div>
+        <div class="filter-toolbar-actions">
+          <button class="filter-drawer-trigger" id="filter-drawer-open" type="button" aria-expanded="false" aria-controls="filter-drawer">展開篩選</button>
+          <button class="favorite-filter" id="favorite-filter" type="button" aria-pressed="false">
+            <span class="star">★</span>
+            <span>只看收藏</span>
+          </button>
+        </div>
+        </div>
+        <div class="active-filter-strip" id="active-filter-summary">
+          <span class="active-filter-empty">目前未套用條件。</span>
+        </div>
+      </div>
+      <div class="filter-status" id="filter-status">目前顯示全部標的。</div>
+      <div class="stage-nav-wrap">
+        <div class="stage-nav"><a class='stage-chip' href='#stage-E' data-stage-jump='E'><em>E</em><span>高檔整理</span><strong>4</strong></a></div>
+      </div>
+    </section>
+
+    <div class="filter-drawer-backdrop" id="filter-drawer-backdrop"></div>
+    <aside class="filter-drawer" id="filter-drawer" aria-hidden="true">
+      <div class="filter-drawer-head">
+        <div>
+          <p class="section-kicker">條件面板</p>
+          <h3>完整篩選</h3>
+          <p class="filter-drawer-copy">桌機與手機共用同一套篩選面板。股性改為完整選項區，不再被窄欄下拉選單截斷。</p>
+        </div>
+        <button class="filter-drawer-close" id="filter-drawer-close" type="button">關閉</button>
+      </div>
+      <div class="filter-drawer-body">
+        <section class="filter-drawer-section">
+          <div class="filter-drawer-section-head">
+            <div>
+              <p class="section-kicker">條件一</p>
+              <div class="filter-drawer-section-title">階段</div>
+              <p class="filter-drawer-section-note">用主階段先切分整體分布。</p>
+            </div>
+            <div class="filter-drawer-section-actions">
+              <button class="stage-filter-action" id="stage-filter-select-all" type="button">全選</button>
+              <button class="stage-filter-action" id="stage-filter-clear" type="button">清除</button>
+            </div>
+          </div>
+          <div class="filter-option-grid">
+            <label class="stage-option"><input type="checkbox" value="E" data-stage-option><span>E. 高位震盪洗盤</span></label>
+          </div>
+        </section>
+        <section class="filter-drawer-section">
+          <div class="filter-drawer-section-head">
+            <div>
+              <p class="section-kicker">條件二</p>
+              <div class="filter-drawer-section-title">把握度</div>
+              <p class="filter-drawer-section-note">用信心層級縮小閱讀名單。</p>
+            </div>
+            <div class="filter-drawer-section-actions">
+              <button class="stage-filter-action" id="confidence-filter-select-all" type="button">全選</button>
+              <button class="stage-filter-action" id="confidence-filter-clear" type="button">清除</button>
+            </div>
+          </div>
+          <div class="filter-option-grid">
+            <label class="stage-option"><input type="checkbox" value="medium" data-confidence-option><span>中</span></label>
+          </div>
+        </section>
+        <section class="filter-drawer-section">
+          <div class="filter-drawer-section-head">
+            <div>
+              <p class="section-kicker">條件三</p>
+              <div class="filter-drawer-section-title">股性</div>
+              <p class="filter-drawer-section-note">完整顯示全部股性分類，避免桌機窄欄下拉截斷。</p>
+            </div>
+            <div class="filter-drawer-section-actions">
+              <button class="stage-filter-action" id="nature-filter-select-all" type="button">全選</button>
+              <button class="stage-filter-action" id="nature-filter-clear" type="button">清除</button>
+            </div>
+          </div>
+          <div class="filter-option-grid">
+            <label class="stage-option"><input type="checkbox" value="景氣修復 / 題材重評" data-nature-option><span>景氣修復 / 題材重評</span></label><label class="stage-option"><input type="checkbox" value="傳產循環" data-nature-option><span>傳產循環</span></label>
+          </div>
+        </section>
+      </div>
+    </aside>
+
+    <section class="panel favorite-spotlight" id="favorite-spotlight">
+      <div class="spotlight-head">
+        <div>
+          <p class="section-kicker">我的觀察清單</p>
+          <h2>收藏個股</h2>
+          <p class="spotlight-copy">這裡固定整理你真正要追的標的，首頁打開後可以先檢查這一區，再往下看整體分布。</p>
+        </div>
+        <span class="count-pill" id="favorite-spotlight-count">0 檔</span>
+      </div>
+      <div class="spotlight-empty" id="favorite-spotlight-empty">目前還沒有收藏個股。你可以在各張個股卡片按下「收藏」，這裡就會自動建立你的觀察清單。</div>
+      <div class="card-grid" id="favorite-spotlight-grid"></div>
+    </section>
+
+    <section class="stage-stack">
+      
+    <section class="panel stage-panel" id="stage-E" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">
+      <div class="section-head">
+        <div class="section-title-wrap">
+          <span class="section-stage-mark">E</span>
+          <div>
+            <p class="section-kicker">階段分類</p>
+            <h2>高檔整理</h2>
+            <div class="section-deck">E. 高位震盪洗盤</div>
+          </div>
+        </div>
+        <span class="count-pill">4 檔</span>
+      </div>
+      <div class="chapter-intro compact">
+        <p class="chapter-copy">高檔震盪是強勢股重新分配籌碼的地帶，關鍵在於是健康洗盤還是轉弱前兆。</p>
+      </div>
+      <div class="card-grid">
+        
+            <article class="stock-card" data-stock="1528 恩德" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="事件窗急漲後失守短期成本帶，轉入高檔洗盤偏弱。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="景氣修復 / 題材重評" data-nature-detail="景氣修復股或高β自動化股，需看接單、工具機 / 自動化週期與題材重評" data-stock-id="1528 恩德">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>1528 恩德</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="1528 恩德" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">景氣修復 / 題材重評</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗急漲後失守短期成本帶，轉入高檔洗盤偏弱。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-23</span>
+                  <span class="detail-chip detail-chip-muted">景氣修復股或高β自動化股，需看接單、工具機 / 自動化週期與題材重評</span>
+                </div>
+                <div class="links">
+                  <a href='1528-v3'>個股儀表板</a>
+                  <a href="analysis/1528_恩德_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="1597 直得" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="事件題材驅動後的高位洗盤；短線轉弱，中期趨勢未壞" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="景氣修復 / 題材重評" data-nature-detail="景氣修復股或高β自動化股，需看接單、工具機 / 自動化週期與題材重評" data-stock-id="1597 直得">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>1597 直得</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="1597 直得" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">景氣修復 / 題材重評</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件題材驅動後的高位洗盤；短線轉弱，中期趨勢未壞</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-23</span>
+                  <span class="detail-chip detail-chip-muted">景氣修復股或高β自動化股，需看接單、工具機 / 自動化週期與題材重評</span>
+                </div>
+                <div class="links">
+                  <a href='1597-v3'>個股儀表板</a>
+                  <a href="analysis/1597_直得_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="2103 台橡" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="站回avwap但未過19.45~20.30。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="傳產循環" data-nature-detail="景氣循環股，需看原料價差與下游客戶庫存" data-stock-id="2103 台橡">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>2103 台橡</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="2103 台橡" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">傳產循環</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>站回AVWAP但未過19.45~20.30。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-23</span>
+                  <span class="detail-chip detail-chip-muted">景氣循環股，需看原料價差與下游客戶庫存</span>
+                </div>
+                <div class="links">
+                  <a href='2103-v3'>個股儀表板</a>
+                  <a href="analysis/2103_台橡_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="4540 全球傳動" data-stage="E" data-stage-label="高檔整理；靠近 拉回測試" data-state="事件後急漲拉回，跌破雙avwap測試支撐" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="景氣修復 / 題材重評" data-nature-detail="台股上市精密傳動 / 自動化零組件股，屬景氣修復型 + 題材重評型中小型波段股。" data-stock-id="4540 全球傳動">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>4540 全球傳動</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="4540 全球傳動" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">景氣修復 / 題材重評</span>
+                    </div>
+                    <p class="stage-detail">高檔整理；靠近 拉回測試</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件後急漲拉回，跌破雙AVWAP測試支撐</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-23</span>
+                  <span class="detail-chip detail-chip-muted">台股上市精密傳動 / 自動化零組件股，屬景氣修復型 + 題材重評型中小型波段股。</span>
+                </div>
+                <div class="links">
+                  <a href='4540-v3'>個股儀表板</a>
+                  <a href="analysis/4540_全球傳動_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+      </div>
+    </section>
+    
+    </section>
+
+    <footer class="site-footer">
+      <div>波段觀測站由共用版波段分析流程自動更新，適合手機與桌機閱讀。</div>
+      <div>首頁依當前階段分組；深入閱讀可進入個股儀表板與文字分析。</div>
+    </footer>
+  </main>
+  <script>
+    const searchInput = document.getElementById('stock-search');
+    const stageOptions = Array.from(document.querySelectorAll('[data-stage-option]'));
+    const confidenceOptions = Array.from(document.querySelectorAll('[data-confidence-option]'));
+    const natureOptions = Array.from(document.querySelectorAll('[data-nature-option]'));
+    const stageFilterSelectAll = document.getElementById('stage-filter-select-all');
+    const stageFilterClear = document.getElementById('stage-filter-clear');
+    const confidenceFilterSelectAll = document.getElementById('confidence-filter-select-all');
+    const confidenceFilterClear = document.getElementById('confidence-filter-clear');
+    const natureFilterSelectAll = document.getElementById('nature-filter-select-all');
+    const natureFilterClear = document.getElementById('nature-filter-clear');
+    const favoriteFilter = document.getElementById('favorite-filter');
+    const statusText = document.getElementById('filter-status');
+    const panels = Array.from(document.querySelectorAll('.stage-panel'));
+    const allCards = Array.from(document.querySelectorAll('.stock-card'));
+    const favoriteStorageKey = 'swing-observer-favorites';
+    const favoriteSpotlight = document.getElementById('favorite-spotlight');
+    const favoriteSpotlightGrid = document.getElementById('favorite-spotlight-grid');
+    const favoriteSpotlightEmpty = document.getElementById('favorite-spotlight-empty');
+    const favoriteSpotlightCount = document.getElementById('favorite-spotlight-count');
+    const activeFilterSummary = document.getElementById('active-filter-summary');
+    const filterDrawer = document.getElementById('filter-drawer');
+    const filterDrawerOpen = document.getElementById('filter-drawer-open');
+    const filterDrawerClose = document.getElementById('filter-drawer-close');
+    const filterDrawerBackdrop = document.getElementById('filter-drawer-backdrop');
+
+    function getFavoriteButtons() {
+      return Array.from(document.querySelectorAll('[data-favorite-toggle]'));
+    }
+
+    function loadFavorites() {
+      try {
+        return new Set(JSON.parse(localStorage.getItem(favoriteStorageKey) || '[]'));
+      } catch (error) {
+        return new Set();
+      }
+    }
+
+    let favorites = loadFavorites();
+
+    function saveFavorites() {
+      localStorage.setItem(favoriteStorageKey, JSON.stringify(Array.from(favorites)));
+    }
+
+    function syncFavoriteButtons() {
+      getFavoriteButtons().forEach((button) => {
+        const stockId = button.dataset.stockId || '';
+        const isActive = favorites.has(stockId);
+        button.classList.toggle('active', isActive);
+        button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        button.setAttribute('title', isActive ? '移除收藏' : '加入收藏');
+      });
+    }
+
+    function syncFavoriteFilterButtons() {
+      const active = favoriteFilter?.classList.contains('active');
+      [favoriteFilter].forEach((button) => {
+        if (!button) return;
+        button.classList.toggle('active', !!active);
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+    }
+
+    function getSelectedValues(options) {
+      return options.filter((option) => option.checked).map((option) => option.value);
+    }
+
+    function getNormalizedSelectedValues(options) {
+      const selected = getSelectedValues(options);
+      if (!options.length || selected.length === options.length) {
+        return [];
+      }
+      return selected;
+    }
+
+    function getSelectedLabels(options) {
+      return options
+        .filter((option) => option.checked)
+        .map((option) => option.parentElement?.textContent?.trim() || option.value);
+    }
+
+    function renderActiveFilterSummary() {
+      if (!activeFilterSummary) return;
+      const pills = [];
+      const query = (searchInput?.value || '').trim();
+      const selectedStages = getNormalizedSelectedValues(stageOptions);
+      const selectedConfidence = getNormalizedSelectedValues(confidenceOptions);
+      const selectedNature = getNormalizedSelectedValues(natureOptions);
+      const favoritesOnly = favoriteFilter?.classList.contains('active');
+
+      if (query) pills.push(`搜尋：${query}`);
+      if (selectedStages.length) pills.push(...getSelectedLabels(stageOptions).map((label) => `階段：${label}`));
+      if (selectedConfidence.length) pills.push(...getSelectedLabels(confidenceOptions).map((label) => `把握度：${label}`));
+      if (selectedNature.length) pills.push(...getSelectedLabels(natureOptions).map((label) => `股性：${label}`));
+      if (favoritesOnly) pills.push('只看收藏');
+
+      if (!pills.length) {
+        activeFilterSummary.innerHTML = '<span class="active-filter-empty">目前未套用條件。</span>';
+        return;
+      }
+
+      activeFilterSummary.innerHTML = pills
+        .map((label) => `<span class="active-filter-pill">${label}</span>`)
+        .join('');
+    }
+
+    function openFilterDrawer() {
+      document.body.classList.add('filter-drawer-open');
+      filterDrawer?.setAttribute('aria-hidden', 'false');
+      filterDrawerOpen?.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeFilterDrawer() {
+      document.body.classList.remove('filter-drawer-open');
+      filterDrawer?.setAttribute('aria-hidden', 'true');
+      filterDrawerOpen?.setAttribute('aria-expanded', 'false');
+    }
+
+    function renderFavoriteSpotlight() {
+      if (!favoriteSpotlight || !favoriteSpotlightGrid || !favoriteSpotlightEmpty || !favoriteSpotlightCount) return;
+      const favoriteCards = allCards
+        .filter((card) => favorites.has(card.dataset.stockId || ''))
+        .map((card) => card.cloneNode(true));
+
+      favoriteSpotlightGrid.innerHTML = '';
+      favoriteCards.forEach((card) => favoriteSpotlightGrid.appendChild(card));
+
+      const hasFavorites = favoriteCards.length > 0;
+      favoriteSpotlightEmpty.style.display = hasFavorites ? 'none' : '';
+      favoriteSpotlightGrid.style.display = hasFavorites ? '' : 'none';
+      favoriteSpotlightCount.textContent = `${favoriteCards.length} 檔`;
+
+      favoriteSpotlightGrid.querySelectorAll('[data-favorite-toggle]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const stockId = button.dataset.stockId || '';
+          if (!stockId) return;
+          if (favorites.has(stockId)) {
+            favorites.delete(stockId);
+          } else {
+            favorites.add(stockId);
+          }
+          saveFavorites();
+          syncFavoriteButtons();
+          renderFavoriteSpotlight();
+          applyFilters();
+        });
+      });
+      syncFavoriteButtons();
+    }
+
+    function applyFilters() {
+      const query = (searchInput?.value || '').trim().toLowerCase();
+      const selectedStages = getNormalizedSelectedValues(stageOptions);
+      const selectedConfidence = getNormalizedSelectedValues(confidenceOptions);
+      const selectedNature = getNormalizedSelectedValues(natureOptions);
+      const favoritesOnly = favoriteFilter?.classList.contains('active');
+      let visibleCount = 0;
+
+      panels.forEach((panel) => {
+        const cards = Array.from(panel.querySelectorAll('.stock-card'));
+        let panelVisibleCount = 0;
+
+        cards.forEach((card) => {
+          const haystack = [
+            card.dataset.stock || '',
+            card.dataset.stage || '',
+            card.dataset.stageLabel || '',
+            card.dataset.state || '',
+            card.dataset.action || '',
+            card.dataset.confidenceLabel || '',
+            card.dataset.nature || '',
+            card.dataset.natureDetail || '',
+          ].join(' ');
+          const matchesQuery = !query || haystack.includes(query);
+          const matchesStage = !selectedStages.length || selectedStages.includes(card.dataset.stage || '');
+          const matchesConfidence = !selectedConfidence.length || selectedConfidence.includes(card.dataset.confidence || '');
+          const matchesNature = !selectedNature.length || selectedNature.includes(card.dataset.nature || '');
+          const stockId = card.dataset.stockId || '';
+          const matchesFavorite = !favoritesOnly || favorites.has(stockId);
+          const show = matchesQuery && matchesStage && matchesConfidence && matchesNature && matchesFavorite;
+          card.style.display = show ? '' : 'none';
+          if (show) {
+            panelVisibleCount += 1;
+            visibleCount += 1;
+          }
+        });
+
+        panel.style.display = panelVisibleCount > 0 ? '' : 'none';
+      });
+
+      if (!query && !selectedStages.length && !selectedConfidence.length && !selectedNature.length) {
+        statusText.textContent = favoritesOnly ? `目前顯示收藏中的 ${visibleCount} 檔。` : '目前顯示全部標的。';
+      } else {
+        const parts = [];
+        if (query) parts.push(`關鍵字「${query}」`);
+        if (selectedStages.length) parts.push(`階段 ${getSelectedLabels(stageOptions).join('、')}`);
+        if (selectedConfidence.length) parts.push(`把握度 ${getSelectedLabels(confidenceOptions).join('、')}`);
+        if (selectedNature.length) parts.push(`股性 ${getSelectedLabels(natureOptions).join('、')}`);
+        if (favoritesOnly) parts.push('只看收藏');
+        statusText.textContent = `目前顯示 ${visibleCount} 檔，條件：${parts.join('、')}。`;
+      }
+      renderActiveFilterSummary();
+    }
+
+    searchInput?.addEventListener('input', applyFilters);
+    [stageOptions, confidenceOptions, natureOptions].forEach((options) => {
+      options.forEach((option) => {
+        option.addEventListener('change', () => {
+          applyFilters();
+        });
+      });
+    });
+    stageFilterSelectAll?.addEventListener('click', () => {
+      stageOptions.forEach((option) => {
+        option.checked = true;
+      });
+      applyFilters();
+    });
+    stageFilterClear?.addEventListener('click', () => {
+      stageOptions.forEach((option) => {
+        option.checked = false;
+      });
+      applyFilters();
+    });
+    confidenceFilterSelectAll?.addEventListener('click', () => {
+      confidenceOptions.forEach((option) => {
+        option.checked = true;
+      });
+      applyFilters();
+    });
+    confidenceFilterClear?.addEventListener('click', () => {
+      confidenceOptions.forEach((option) => {
+        option.checked = false;
+      });
+      applyFilters();
+    });
+    natureFilterSelectAll?.addEventListener('click', () => {
+      natureOptions.forEach((option) => {
+        option.checked = true;
+      });
+      applyFilters();
+    });
+    natureFilterClear?.addEventListener('click', () => {
+      natureOptions.forEach((option) => {
+        option.checked = false;
+      });
+      applyFilters();
+    });
+    [favoriteFilter].forEach((button) => {
+      button?.addEventListener('click', () => {
+        favoriteFilter?.classList.toggle('active');
+        syncFavoriteFilterButtons();
+        applyFilters();
+      });
+    });
+    filterDrawerOpen?.addEventListener('click', openFilterDrawer);
+    filterDrawerClose?.addEventListener('click', closeFilterDrawer);
+    filterDrawerBackdrop?.addEventListener('click', closeFilterDrawer);
+    document.querySelectorAll('[data-stage-jump]').forEach((button) => {
+      button.addEventListener('click', closeFilterDrawer);
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeFilterDrawer();
+      }
+    });
+
+    getFavoriteButtons().forEach((button) => {
+      button.addEventListener('click', () => {
+        const stockId = button.dataset.stockId || '';
+        if (!stockId) return;
+        if (favorites.has(stockId)) {
+          favorites.delete(stockId);
+        } else {
+          favorites.add(stockId);
+        }
+        saveFavorites();
+        syncFavoriteButtons();
+        renderFavoriteSpotlight();
+        applyFilters();
+      });
+    });
+
+    syncFavoriteButtons();
+    syncFavoriteFilterButtons();
+    renderActiveFilterSummary();
+    renderFavoriteSpotlight();
+    applyFilters();
+  </script>
+</body>
+</html>
