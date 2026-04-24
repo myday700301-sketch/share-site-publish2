@@ -1,0 +1,2417 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>3714 富采 Dashboard V3</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap');
+    :root {
+      --bg: #f3ede2;
+      --panel: rgba(255,255,255,0.94);
+      --panel-strong: rgba(255,255,255,0.98);
+      --text: #1f2a36;
+      --muted: #647284;
+      --line: rgba(24,32,28,0.14);
+      --line-strong: rgba(24,32,28,0.22);
+      --accent: #294c73;
+      --accent-soft: rgba(41,76,115,0.10);
+      --accent-strong: #1d3957;
+      --mix: #9a6431;
+      --mix-soft: rgba(154,100,49,0.12);
+      --green: #255f4b;
+      --green-soft: rgba(37,95,75,0.10);
+      --amber: #7e5c13;
+      --amber-soft: rgba(126,92,19,0.12);
+      --red: #953f31;
+      --red-soft: rgba(149,63,49,0.10);
+      --shadow: 0 14px 34px rgba(39, 31, 20, 0.08);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        linear-gradient(rgba(24,32,28,0.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(24,32,28,0.024) 1px, transparent 1px),
+        radial-gradient(circle at top left, rgba(157,74,44,0.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(37,95,75,0.08), transparent 28%),
+        linear-gradient(180deg, #f8f3ea 0%, #eee5d3 100%);
+      background-size: 100% 34px, 34px 100%, auto, auto, auto;
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      font-size: 15.5px;
+      line-height: 1.78;
+    }
+    .page {
+      max-width: 1560px;
+      margin: 0 auto;
+      padding: 24px 18px 64px;
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.88fr;
+      gap: 18px;
+      padding: 28px;
+      border-radius: 28px;
+      background:
+        linear-gradient(155deg, rgba(255,255,255,0.98), rgba(245,239,228,0.92)),
+        linear-gradient(180deg, rgba(157,74,44,0.08), transparent);
+      border: 1.5px solid var(--line);
+      border-top: 4px solid var(--accent);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent 0%, rgba(47,106,85,0.05) 44%, transparent 100%);
+      pointer-events: none;
+    }
+    .hero-main, .hero-side {
+      position: relative;
+      z-index: 1;
+    }
+    .hero h1 {
+      margin: 0;
+      font-family: "Noto Serif TC", serif;
+      font-size: clamp(36px, 5vw, 62px);
+      line-height: 1.08;
+      letter-spacing: 0.01em;
+    }
+    .hero-subtitle {
+      margin: 14px 0 0;
+      font-size: 20px;
+      line-height: 1.9;
+      max-width: 780px;
+      font-weight: 700;
+    }
+    .hero-note {
+      margin-top: 14px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      background: rgba(24,32,28,0.045);
+      border: 1px solid rgba(24,32,28,0.10);
+    }
+    .hero-note p {
+      margin: 0;
+      line-height: 1.8;
+    }
+    .hero-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .hero-side {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .hero-current-card {
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      border: 1.5px solid rgba(24,32,28,0.10);
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(245,239,228,0.92));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+    .hero-current-label {
+      margin: 0 0 8px;
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .hero-current-value {
+      margin: 0;
+      font-family: "Noto Serif TC", serif;
+      font-size: clamp(34px, 4vw, 46px);
+      line-height: 1.06;
+      color: var(--accent-strong);
+    }
+    .hero-current-note {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .action-tile {
+      border-radius: 16px;
+      border: 1.5px solid rgba(24,32,28,0.10);
+      border-left-width: 6px;
+      padding: 15px 16px 14px;
+      background: rgba(255,255,255,0.94);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+    }
+    .action-cost {
+      background: linear-gradient(180deg, rgba(47,106,85,0.10), rgba(255,255,255,0.96));
+      border-left-color: var(--green);
+    }
+    .action-risk {
+      background: linear-gradient(180deg, rgba(159,70,55,0.10), rgba(255,255,255,0.96));
+      border-left-color: var(--red);
+    }
+    .action-resist {
+      background: linear-gradient(180deg, rgba(141,103,22,0.12), rgba(255,255,255,0.96));
+      border-left-color: var(--amber);
+    }
+    .action-kicker {
+      margin: 0 0 6px;
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .action-range {
+      margin: 0;
+      font-family: "Noto Serif TC", serif;
+      font-size: 34px;
+      line-height: 1.06;
+      font-weight: 700;
+      color: var(--accent-strong);
+    }
+    .action-range-above {
+      color: var(--red);
+    }
+    .action-range-below {
+      color: var(--green);
+    }
+    .action-range-mixed {
+      color: var(--mix);
+    }
+    .action-note {
+      margin: 8px 0 0;
+      color: var(--accent-strong);
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.65;
+    }
+    .action-trigger {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.7;
+    }
+    .metric-card, .callout, .route-card, .profile-card, .snapshot-card, .score-card, .scenario-card, .watch-card, .classification-card, .tri-card, .price-tile {
+      border-radius: var(--radius-md);
+      border: 1.5px solid rgba(24,32,28,0.10);
+      background: var(--panel);
+      padding: 16px;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset;
+    }
+    .metric-label {
+      margin: 0 0 8px;
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .metric-value {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.4;
+      font-weight: 700;
+      color: var(--accent-strong);
+    }
+    .metric-good, .metric-warn, .metric-plain, .metric-bad { color: var(--accent-strong); }
+    .metric-above, .metric-up { color: var(--red); }
+    .metric-below, .metric-down { color: var(--green); }
+    .metric-mixed { color: var(--mix); }
+    .anchor-board {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .sticky-nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 18px;
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(243,237,226,0.94);
+      backdrop-filter: blur(14px);
+      border: 1.5px solid var(--line);
+    }
+    .sticky-nav a {
+      text-decoration: none;
+      color: var(--text);
+      background: rgba(255,255,255,0.94);
+      border: 1px solid rgba(24,32,28,0.10);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .mobile-nav-fab {
+      display: none;
+    }
+    .mobile-nav-fab > summary::-webkit-details-marker {
+      display: none;
+    }
+    .mobile-nav-fab > summary {
+      list-style: none;
+    }
+    .mobile-nav-sheet {
+      display: none;
+    }
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+    .section {
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: var(--panel-strong);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 14px;
+      padding: 18px 22px 15px;
+      cursor: pointer;
+      list-style: none;
+      position: relative;
+      background: linear-gradient(180deg, rgba(243,236,223,0.96), rgba(255,255,255,0.86));
+    }
+    .section-head::-webkit-details-marker,
+    .fold-panel > summary::-webkit-details-marker {
+      display: none;
+    }
+    .section[open] > .section-head {
+      border-bottom: 1px solid var(--line);
+    }
+    .section-head::after {
+      content: "展開";
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .section[open] > .section-head::after {
+      content: "收合";
+    }
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+    .section-index {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: rgba(28,36,31,0.06);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .section-head h2 {
+      margin: 0;
+      font-family: "Noto Serif TC", serif;
+      font-size: 29px;
+      line-height: 1.2;
+      color: var(--accent-strong);
+      min-width: 0;
+    }
+    .section-body {
+      padding: 22px;
+    }
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: flex-end;
+      max-width: 100%;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      border: 1px solid rgba(41,76,115,0.14);
+      background: rgba(41,76,115,0.07);
+      font-weight: 700;
+      color: var(--accent-strong);
+    }
+    .badge-good { background: rgba(41,76,115,0.09); color: var(--accent-strong); }
+    .badge-warn { background: rgba(41,76,115,0.09); color: var(--accent-strong); }
+    .badge-bad { background: rgba(41,76,115,0.09); color: var(--accent-strong); }
+    .badge-conf-high {
+      background: #24486d;
+      color: #f8fbff;
+      border-color: rgba(36,72,109,0.30);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.12) inset;
+    }
+    .badge-conf-medium-high {
+      background: #3c6797;
+      color: #f8fbff;
+      border-color: rgba(60,103,151,0.30);
+    }
+    .badge-conf-medium {
+      background: rgba(41,76,115,0.12);
+      color: var(--accent-strong);
+      border-color: rgba(41,76,115,0.18);
+    }
+    .badge-conf-medium-low {
+      background: rgba(111,124,141,0.10);
+      color: #5f6d7d;
+      border-color: rgba(111,124,141,0.16);
+    }
+    .badge-conf-low {
+      background: rgba(111,124,141,0.08);
+      color: #748191;
+      border-color: rgba(111,124,141,0.14);
+    }
+    .badge-cost,
+    .badge-support {
+      background: rgba(41,76,115,0.09);
+      color: var(--accent-strong);
+    }
+    .badge-risk {
+      background: rgba(41,76,115,0.09);
+      color: var(--accent-strong);
+    }
+    .badge-resist {
+      background: rgba(41,76,115,0.09);
+      color: var(--accent-strong);
+    }
+    .badge-target {
+      background: rgba(41,76,115,0.09);
+      color: var(--accent-strong);
+    }
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 16px;
+    }
+    .decision-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .decision-card {
+      border-radius: 16px;
+      border: 1.5px solid rgba(24,32,28,0.10);
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,244,236,0.90));
+      padding: 16px;
+    }
+    .decision-card h3 {
+      margin: 0 0 10px;
+      color: var(--accent-strong);
+      font-size: 18px;
+    }
+    .decision-status-grid {
+      display: grid;
+      gap: 12px;
+    }
+    .decision-status-card {
+      border-radius: 14px;
+      border: 1.5px solid rgba(24,32,28,0.08);
+      background: rgba(255,255,255,0.92);
+      padding: 14px;
+    }
+    .decision-status-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .decision-status-top h4 {
+      margin: 0;
+      color: var(--accent-strong);
+      font-size: 17px;
+      line-height: 1.35;
+    }
+    .overview-main {
+      padding: 18px 20px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(157,74,44,0.08), rgba(255,255,255,0.84));
+      border: 1.5px solid rgba(157,74,44,0.14);
+    }
+    .lead-text {
+      margin: 0 0 12px;
+      font-size: 24px;
+      line-height: 1.65;
+      font-weight: 700;
+      color: var(--accent-strong);
+    }
+    .overview-side {
+      display: block;
+    }
+    .callout-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .callout {
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,244,236,0.90));
+    }
+    .callout h4, .route-card h3, .profile-card h4, .snapshot-card h4, .score-card h4, .scenario-card h4, .watch-card h4, .classification-card h4, .tri-card h4, .price-tile h4, .fold-head h4 {
+      margin: 0 0 10px;
+      color: var(--accent-strong);
+    }
+    .price-tile h4,
+    .signal-item-top h4,
+    .snapshot-top h4,
+    .score-top h4,
+    .scenario-top h4,
+    .watch-top h4,
+    .fold-head h4,
+    .pin-title {
+      word-break: keep-all;
+      overflow-wrap: normal;
+      line-break: strict;
+    }
+    .price-group + .price-group {
+      margin-top: 18px;
+    }
+    .group-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(28,36,31,0.08);
+    }
+    .group-head h3, .subhead h3 {
+      margin: 0;
+      font-size: 18px;
+      color: var(--accent-strong);
+    }
+    .pin-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .pin-card {
+      padding: 16px 16px 14px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(24,32,28,0.10);
+      border-left-width: 6px;
+      background: rgba(255,255,255,0.92);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+    .pin-cost {
+      background: linear-gradient(180deg, rgba(47,106,85,0.10), rgba(255,255,255,0.96));
+      border-color: rgba(47,106,85,0.16);
+      border-left-color: var(--green);
+    }
+    .pin-risk {
+      background: linear-gradient(180deg, rgba(159,70,55,0.10), rgba(255,255,255,0.96));
+      border-color: rgba(159,70,55,0.16);
+      border-left-color: var(--red);
+    }
+    .pin-resist {
+      background: linear-gradient(180deg, rgba(141,103,22,0.12), rgba(255,255,255,0.96));
+      border-color: rgba(141,103,22,0.18);
+      border-left-color: var(--amber);
+    }
+    .pin-target {
+      background: linear-gradient(180deg, rgba(164,79,46,0.10), rgba(255,255,255,0.96));
+      border-color: rgba(164,79,46,0.16);
+      border-left-color: var(--accent);
+    }
+    .pin-title {
+      margin: 0 0 8px;
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .pin-range {
+      margin: 0 0 8px;
+      font-family: "Noto Serif TC", serif;
+      font-size: 28px;
+      line-height: 1.08;
+      color: var(--accent-strong);
+      font-weight: 700;
+    }
+    .pin-range-above {
+      color: var(--red);
+    }
+    .pin-range-below {
+      color: var(--green);
+    }
+    .pin-range-mixed {
+      color: var(--mix);
+    }
+    .pin-subtitle {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+    .price-map-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.48fr);
+      gap: 16px;
+      align-items: start;
+    }
+    .price-map-side {
+      display: grid;
+      gap: 12px;
+    }
+    .price-ladder {
+      position: relative;
+      display: grid;
+      gap: 12px;
+      padding-left: 22px;
+    }
+    .price-ladder::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      top: 12px;
+      bottom: 12px;
+      width: 2px;
+      background: linear-gradient(180deg, rgba(41,76,115,0.22), rgba(41,76,115,0.08));
+    }
+    .ladder-item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 18px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+    }
+    .ladder-rail-mark {
+      position: relative;
+      min-height: 100%;
+    }
+    .ladder-dot {
+      position: absolute;
+      top: 18px;
+      left: -1px;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 3px solid rgba(255,255,255,0.96);
+      background: var(--accent);
+      box-shadow: 0 0 0 1px rgba(24,32,28,0.08);
+    }
+    .ladder-content {
+      border-radius: 16px;
+      border: 1.5px solid rgba(24,32,28,0.10);
+      border-left-width: 6px;
+      padding: 15px 16px 14px;
+      background: rgba(255,255,255,0.94);
+    }
+    .ladder-cost .ladder-content {
+      background: linear-gradient(180deg, rgba(47,106,85,0.10), rgba(255,255,255,0.96));
+      border-left-color: var(--green);
+    }
+    .ladder-support .ladder-content {
+      background: linear-gradient(180deg, rgba(47,106,85,0.07), rgba(255,255,255,0.96));
+      border-left-color: var(--green);
+    }
+    .ladder-risk .ladder-content {
+      background: linear-gradient(180deg, rgba(159,70,55,0.10), rgba(255,255,255,0.96));
+      border-left-color: var(--red);
+    }
+    .ladder-resist .ladder-content {
+      background: linear-gradient(180deg, rgba(141,103,22,0.12), rgba(255,255,255,0.96));
+      border-left-color: var(--amber);
+    }
+    .ladder-target .ladder-content {
+      background: linear-gradient(180deg, rgba(164,79,46,0.10), rgba(255,255,255,0.96));
+      border-left-color: var(--accent);
+    }
+    .ladder-current .ladder-content {
+      background: linear-gradient(180deg, rgba(41,76,115,0.12), rgba(255,255,255,0.98));
+      border-left-color: var(--accent-strong);
+      box-shadow: 0 8px 22px rgba(41,76,115,0.10);
+    }
+    .ladder-current .ladder-dot {
+      background: var(--accent-strong);
+      transform: scale(1.08);
+    }
+    .ladder-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .ladder-top h4 {
+      margin: 0;
+      color: var(--accent-strong);
+      font-size: 17px;
+      line-height: 1.35;
+    }
+    .ladder-range {
+      margin: 8px 0 0;
+      font-family: "Noto Serif TC", serif;
+      font-size: 34px;
+      line-height: 1.06;
+      font-weight: 700;
+      color: var(--accent-strong);
+    }
+    .ladder-range-above {
+      color: var(--red);
+    }
+    .ladder-range-below {
+      color: var(--green);
+    }
+    .ladder-range-mixed {
+      color: var(--mix);
+    }
+    .ladder-note {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.75;
+    }
+    .price-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .price-tile {
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,247,240,0.90));
+      border-width: 2px;
+      border-left-width: 6px;
+    }
+    .price-cost {
+      border-color: rgba(47,106,85,0.18);
+      border-left-color: var(--green);
+      background: linear-gradient(180deg, rgba(47,106,85,0.07), rgba(255,255,255,0.96));
+    }
+    .price-support {
+      border-color: rgba(47,106,85,0.14);
+      border-left-color: var(--green);
+      background: linear-gradient(180deg, rgba(47,106,85,0.05), rgba(255,255,255,0.96));
+    }
+    .price-risk {
+      border-color: rgba(159,70,55,0.18);
+      border-left-color: var(--red);
+      background: linear-gradient(180deg, rgba(159,70,55,0.06), rgba(255,255,255,0.96));
+    }
+    .price-resist {
+      border-color: rgba(141,103,22,0.18);
+      border-left-color: var(--amber);
+      background: linear-gradient(180deg, rgba(141,103,22,0.07), rgba(255,255,255,0.96));
+    }
+    .price-target {
+      border-color: rgba(164,79,46,0.18);
+      border-left-color: var(--accent);
+      background: linear-gradient(180deg, rgba(164,79,46,0.06), rgba(255,255,255,0.96));
+    }
+    .price-top, .signal-top, .snapshot-top, .score-top, .scenario-top, .watch-top, .review-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .price-top h4,
+    .signal-item-top h4,
+    .snapshot-top h4,
+    .score-top h4,
+    .scenario-top h4,
+    .watch-top h4,
+    .fold-head h4 {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .price-range {
+      margin: 0 0 10px;
+      font-family: "Noto Serif TC", serif;
+      font-size: 34px;
+      line-height: 1.05;
+      color: var(--accent-strong);
+    }
+    .price-range-above {
+      color: var(--red);
+    }
+    .price-range-below {
+      color: var(--green);
+    }
+    .price-range-mixed {
+      color: var(--mix);
+    }
+    .price-trigger {
+      margin: 0 0 12px;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+    .inline-price {
+      font-weight: 700;
+      color: var(--accent-strong);
+    }
+    .inline-price-above {
+      color: var(--red);
+    }
+    .inline-price-below {
+      color: var(--green);
+    }
+    .inline-price-mixed {
+      color: var(--mix);
+    }
+    .price-anchor h5, .route-card h4, .fold-body h5 {
+      margin: 12px 0 8px;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .route-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .route-entry { background: rgba(47,106,85,0.06); }
+    .route-hold { background: rgba(141,103,22,0.06); }
+    .route-fail { background: rgba(159,70,55,0.06); }
+    .signal-grid, .info-grid, .score-grid, .scenario-grid, .watch-grid {
+      display: grid;
+      gap: 14px;
+    }
+    .signal-grid {
+      grid-template-columns: 1fr;
+    }
+    .section-note {
+      margin: -2px 0 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .signal-matrix {
+      display: grid;
+      gap: 14px;
+    }
+    .signal-row {
+      display: grid;
+      grid-template-columns: 220px 1fr 1fr;
+      gap: 14px;
+      align-items: stretch;
+      padding: 14px;
+      border: 1px solid rgba(28,36,31,0.08);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,244,236,0.88));
+      box-shadow: 0 10px 30px rgba(29,36,30,0.05);
+    }
+    .signal-row-price {
+      padding-right: 12px;
+      border-right: 1px solid rgba(28,36,31,0.08);
+    }
+    .signal-row-label {
+      margin: 0 0 8px;
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .signal-row-range {
+      margin: 0;
+      font-family: "Noto Serif TC", serif;
+      font-size: 28px;
+      line-height: 1.08;
+      font-weight: 700;
+      color: var(--accent-strong);
+    }
+    .signal-row-range-above {
+      color: var(--red);
+    }
+    .signal-row-range-below {
+      color: var(--green);
+    }
+    .signal-row-range-mixed {
+      color: var(--mix);
+    }
+    .signal-row-side {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+    .signal-side-title {
+      margin: 0;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .signal-stack {
+      display: grid;
+      gap: 10px;
+    }
+    .signal-item {
+      padding: 12px 12px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(28,36,31,0.08);
+      background: rgba(255,255,255,0.92);
+    }
+    .signal-item-entry {
+      border-left: 5px solid rgba(47,106,85,0.68);
+      background: linear-gradient(180deg, rgba(47,106,85,0.05), rgba(255,255,255,0.94));
+    }
+    .signal-item-exit {
+      border-left: 5px solid rgba(159,70,55,0.68);
+      background: linear-gradient(180deg, rgba(159,70,55,0.05), rgba(255,255,255,0.94));
+    }
+    .signal-item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .signal-item-top h4 {
+      margin: 0;
+      color: var(--accent-strong);
+      min-width: 0;
+    }
+    .signal-note {
+      margin: 8px 0 0;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+    .signal-empty {
+      margin: 0;
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(118,127,139,0.08);
+    }
+    .profile-stack {
+      display: grid;
+      gap: 14px;
+    }
+    .profile-audit-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .profile-subsection-stack {
+      display: grid;
+      gap: 10px;
+    }
+    .fold-panel-compact {
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(247,243,235,0.86));
+    }
+    .fold-panel-compact .fold-head {
+      padding: 12px 14px;
+    }
+    .fold-panel-compact .fold-head h4 {
+      font-size: 16px;
+      line-height: 1.3;
+    }
+    .fold-panel-compact .fold-body {
+      padding: 8px 14px 14px;
+    }
+    .review-list-grid {
+      display: grid;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .evidence-block + .evidence-block {
+      margin-top: 18px;
+    }
+    .classification-card {
+      margin-bottom: 14px;
+      background: rgba(28,36,31,0.04);
+    }
+    .snapshot-value {
+      margin: 0 0 10px;
+      font-size: 22px;
+      line-height: 1.5;
+      font-weight: 700;
+      color: var(--accent-strong);
+    }
+    .snapshot-value.snapshot-up {
+      color: var(--red);
+    }
+    .snapshot-value.snapshot-down {
+      color: var(--green);
+    }
+    .info-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .tri-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .score-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .scenario-focus-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .scenario-spotlight {
+      border-radius: 18px;
+      border: 1.5px solid rgba(24,32,28,0.10);
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247,242,233,0.92));
+      padding: 18px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
+    }
+    .spotlight-kicker {
+      margin: 0 0 6px;
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 800;
+    }
+    .watch-focus-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .watch-focus-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247,242,233,0.92));
+    }
+    .scenario-grid {
+      grid-template-columns: 1fr;
+    }
+    .watch-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .governance-stack {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .fold-panel {
+      border: 1.5px solid rgba(24,32,28,0.10);
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,0.88);
+      overflow: hidden;
+    }
+    .fold-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      cursor: pointer;
+      list-style: none;
+      position: relative;
+    }
+    .fold-head::-webkit-details-marker {
+      display: none;
+    }
+    .fold-head::after {
+      content: "展開";
+      margin-left: auto;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .fold-panel[open] > .fold-head::after {
+      content: "收合";
+    }
+    .fold-panel[open] > .fold-head {
+      border-bottom: 1px solid rgba(28,36,31,0.08);
+    }
+    .fold-body {
+      padding: 14px 16px 16px;
+    }
+    .bullet-list {
+      margin: 0;
+      padding-left: 18px;
+      line-height: 1.75;
+    }
+    .muted {
+      color: var(--muted);
+    }
+    p {
+      margin: 0 0 10px;
+      line-height: 1.78;
+    }
+    .footer-note {
+      margin-top: 18px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    @media (max-width: 1180px) {
+      .hero,
+      .overview-grid,
+      .scenario-focus-grid,
+      .price-map-layout {
+        grid-template-columns: 1fr;
+      }
+      .callout-grid,
+      .route-grid,
+      .pin-grid,
+      .price-grid,
+      .info-grid,
+      .tri-grid,
+      .score-grid,
+      .watch-focus-grid,
+      .decision-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .watch-grid,
+      .anchor-board,
+      .profile-audit-grid {
+        grid-template-columns: 1fr;
+      }
+      .signal-row {
+        grid-template-columns: 1fr;
+      }
+      .signal-row-price {
+        padding-right: 0;
+        padding-bottom: 10px;
+        border-right: 0;
+        border-bottom: 1px solid rgba(28,36,31,0.08);
+      }
+    }
+    @media (max-width: 760px) {
+      .page {
+        padding: 16px 12px 48px;
+      }
+      .hero {
+        padding: 18px;
+        border-radius: 26px;
+      }
+      .hero-grid,
+      .callout-grid,
+      .route-grid,
+      .pin-grid,
+      .price-grid,
+      .info-grid,
+      .tri-grid,
+      .score-grid,
+      .watch-grid,
+      .watch-focus-grid,
+      .decision-grid {
+        grid-template-columns: 1fr;
+      }
+      .section-head {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+        padding: 16px 52px 14px 16px;
+      }
+      .section-head::after {
+        position: absolute;
+        top: 18px;
+        right: 16px;
+      }
+      .section-title {
+        width: 100%;
+      }
+      .section-index {
+        display: none;
+      }
+      .section-head h2 {
+        font-size: 25px;
+        line-height: 1.14;
+      }
+      .badge-row {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .badge {
+        padding: 5px 9px;
+        font-size: 10px;
+      }
+      .price-top,
+      .ladder-top,
+      .decision-status-top,
+      .signal-item-top,
+      .snapshot-top,
+      .score-top,
+      .scenario-top,
+      .watch-top,
+      .fold-head {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .price-top .badge-row,
+      .ladder-top .badge-row,
+      .decision-status-top .badge-row,
+      .signal-item-top .badge-row,
+      .snapshot-top .badge-row,
+      .score-top .badge-row,
+      .scenario-top .badge-row,
+      .watch-top .badge-row,
+      .fold-head .badge-row {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .price-tile h4 {
+        margin-bottom: 0;
+        font-size: 18px;
+        line-height: 1.35;
+      }
+      .signal-item-top h4,
+      .snapshot-top h4,
+      .score-top h4,
+      .scenario-top h4,
+      .watch-top h4,
+      .fold-head h4 {
+        font-size: 17px;
+        line-height: 1.35;
+        margin-bottom: 0;
+      }
+      .fold-head {
+        padding: 14px 48px 14px 16px;
+      }
+      .fold-head::after {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        margin-left: 0;
+      }
+      .fold-panel-compact .fold-head {
+        padding: 12px 44px 12px 14px;
+      }
+      .fold-panel-compact .fold-body {
+        padding: 6px 14px 14px;
+      }
+      .section-body {
+        padding: 16px;
+      }
+      .price-range {
+        font-size: 28px;
+      }
+      .action-range,
+      .ladder-range {
+        font-size: 28px;
+      }
+      .sticky-nav {
+        display: none;
+      }
+      .mobile-nav-fab {
+        display: block;
+        position: fixed;
+        right: 14px;
+        bottom: calc(env(safe-area-inset-bottom) + 76px);
+        z-index: 50;
+      }
+      .mobile-nav-fab > summary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 64px;
+        height: 46px;
+        padding: 0 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(24,32,28,0.12);
+        background: rgba(255,255,255,0.94);
+        box-shadow: 0 12px 32px rgba(30,33,25,0.14);
+        color: var(--accent-strong);
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        backdrop-filter: blur(16px);
+      }
+      .mobile-nav-fab[open] > summary {
+        background: var(--accent);
+        color: #f8fbff;
+      }
+      .mobile-nav-sheet {
+        display: none;
+      }
+      .mobile-nav-fab[open] .mobile-nav-sheet {
+        display: block;
+        position: absolute;
+        right: 0;
+        bottom: 58px;
+        width: min(78vw, 280px);
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(24,32,28,0.10);
+        background: rgba(255,255,255,0.96);
+        box-shadow: 0 18px 42px rgba(30,33,25,0.16);
+        backdrop-filter: blur(18px);
+      }
+      .mobile-nav-title {
+        margin: 0 0 10px;
+        font-size: 12px;
+        letter-spacing: 0.10em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 800;
+      }
+      .mobile-nav-links {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .mobile-nav-link {
+        display: block;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(243,237,226,0.84);
+        border: 1px solid rgba(24,32,28,0.08);
+        color: var(--accent-strong);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.35;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-main">
+        <h1>3714 富采</h1>
+        <p class="hero-subtitle">高位洗盤後仍守突破段AVWAP，需站回71.1~76.3恢復攻勢。</p>
+        <div class="hero-chip-row">
+          <span class='badge badge-plain'>資料日 2026-04-23</span>
+          <span class='badge badge-plain'>最近更新 2026-04-24 12:37:16</span>
+          <span class='badge badge-conf-medium'>把握度 中</span>
+        </div>
+        <div class="hero-note">
+          <p>月週趨勢仍強，但收盤跌破事件AVWAP且量縮，66.1低點與65.2 AVWAP成防守核心。</p>
+        </div>
+      </div>
+      <aside class="hero-side">
+        <article class="hero-current-card">
+          <p class="hero-current-label">現價 / 收盤</p>
+          <p class="hero-current-value">70</p>
+          <p class="hero-current-note">模型狀態：主錨點有效、事件錨點轉壓力</p>
+        </article>
+        <div class="hero-grid">
+          
+    <article class="action-tile action-cost">
+      <p class="action-kicker">可觀察區</p>
+      <p class="action-range action-range-mixed">66.1~71.1</p>
+      <p class="action-note">回測不破再轉強</p>
+      <p class='action-trigger'>縮量守66.1後站回71.1才視為加碼轉強</p>
+    </article>
+    
+    <article class="action-tile action-risk">
+      <p class="action-kicker">防守區</p>
+      <p class="action-range action-range-below">65.2~66.1</p>
+      <p class="action-note">跌入先降風險</p>
+      <p class='action-trigger'>日收或週收有效跌破65.2</p>
+    </article>
+    
+    <article class="action-tile action-resist">
+      <p class="action-kicker">第一壓力</p>
+      <p class="action-range action-range-above">73.3~76.3</p>
+      <p class="action-note">放量站穩才算突破</p>
+      <p class='action-trigger'>收復76.3且量能回升</p>
+    </article>
+    
+        </div>
+      </aside>
+    </section>
+
+    <nav class="sticky-nav" aria-label="章節導覽"><a href='#overview'>決策總覽</a><a href='#price-map'>價格地圖</a><a href='#strategy'>操作策略</a><a href='#scenarios'>情境與監控</a><a href='#profile'>股性與校正</a><a href='#evidence'>證據資料板</a><a href='#governance'>治理資料</a></nav>
+    <details class="mobile-nav-fab">
+      <summary>章節</summary>
+      <div class="mobile-nav-sheet">
+        <p class="mobile-nav-title">快速跳轉</p>
+        <div class="mobile-nav-links"><a href='#overview' class='mobile-nav-link'>決策總覽</a><a href='#price-map' class='mobile-nav-link'>價格地圖</a><a href='#strategy' class='mobile-nav-link'>操作策略</a><a href='#scenarios' class='mobile-nav-link'>情境與監控</a><a href='#profile' class='mobile-nav-link'>股性與校正</a><a href='#evidence' class='mobile-nav-link'>證據資料板</a><a href='#governance' class='mobile-nav-link'>治理資料</a></div>
+      </div>
+    </details>
+
+    <div class="stack">
+      
+    <details id="overview" class="section">
+      <summary class="section-head">
+        <div class="section-title">
+          <span class="section-index">OVERVIEW</span>
+          <h2>決策總覽</h2>
+        </div>
+        <div class="badge-row"><span class='badge badge-conf-medium'>中</span></div>
+      </summary>
+      <div class="section-body">
+        
+      <div class="decision-grid">
+        <article class="decision-card">
+          <h3>階段定位</h3>
+          <p><strong>主階段：</strong>E. 高位震盪洗盤</p>
+          <p><strong>靠近階段：</strong>D. 主升一波後段</p>
+        </article>
+        <article class="decision-card">
+          <h3>進出場狀態</h3>
+          <div class="decision-status-grid">
+            
+    <article class="decision-status-card">
+      <div class="decision-status-top">
+        <h4>進場訊號</h4>
+        <div class="badge-row"><span class='badge badge-warn'>部分成立</span></div>
+      </div>
+      <p><strong>最佳依據：</strong>回測型：守65.2~66.1後站回71.1</p>
+    </article>
+    
+            
+    <article class="decision-status-card">
+      <div class="decision-status-top">
+        <h4>出場警訊</h4>
+        <div class="badge-row"><span class='badge badge-warn'>部分成立</span></div>
+      </div>
+      <p><strong>目前警訊：</strong>跌破事件AVWAP且5日法人仍偏賣，短線鈍化。</p>
+    </article>
+    
+          </div>
+        </article>
+      </div>
+      <div class="callout-grid">
+        <article class="callout">
+          <h4>目前操作重點</h4>
+          <p>不追高；先看65.2~66.1防守與71.1/76.3收復。</p>
+        </article>
+        <article class="callout">
+          <h4>風險切換條件</h4>
+          <p><strong>警訊：</strong>跌破事件AVWAP且5日法人仍偏賣，短線鈍化。</p>
+          <p><strong>正式條件：</strong>日收失守65.2或週收跌破66.1</p>
+        </article>
+      </div>
+    
+      </div>
+    </details>
+    
+      
+    <details id="price-map" class="section">
+      <summary class="section-head">
+        <div class="section-title">
+          <span class="section-index">PRICE-MAP</span>
+          <h2>價格地圖</h2>
+        </div>
+        <div class="badge-row"><span class='badge badge-plain'>主錨點有效、事件錨點轉壓力</span><span class='badge badge-plain'>資料日 2026-04-23</span><span class='badge badge-plain'>比較基準 70</span></div>
+      </summary>
+      <div class="section-body">
+        
+      <div class="price-map-layout">
+        <section class="price-map-main">
+          <div class="subhead"><h3>垂直價格階梯</h3></div>
+          <p class="section-note">由上往下看壓力、現價、承接與失效，先判斷目前位階，再決定觀察、加碼或防守。</p>
+          <div class='price-ladder'>
+            <article class="ladder-item ladder-target ">
+              <div class="ladder-rail-mark">
+                <span class="ladder-dot"></span>
+                <span class="ladder-line"></span>
+              </div>
+              <div class="ladder-content">
+                <div class="ladder-top">
+                  <h4>1.618 延伸</h4>
+                  <div class="badge-row"><span class='badge badge-target'>目標 / 延伸</span></div>
+                </div>
+                <p class="ladder-range ladder-range-above">89~90</p>
+                <p class="ladder-note">84.0~85.0站穩後才啟用</p>
+              </div>
+            </article>
+            
+            <article class="ladder-item ladder-target ">
+              <div class="ladder-rail-mark">
+                <span class="ladder-dot"></span>
+                <span class="ladder-line"></span>
+              </div>
+              <div class="ladder-content">
+                <div class="ladder-top">
+                  <h4>1.272 延伸</h4>
+                  <div class="badge-row"><span class='badge badge-target'>目標 / 延伸</span></div>
+                </div>
+                <p class="ladder-range ladder-range-above">84~85</p>
+                <p class="ladder-note">有效突破80.5後才啟用</p>
+              </div>
+            </article>
+            
+            <article class="ladder-item ladder-target ">
+              <div class="ladder-rail-mark">
+                <span class="ladder-dot"></span>
+                <span class="ladder-line"></span>
+              </div>
+              <div class="ladder-content">
+                <div class="ladder-top">
+                  <h4>主目標</h4>
+                  <div class="badge-row"><span class='badge badge-target'>目標 / 延伸</span></div>
+                </div>
+                <p class="ladder-range ladder-range-above">77.4~80.5</p>
+                <p class="ladder-note">突破76.3後挑戰前高80.5</p>
+              </div>
+            </article>
+            
+            <article class="ladder-item ladder-resist ">
+              <div class="ladder-rail-mark">
+                <span class="ladder-dot"></span>
+                <span class="ladder-line"></span>
+              </div>
+              <div class="ladder-content">
+                <div class="ladder-top">
+                  <h4>第一壓力</h4>
+                  <div class="badge-row"><span class='badge badge-resist'>壓力</span></div>
+                </div>
+                <p class="ladder-range ladder-range-above">73.3~76.3</p>
+                <p class="ladder-note">收復76.3且量能回升</p>
+              </div>
+            </article>
+            
+            <article class="ladder-item ladder-cost ">
+              <div class="ladder-rail-mark">
+                <span class="ladder-dot"></span>
+                <span class="ladder-line"></span>
+              </div>
+              <div class="ladder-content">
+                <div class="ladder-top">
+                  <h4>可觀察區</h4>
+                  <div class="badge-row"><span class='badge badge-cost'>成本 / 承接</span></div>
+                </div>
+                <p class="ladder-range ladder-range-mixed">66.1~71.1</p>
+                <p class="ladder-note">縮量守66.1後站回71.1才視為加碼轉強</p>
+              </div>
+            </article>
+            
+            <article class="ladder-item ladder-support ">
+              <div class="ladder-rail-mark">
+                <span class="ladder-dot"></span>
+                <span class="ladder-line"></span>
+              </div>
+              <div class="ladder-content">
+                <div class="ladder-top">
+                  <h4>核心成本</h4>
+                  <div class="badge-row"><span class='badge badge-support'>支撐</span></div>
+                </div>
+                <p class="ladder-range ladder-range-mixed">65.2~66.1；70~71.1</p>
+                <p class="ladder-note">守住65.2~66.1且站回71.1較佳</p>
+              </div>
+            </article>
+            
+            <article class="ladder-item ladder-plain ladder-current">
+              <div class="ladder-rail-mark">
+                <span class="ladder-dot"></span>
+                <span class="ladder-line"></span>
+              </div>
+              <div class="ladder-content">
+                <div class="ladder-top">
+                  <h4>現價 / 收盤</h4>
+                  <div class="badge-row"><span class='badge badge-plain'>價格區</span></div>
+                </div>
+                <p class="ladder-range ladder-range-mixed">70</p>
+                <p class="ladder-note">當前比較基準</p>
+              </div>
+            </article>
+            
+            <article class="ladder-item ladder-risk ">
+              <div class="ladder-rail-mark">
+                <span class="ladder-dot"></span>
+                <span class="ladder-line"></span>
+              </div>
+              <div class="ladder-content">
+                <div class="ladder-top">
+                  <h4>防守失效區</h4>
+                  <div class="badge-row"><span class='badge badge-risk'>失效 / 風控</span></div>
+                </div>
+                <p class="ladder-range ladder-range-below">65.2~66.1</p>
+                <p class="ladder-note">日收或週收有效跌破65.2</p>
+              </div>
+            </article>
+            </div>
+        </section>
+        <aside class="price-map-side">
+          <article class='metric-card'><p class='metric-label'>現價 / 收盤</p><p class='metric-value metric-plain'>70</p></article>
+          <article class='metric-card'><p class='metric-label'>主目標</p><p class='metric-value metric-above'>77.4~80.5</p></article>
+          <article class='metric-card'><p class='metric-label'>模型狀態</p><p class='metric-value metric-plain'>主錨點有效、事件錨點轉壓力</p></article>
+        </aside>
+      </div>
+    
+      </div>
+    </details>
+    
+      
+    <details id="strategy" class="section">
+      <summary class="section-head">
+        <div class="section-title">
+          <span class="section-index">STRATEGY</span>
+          <h2>操作策略</h2>
+        </div>
+        <div class="badge-row"></div>
+      </summary>
+      <div class="section-body">
+        
+      <div class="route-grid">
+        <article class="route-card route-entry">
+          <h3>未持股</h3>
+          <p><strong>優先觀察：</strong>回測型：守65.2~66.1後站回71.1</p>
+          <p><strong>保守方案：</strong>突破型：需重新站上76.3並挑戰80.5</p>
+          <p class="muted">新倉以回測守穩或突破收穩為主，不用高位猜頂追價。</p>
+        </article>
+        <article class="route-card route-hold">
+          <h3>已持股</h3>
+          <p>以已持有或等待回測者為主，不建議在76.3下方盲目追價。</p>
+          <h4>續抱條件</h4>
+          <ul class='bullet-list'><li>日收守65.2且反彈站回71.1</li><li>融資續降且法人5日賣壓收斂</li><li>76.3收復後才提高續攻判斷</li></ul>
+        </article>
+        <article class="route-card route-fail">
+          <h3>失敗時</h3>
+          <h4>防守區</h4>
+          <ul class='bullet-list'><li>防守：<span class='inline-price inline-price-below'>65.2~66.1</span></li><li>防守：<span class='inline-price inline-price-below'>57.2~62.9</span></li></ul>
+          <h4>減碼區</h4>
+          <ul class='bullet-list'><li>減碼：<span class='inline-price inline-price-above'>73.3~76.3</span></li><li>減碼：<span class='inline-price inline-price-above'>77.4~80.5</span></li><li>減碼：<span class='inline-price inline-price-above'>84~85</span></li></ul>
+        </article>
+      </div>
+      <div class="subhead">
+        <h3>訊號矩陣</h3>
+      </div>
+      <p class="section-note">每列對應一個價位帶，左右直接對照進場與出場訊號，減少跨欄閱讀。</p>
+      <div class='signal-matrix'>
+            <article class="signal-row">
+              <div class="signal-row-price">
+                <p class="signal-row-label">價位帶</p>
+                <p class="signal-row-range signal-row-range-above">76.3~80.5</p>
+              </div>
+              <div class="signal-row-side">
+                <p class="signal-side-title">進場</p>
+                <div class="signal-stack">
+                  
+    <article class="signal-item signal-item-entry">
+      <div class="signal-item-top">
+        <h4>突破型</h4>
+        <div class="badge-row">
+          <span class='badge badge-bad'>尚未成立</span>
+          <span class='badge badge-conf-medium'>中</span>
+        </div>
+      </div>
+      <p class="signal-note">未收復76.3前不成立；跌破71.1弱化</p>
+    </article>
+    
+                </div>
+              </div>
+              <div class="signal-row-side">
+                <p class="signal-side-title">出場</p>
+                <div class="signal-stack">
+                  <p class='muted signal-empty'>暫無對應訊號</p>
+                </div>
+              </div>
+            </article>
+            
+            <article class="signal-row">
+              <div class="signal-row-price">
+                <p class="signal-row-label">價位帶</p>
+                <p class="signal-row-range signal-row-range-above">73.3~80.5</p>
+              </div>
+              <div class="signal-row-side">
+                <p class="signal-side-title">進場</p>
+                <div class="signal-stack">
+                  <p class='muted signal-empty'>暫無對應訊號</p>
+                </div>
+              </div>
+              <div class="signal-row-side">
+                <p class="signal-side-title">出場</p>
+                <div class="signal-stack">
+                  
+    <article class="signal-item signal-item-exit">
+      <div class="signal-item-top">
+        <h4>高檔量縮鈍化</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>部分成立</span>
+          <span class='badge badge-conf-medium'>中</span>
+        </div>
+      </div>
+      <p class="signal-note">放量突破80.5解除</p>
+    </article>
+    
+                </div>
+              </div>
+            </article>
+            
+            <article class="signal-row">
+              <div class="signal-row-price">
+                <p class="signal-row-label">價位帶</p>
+                <p class="signal-row-range signal-row-range-mixed">70~80.5</p>
+              </div>
+              <div class="signal-row-side">
+                <p class="signal-side-title">進場</p>
+                <div class="signal-stack">
+                  <p class='muted signal-empty'>暫無對應訊號</p>
+                </div>
+              </div>
+              <div class="signal-row-side">
+                <p class="signal-side-title">出場</p>
+                <div class="signal-stack">
+                  
+    <article class="signal-item signal-item-exit">
+      <div class="signal-item-top">
+        <h4>籌碼擁擠警訊</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>部分成立</span>
+          <span class='badge badge-conf-medium'>中</span>
+        </div>
+      </div>
+      <p class="signal-note">融資續減且法人5日轉正可降風險</p>
+    </article>
+    
+                </div>
+              </div>
+            </article>
+            
+            <article class="signal-row">
+              <div class="signal-row-price">
+                <p class="signal-row-label">價位帶</p>
+                <p class="signal-row-range signal-row-range-mixed">70~76.3</p>
+              </div>
+              <div class="signal-row-side">
+                <p class="signal-side-title">進場</p>
+                <div class="signal-stack">
+                  
+    <article class="signal-item signal-item-entry">
+      <div class="signal-item-top">
+        <h4>吸籌轉發動型</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>部分成立</span>
+          <span class='badge badge-conf-medium'>中</span>
+        </div>
+      </div>
+      <p class="signal-note">站不回71.1或法人5日續賣</p>
+    </article>
+    
+    <article class="signal-item signal-item-entry">
+      <div class="signal-item-top">
+        <h4>事件窗型</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>部分成立</span>
+          <span class='badge badge-conf-medium'>中</span>
+        </div>
+      </div>
+      <p class="signal-note">跌破65.2或5/15前無基本面續證</p>
+    </article>
+    
+                </div>
+              </div>
+              <div class="signal-row-side">
+                <p class="signal-side-title">出場</p>
+                <div class="signal-stack">
+                  <p class='muted signal-empty'>暫無對應訊號</p>
+                </div>
+              </div>
+            </article>
+            
+            <article class="signal-row">
+              <div class="signal-row-price">
+                <p class="signal-row-label">價位帶</p>
+                <p class="signal-row-range signal-row-range-above">71.1~76.3</p>
+              </div>
+              <div class="signal-row-side">
+                <p class="signal-side-title">進場</p>
+                <div class="signal-stack">
+                  <p class='muted signal-empty'>暫無對應訊號</p>
+                </div>
+              </div>
+              <div class="signal-row-side">
+                <p class="signal-side-title">出場</p>
+                <div class="signal-stack">
+                  
+    <article class="signal-item signal-item-exit">
+      <div class="signal-item-top">
+        <h4>跌破事件成本帶</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>成立</span>
+          <span class='badge badge-conf-medium'>中</span>
+        </div>
+      </div>
+      <p class="signal-note">收復76.3解除</p>
+    </article>
+    
+                </div>
+              </div>
+            </article>
+            
+            <article class="signal-row">
+              <div class="signal-row-price">
+                <p class="signal-row-label">價位帶</p>
+                <p class="signal-row-range signal-row-range-mixed">65.2~71.1</p>
+              </div>
+              <div class="signal-row-side">
+                <p class="signal-side-title">進場</p>
+                <div class="signal-stack">
+                  
+    <article class="signal-item signal-item-entry">
+      <div class="signal-item-top">
+        <h4>回測型</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>部分成立</span>
+          <span class='badge badge-conf-medium-high'>中高</span>
+        </div>
+      </div>
+      <p class="signal-note">日收跌破65.2</p>
+    </article>
+    
+                </div>
+              </div>
+              <div class="signal-row-side">
+                <p class="signal-side-title">出場</p>
+                <div class="signal-stack">
+                  <p class='muted signal-empty'>暫無對應訊號</p>
+                </div>
+              </div>
+            </article>
+            
+            <article class="signal-row">
+              <div class="signal-row-price">
+                <p class="signal-row-label">價位帶</p>
+                <p class="signal-row-range signal-row-range-below">65.2~66.1</p>
+              </div>
+              <div class="signal-row-side">
+                <p class="signal-side-title">進場</p>
+                <div class="signal-stack">
+                  <p class='muted signal-empty'>暫無對應訊號</p>
+                </div>
+              </div>
+              <div class="signal-row-side">
+                <p class="signal-side-title">出場</p>
+                <div class="signal-stack">
+                  
+    <article class="signal-item signal-item-exit">
+      <div class="signal-item-top">
+        <h4>失守主成本區</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>部分成立</span>
+          <span class='badge badge-conf-medium-high'>中高</span>
+        </div>
+      </div>
+      <p class="signal-note">重新站回71.1解除部分風險</p>
+    </article>
+    
+    <article class="signal-item signal-item-exit">
+      <div class="signal-item-top">
+        <h4>週線結構轉弱</h4>
+        <div class="badge-row">
+          <span class='badge badge-bad'>尚未成立</span>
+          <span class='badge badge-conf-medium'>中</span>
+        </div>
+      </div>
+      <p class="signal-note">週收守66.1則不成立</p>
+    </article>
+    
+                </div>
+              </div>
+            </article>
+            </div>
+    
+      </div>
+    </details>
+    
+      
+    <details id="scenarios" class="section">
+      <summary class="section-head">
+        <div class="section-title">
+          <span class="section-index">SCENARIOS</span>
+          <h2>情境與監控</h2>
+        </div>
+        <div class="badge-row"></div>
+      </summary>
+      <div class="section-body">
+        
+      <div class="scenario-focus-grid">
+        
+    <article class="scenario-spotlight">
+      <div class="scenario-top">
+        <div>
+          <p class="spotlight-kicker">本週主情境</p>
+          <h4>高檔整理</h4>
+        </div>
+        <div class="badge-row"><span class='badge badge-good'>38%</span></div>
+      </div>
+      <p><strong>觸發：</strong>66.1~76.3間震盪，量能低於5日均</p>
+      <p><strong>目標：</strong>66.1~76.3</p>
+      <p><strong>失效：</strong>跌破65.2</p>
+      <p><strong>驅動：</strong>高檔換手與融資降溫</p>
+      <p class="muted">處置/新聞複核與5/15事件窗</p>
+    </article>
+    
+        
+    <article class="scenario-spotlight">
+      <div class="scenario-top">
+        <div>
+          <p class="spotlight-kicker">本月主情境</p>
+          <h4>箱體震盪整理</h4>
+        </div>
+        <div class="badge-row"><span class='badge badge-good'>38%</span></div>
+      </div>
+      <p><strong>觸發：</strong>65.2~80.5箱體內換手</p>
+      <p><strong>目標：</strong>65.2~80.5</p>
+      <p><strong>失效：</strong>有效突破80.5或跌破65.2</p>
+      <p><strong>驅動：</strong>高檔籌碼消化與事件等待</p>
+      <p class="muted">2026-05-15</p>
+    </article>
+    
+      </div>
+      <section class="evidence-block">
+        <div class="subhead"><h3>今天先盯 3 個指標</h3></div>
+        <div class="watch-focus-grid">
+    <article class="watch-card watch-focus-card">
+      <div class="watch-top">
+        <h4>65.2~66.1是否守住</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium-high'>中高</span>
+        </div>
+      </div>
+      <p>核心失效帶。</p>
+    </article>
+    
+    <article class="watch-card watch-focus-card">
+      <div class="watch-top">
+        <h4>71.1/76.3收復狀態</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium'>中</span>
+        </div>
+      </div>
+      <p>站回才有續攻資格。</p>
+    </article>
+    
+    <article class="watch-card watch-focus-card">
+      <div class="watch-top">
+        <h4>80.5前高突破</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-high'>高</span>
+        </div>
+      </div>
+      <p>主升二波觸發價。</p>
+    </article>
+    </div>
+      </section>
+      
+    <details class="fold-panel">
+      <summary class="fold-head">
+        <h4>其他情境</h4>
+        <div class="badge-row"><span class='badge badge-plain'>次要情境</span></div>
+      </summary>
+      <div class="fold-body">
+        <section><div class='subhead'><h3>未來 1 週</h3></div><div class='scenario-grid'>
+    <article class="scenario-card">
+      <div class="scenario-top">
+        <h4>回測洗盤</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>32%</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>再測65.2~66.1後不破並拉回70</p>
+      <p><strong>目標：</strong>65.2~71.1</p>
+      <p><strong>失效：</strong>跌破62.9</p>
+      <p><strong>驅動：</strong>洗出高槓桿與當沖籌碼</p>
+      <p class="muted">2026-05-15前基本面續證</p>
+    </article>
+    
+    <article class="scenario-card">
+      <div class="scenario-top">
+        <h4>強勢續攻</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>20%</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>放量收復76.3並挑戰80.5</p>
+      <p><strong>目標：</strong>77.4~80.5；84~85</p>
+      <p><strong>失效：</strong>跌回71.1下方</p>
+      <p><strong>驅動：</strong>事件題材續熱與空方回補</p>
+      <p class="muted">2026-05-15前財報/法說視窗</p>
+    </article>
+    
+    <article class="scenario-card">
+      <div class="scenario-top">
+        <h4>轉弱下破</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>10%</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>日收跌破65.2且反彈不過66.1</p>
+      <p><strong>目標：</strong>57.2~62.9</p>
+      <p><strong>失效：</strong>重新站回71.1</p>
+      <p><strong>驅動：</strong>事件退燒或法人續賣</p>
+      <p class="muted">處置/新聞複核</p>
+    </article>
+    </div></section><section class='evidence-block'><div class='subhead'><h3>未來 1 月</h3></div><div class='scenario-grid'>
+    <article class="scenario-card">
+      <div class="scenario-top">
+        <h4>主升延續</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>32%</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>突破80.5且週線不失71.1</p>
+      <p><strong>目標：</strong>80.5~89.4</p>
+      <p><strong>失效：</strong>週收跌破66.1</p>
+      <p><strong>驅動：</strong>Micro LED/VCSEL題材與營收修復延續</p>
+      <p class="muted">2026-05-15財報/法說常見視窗</p>
+    </article>
+    
+    <article class="scenario-card">
+      <div class="scenario-top">
+        <h4>高位派發轉弱</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>18%</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>反彈不過76.3且法人5日續賣</p>
+      <p><strong>目標：</strong>62.9~66.1</p>
+      <p><strong>失效：</strong>收復80.5</p>
+      <p><strong>驅動：</strong>量縮反彈與籌碼擁擠</p>
+      <p class="muted">處置/新聞正式公告複核</p>
+    </article>
+    
+    <article class="scenario-card">
+      <div class="scenario-top">
+        <h4>破位進入修正</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>12%</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>週收跌破65.2</p>
+      <p><strong>目標：</strong>57.2~62.9；52~57.2</p>
+      <p><strong>失效：</strong>重新站回71.1</p>
+      <p><strong>驅動：</strong>主題退潮或大盤族群轉弱</p>
+      <p class="muted">2026-05-15前後</p>
+    </article>
+    </div></section>
+      </div>
+    </details>
+    
+      
+    <details class="fold-panel">
+      <summary class="fold-head">
+        <h4>完整監控清單</h4>
+        <div class="badge-row"><span class='badge badge-plain'>完整監控</span></div>
+      </summary>
+      <div class="fold-body">
+        <div class='watch-grid'>
+    <article class="watch-card">
+      <div class="watch-top">
+        <h4>融資與當沖擁擠度</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-high'>高</span>
+        </div>
+      </div>
+      <p>融資仍高、當沖均值高。</p>
+    </article>
+    
+    <article class="watch-card">
+      <div class="watch-top">
+        <h4>5/15事件窗與處置新聞複核</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium'>中</span>
+        </div>
+      </div>
+      <p>正式公告需人工確認。</p>
+    </article>
+    </div>
+      </div>
+    </details>
+    
+    
+      </div>
+    </details>
+    
+      
+    <details id="profile" class="section">
+      <summary class="section-head">
+        <div class="section-title">
+          <span class="section-index">PROFILE</span>
+          <h2>股性與校正</h2>
+        </div>
+        <div class="badge-row"></div>
+      </summary>
+      <div class="section-body">
+        
+      <div class="profile-stack">
+        
+    <details class="fold-panel">
+      <summary class="fold-head">
+        <h4>固定設定卡</h4>
+        <div class="badge-row"><span class='badge badge-plain'>固定設定</span></div>
+      </summary>
+      <div class="fold-body">
+        
+      <div class="profile-subsection-stack">
+        
+    <details class="fold-panel fold-panel-compact">
+      <summary class="fold-head">
+        <h4>基礎定位</h4>
+        <div class="badge-row"></div>
+      </summary>
+      <div class="fold-body">
+        <ul class='bullet-list'><li>市場定位：光電</li><li>身分定位：台股中型上市光電整合股，屬於中型高β事件驅動鎖價型趨勢股。</li><li>核心主線：車用光電：車外 / 車內照明、ADB、Mini / Micro LED 車用顯示。</li><li>交會主線：先進顯示：Mini LED、Micro LED、透明顯示、HUD 與背光升級。</li><li>題材重評主線：智能感測：IR、VCSEL、感測模組、安防 / 穿戴 / 工業感測。</li><li>中長線補充主線：AI 光通訊：Micro LED、VCSEL、Tx/Rx、CW-DFB LD、矽光子 / CPO / 外置光源。</li><li>必抓資料：車用、Micro LED、感測與 AI 光通訊進度、最新法說、驗證、量產與合作案。</li><li>事件 Beta：法說、月營收、Touch Taiwan、顯示展、車用與 AI 光通訊題材共振時，上調事件 Beta。</li><li>專屬提醒：非純 LED 背光股、非小型投機妖股、非大型權值慢股；一般背光只能列為次要循環因子。</li><li>校正原則：</li><li>A 級主線權重大於 C 級敘事</li><li>題材驅動、基本面修復、純籌碼推動必須分開判讀</li><li>分K只能補充背景，不可主導波段結論</li><li>單日爆量、單筆大單、零星盤中異常，不得直接當成主力定論</li></ul>
+      </div>
+    </details>
+    
+        
+      </div>
+    
+      </div>
+    </details>
+    
+        <div class="profile-audit-grid">
+          
+    <details class="fold-panel">
+      <summary class="fold-head">
+        <h4>固定設定卡回測校正</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium'>維持不變</span></div>
+      </summary>
+      <div class="fold-body">
+        <p>本次資料仍符合3714固定設定：中型高β事件驅動光電股。</p><p class='muted'>本輪沒有變動欄位。</p>
+      </div>
+    </details>
+    
+          
+    <details class="fold-panel">
+      <summary class="fold-head">
+        <h4>專屬校正框架</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium'>延後觀察</span></div>
+      </summary>
+      <div class="fold-body">
+        <p>本次屬既有高β事件驅動股劇本內案例，未見框架失準證據。</p><div class='review-list-grid'><section><h5>下一輪必驗證</h5><ul class='bullet-list'><li>65.2失守是否快速轉弱</li><li>76.3收復是否帶動法人5日轉正</li></ul></section><section><h5>保留規則</h5><ul class='bullet-list'><li>單日爆量不改框架</li><li>未經正式公告的新聞不升為A級主線</li></ul></section></div>
+      </div>
+    </details>
+    
+        </div>
+      </div>
+    
+      </div>
+    </details>
+    
+      
+    <details id="evidence" class="section">
+      <summary class="section-head">
+        <div class="section-title">
+          <span class="section-index">EVIDENCE</span>
+          <h2>證據資料板</h2>
+        </div>
+        <div class="badge-row"></div>
+      </summary>
+      <div class="section-body">
+        
+      <section class="evidence-block">
+        <div class="subhead"><h3>市場快照</h3></div>
+        <div class="info-grid">
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>最新收盤</h4>
+        <div class="badge-row"><span class='badge badge-conf-high'>高</span></div>
+      </div>
+      <p class="snapshot-value snapshot-down">70.0，跌3.3元/-4.5%</p>
+      <p class="muted"></p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>當日振幅</h4>
+        <div class="badge-row"><span class='badge badge-conf-high'>高</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">12.1%，高75.0、低66.1</p>
+      <p class="muted"></p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>量能</h4>
+        <div class="badge-row"><span class='badge badge-conf-high'>高</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">18551張，5日量比0.35</p>
+      <p class="muted"></p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>成交額/換手</h4>
+        <div class="badge-row"><span class='badge badge-conf-high'>高</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">12.8億元，換手2.51%</p>
+      <p class="muted"></p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>法人流向</h4>
+        <div class="badge-row"><span class='badge badge-conf-high'>高</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">1日+883張、3日+1895.3張、5日-7488.7張</p>
+      <p class="muted"></p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>融資/借券</h4>
+        <div class="badge-row"><span class='badge badge-conf-high'>高</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">融資-2977張至37797張；借券賣出餘額25929張</p>
+      <p class="muted"></p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>AVWAP位置</h4>
+        <div class="badge-row"><span class='badge badge-conf-high'>高</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">收盤高於突破段AVWAP65.166，低於事件AVWAP76.3338</p>
+      <p class="muted"></p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>分K狀態</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium-high'>中高</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">5m Donchian上緣70.0，下緣66.2，收在上緣；session VWAP 71.1466</p>
+      <p class="muted"></p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>事件窗</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium-high'>中高</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">3月營收MoM+29.14%、YoY-6.51%；Q4 EPS -3.69</p>
+      <p class="muted"></p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>題材溫度</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium'>中</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">新聞題材含營運轉強、Micro LED、VCSEL/光通訊，但需複核</p>
+      <p class="muted"></p>
+    </article>
+    </div>
+      </section>
+      <section class="evidence-block">
+        <div class="subhead"><h3>多週期判讀</h3></div>
+        <article class="classification-card">
+          <h4>總分類</h4>
+          <p>高位延伸後洗盤</p>
+        </article>
+        <div class="info-grid">
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>年線位階</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium'>中</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">2026年仍大幅上漲，屬高β再評價段</p>
+      <p class="muted"></p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>季線位階</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium'>中</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">2026Q2單季上漲逾50%，動能強但延伸大</p>
+      <p class="muted"></p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>月線方向</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium'>中</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">4月月K大漲，月RSI偏高、MACD翻揚</p>
+      <p class="muted"></p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>週線邏輯</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium'>中</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">週K自80.1回落至70，但ADX與RSI仍偏強</p>
+      <p class="muted"></p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>日線timing</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium-high'>中高</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">日線跌回70但守65.2附近主AVWAP，KD偏高後轉鈍</p>
+      <p class="muted"></p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>分K背景</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium'>中</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">4/23盤中急殺後收在5m Donchian上緣，反彈但仍低於session VWAP</p>
+      <p class="muted"></p>
+    </article>
+    </div>
+      </section>
+      <section class="evidence-block">
+        <div class="subhead"><h3>已知事實 / 缺口 / 推論</h3></div>
+        <div class="tri-grid">
+          <article class="tri-card"><h4>已知事實</h4><ul class='bullet-list'><li>2026-04-23收70.0，跌4.5%，高75.0、低66.1，成交18551張。</li><li>5日量比0.35，外資單日買超1734張但三大法人5日合計賣超7488.7張。</li><li>融資單日減2977張、借券賣出餘額減271張；突破段AVWAP為65.166。</li><li>3月營收MoM+29.14%、YoY-6.51%；2025Q4 EPS -3.69，事件窗仍有效。</li></ul></article>
+          <article class="tri-card"><h4>需補資料</h4><ul class='bullet-list'><li>分點與隔日沖明細</li><li>日線MA20/MA60與布林帶精確數值</li><li>新聞與處置資訊正式公告複核</li></ul></article>
+          <article class="tri-card"><h4>推論</h4><ul class='bullet-list'><li>本波以題材/事件窗與籌碼換手主導，基本面僅早期修復。</li><li>目前較接近高位震盪洗盤，非主升無風險續攻。</li></ul></article>
+        </div>
+      </section>
+      <section class="evidence-block">
+        <div class="subhead"><h3>核心分數</h3></div>
+        <div class="score-grid">
+    <article class="score-card">
+      <div class="score-top">
+        <h4>題材溫度 T</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-high'>高</span>
+        </div>
+      </div>
+      <p>Micro LED/VCSEL/光通訊與營運轉強敘事仍熱。</p>
+    </article>
+    
+    <article class="score-card">
+      <div class="score-top">
+        <h4>基本面修正 F</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium-low'>中低</span>
+        </div>
+      </div>
+      <p>3月營收MoM轉強，但YoY仍負且Q4虧損。</p>
+    </article>
+    
+    <article class="score-card">
+      <div class="score-top">
+        <h4>籌碼強度 C</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium'>中</span>
+        </div>
+      </div>
+      <p>短線外資與法人回補，但5日法人仍賣超。</p>
+    </article>
+    
+    <article class="score-card">
+      <div class="score-top">
+        <h4>價量結構 P</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium-high'>中高</span>
+        </div>
+      </div>
+      <p>守住突破AVWAP，但高檔回落與量縮限制強度。</p>
+    </article>
+    
+    <article class="score-card">
+      <div class="score-top">
+        <h4>多週期趨勢一致性 S</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium-high'>中高</span>
+        </div>
+      </div>
+      <p>月週仍多，日線進入高檔洗盤。</p>
+    </article>
+    
+    <article class="score-card">
+      <div class="score-top">
+        <h4>主力操作強度 M</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium'>中</span>
+        </div>
+      </div>
+      <p>有急漲換手與融資降溫，但分點缺資料。</p>
+    </article>
+    
+    <article class="score-card">
+      <div class="score-top">
+        <h4>散戶擁擠度 R</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium-high'>中高</span>
+        </div>
+      </div>
+      <p>當沖5日均66.6%且融資仍高，雖單日降溫。</p>
+    </article>
+    </div>
+      </section>
+    
+      </div>
+    </details>
+    
+      
+    <details id="governance" class="section">
+      <summary class="section-head">
+        <div class="section-title">
+          <span class="section-index">GOVERNANCE</span>
+          <h2>治理資料</h2>
+        </div>
+        <div class="badge-row"></div>
+      </summary>
+      <div class="section-body">
+        
+      <div class="governance-stack">
+        
+    <details class="fold-panel">
+      <summary class="fold-head">
+        <h4>資料完整性</h4>
+        <div class="badge-row"><span class='badge badge-plain'>完整性</span></div>
+      </summary>
+      <div class="fold-body">
+        ("<p>標的與日期一致，Tier 1足夠；分K樣本不足處降信心。</p><p class='muted'>EOD與分K皆為2026-04-23；事件資料出表日多為2026-04-17，作事件窗輔助。</p><ul class='bullet-list'><li>第一層：足夠：OHLCV、量能、事件、月營收/財報、AVWAP皆有。</li><li>第二層：可用：法人、融資券、借券；分點缺。</li><li>第三層：不足：分點、五檔、隔日沖細項未完整。</li></ul>",)
+      </div>
+    </details>
+    
+        
+    <details class="fold-panel">
+      <summary class="fold-head">
+        <h4>回測與缺口</h4>
+        <div class="badge-row"><span class='badge badge-plain'>治理</span></div>
+      </summary>
+      <div class="fold-body">
+        <p>未提供回測資料，本區不做正式審計。</p><h5>缺口</h5><ul class='bullet-list'><li>缺交易規則、成本/滑價、樣本內外、walk-forward資料</li></ul><h5>下一輪假設</h5><ul class='bullet-list'><li>AVWAP守住後站回session VWAP勝率</li><li>高當沖比下回測66.1的隔日續航</li><li>事件AVWAP轉壓力後突破有效性</li></ul>
+      </div>
+    </details>
+    
+        
+    <details class="fold-panel">
+      <summary class="fold-head">
+        <h4>框架檢視細節</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium'>延後觀察</span></div>
+      </summary>
+      <div class="fold-body">
+        <p><strong>本輪結論：</strong>資料不足以調整專屬框架。</p><p><strong>判斷理由：</strong>本次屬既有高β事件驅動股劇本內案例，未見框架失準證據。</p><h5>成功判準</h5><ul class='bullet-list'><li>下一輪情境主次能解釋65.2/76.3切換</li></ul><h5>失敗判準</h5><ul class='bullet-list'><li>連續兩次誤判主階段或目標帶失效</li></ul>
+      </div>
+    </details>
+    
+      </div>
+    
+      </div>
+    </details>
+    
+    </div>
+
+    <p class="footer-note">這是 V3 單股原型頁，主真源仍為驗證後 JSON；固定設定卡由最新專屬提示詞補齊。這版不覆蓋 V2，也尚未接入全部個股批次。</p>
+  </main>
+  <script>
+    (() => {
+      const mobileNav = document.querySelector('.mobile-nav-fab');
+      if (!mobileNav) return;
+      mobileNav.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+          mobileNav.removeAttribute('open');
+        });
+      });
+      document.addEventListener('click', (event) => {
+        if (!mobileNav.hasAttribute('open')) return;
+        if (mobileNav.contains(event.target)) return;
+        mobileNav.removeAttribute('open');
+      });
+    })();
+  </script>
+</body>
+</html>
