@@ -1,0 +1,3790 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>波段觀測站 | 台股波段分析總覽</title>
+  <style>
+    :root {
+      --bg: #efe7da;
+      --paper: rgba(253, 248, 240, 0.92);
+      --paper-strong: rgba(255, 252, 246, 0.98);
+      --ink: #1c160f;
+      --muted: #6f6358;
+      --forest: #27483f;
+      --forest-deep: #173129;
+      --gold: #b47b3f;
+      --clay: #c76d42;
+      --line: rgba(28, 22, 15, 0.1);
+      --shadow: 0 24px 80px rgba(35, 26, 17, 0.12);
+      --shadow-strong: 0 32px 90px rgba(35, 26, 17, 0.18);
+      --sand: #e9dac1;
+      --serif: "Iowan Old Style", "Noto Serif TC", "PingFang TC", serif;
+      --sans: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", "Avenir Next", sans-serif;
+      --mono: "SFMono-Regular", "Menlo", monospace;
+      --text-xs: 12px;
+      --text-sm: 13px;
+      --text-md: 16px;
+      --text-lg: 18px;
+      --text-xl: 20px;
+      --text-2xl: 24px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: var(--text-md);
+      line-height: 1.75;
+      background:
+        radial-gradient(circle at 10% 12%, rgba(183, 122, 63, .22), transparent 24%),
+        radial-gradient(circle at 88% 18%, rgba(39, 72, 63, .18), transparent 28%),
+        linear-gradient(180deg, #fbf6ef 0%, #efe4d6 52%, #e9ddcf 100%);
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .08;
+      background-image:
+        linear-gradient(rgba(31, 22, 15, .08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31, 22, 15, .08) 1px, transparent 1px);
+      background-size: 120px 120px;
+    }
+    a {
+      color: var(--forest);
+      text-decoration: none;
+      font-weight: 800;
+      transition: transform .22s ease, color .22s ease, opacity .22s ease;
+    }
+    a:hover {
+      color: var(--forest-deep);
+    }
+    .shell { max-width: 1560px; margin: 0 auto; padding: 24px 20px 40px; }
+    .hero, .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 38px;
+      margin-bottom: 18px;
+      background:
+        linear-gradient(135deg, rgba(255,252,246,.96) 0%, rgba(247,239,226,.88) 58%, rgba(235,223,205,.92) 100%);
+      box-shadow: var(--shadow-strong);
+    }
+    .hero::selection {
+      background: rgba(180,123,63,.25);
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: -120px auto auto -60px;
+      width: 380px;
+      height: 380px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(199,109,66,.2) 0%, rgba(199,109,66,0) 68%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      top: -40px;
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(39,72,63,.18) 0%, rgba(39,72,63,0) 68%);
+      pointer-events: none;
+    }
+    .hero::marker {
+      display: none;
+    }
+    .hero > * {
+      position: relative;
+      z-index: 1;
+    }
+    .site-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .nav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 250, 242, 0.72);
+      border: 1px solid rgba(39, 72, 63, 0.14);
+      color: var(--forest);
+      font-weight: 800;
+      backdrop-filter: blur(10px);
+    }
+    .nav-pill.current {
+      background: linear-gradient(135deg, rgba(39,72,63,.14), rgba(180,123,63,.16));
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(320px, .75fr);
+      gap: 24px;
+      align-items: end;
+    }
+    .hero-main {
+      max-width: 760px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(39,72,63,.12), rgba(180,123,63,.16));
+      color: var(--forest-deep);
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-size: var(--text-xs);
+    }
+    .brand-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+    .brand-copy {
+      color: var(--muted);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      text-align: right;
+      line-height: 1.7;
+    }
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(38px, 5vw, 68px);
+      line-height: 1.02;
+      letter-spacing: -.04em;
+      font-family: var(--serif);
+      font-weight: 700;
+      max-width: 11ch;
+    }
+    .hero-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.9;
+      max-width: 760px;
+      font-weight: 500;
+    }
+    .hero-meta {
+      display: grid;
+      gap: 12px;
+      align-self: stretch;
+    }
+    .meta-card {
+      background: linear-gradient(180deg, rgba(255,252,246,.94), rgba(250,244,235,.9));
+      border: 1px solid rgba(39, 72, 63, 0.12);
+      border-radius: 24px;
+      padding: 18px 20px;
+      box-shadow: 0 16px 36px rgba(35, 26, 17, 0.06);
+      position: relative;
+      overflow: hidden;
+    }
+    .meta-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: linear-gradient(180deg, rgba(199,109,66,.7), rgba(39,72,63,.7));
+      opacity: .9;
+    }
+    .meta-card span {
+      display: block;
+      color: var(--muted);
+      font-size: var(--text-sm);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .meta-card strong {
+      display: block;
+      font-size: 22px;
+      line-height: 1.45;
+      word-break: break-word;
+      font-weight: 700;
+    }
+    .meta-card .meta-block + .meta-block {
+      margin-top: 18px;
+    }
+    .meta-card strong.meta-date {
+      font-size: 30px;
+      line-height: 1.2;
+      font-family: var(--serif);
+      letter-spacing: -.02em;
+    }
+    .meta-card strong.meta-total {
+      color: var(--forest);
+    }
+    .nav-panel {
+      padding: 22px 22px 20px;
+      margin-bottom: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,250,242,.94), rgba(248,240,227,.9));
+    }
+    .nav-panel h2 {
+      margin: 0;
+      color: var(--forest);
+      font-size: 24px;
+      font-family: var(--serif);
+      line-height: 1.15;
+      font-weight: 700;
+    }
+    .nav-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    .nav-copy {
+      color: var(--muted);
+      font-size: var(--text-md);
+      line-height: 1.8;
+      max-width: 620px;
+      font-weight: 500;
+    }
+    .filter-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr) minmax(220px, 260px);
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+    .field label {
+      color: var(--muted);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .field input,
+    .stage-filter-toggle {
+      width: 100%;
+      border: 1px solid rgba(39,72,63,.12);
+      background: rgba(255, 252, 246, 0.82);
+      border-radius: 16px;
+      padding: 14px 16px;
+      color: var(--ink);
+      font: inherit;
+      outline: none;
+    }
+    .field input:focus,
+    .stage-filter-toggle:focus {
+      border-color: rgba(180,123,63,.55);
+      box-shadow: 0 0 0 4px rgba(180,123,63,.12);
+    }
+    .stage-filter-box {
+      position: relative;
+    }
+    .stage-filter-box[open] {
+      z-index: 4;
+    }
+    .stage-filter-box summary {
+      list-style: none;
+    }
+    .stage-filter-box summary::-webkit-details-marker {
+      display: none;
+    }
+    .stage-filter-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 600;
+    }
+    .stage-filter-toggle strong {
+      font: inherit;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .stage-filter-toggle span {
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1;
+      transition: transform .2s ease;
+    }
+    .stage-filter-box[open] .stage-filter-toggle span {
+      transform: rotate(180deg);
+    }
+    .stage-filter-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      padding: 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(39,72,63,.12);
+      background: rgba(255, 252, 246, 0.98);
+      box-shadow: 0 22px 48px rgba(35, 26, 17, 0.12);
+      display: grid;
+      gap: 8px;
+    }
+    .stage-filter-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(39,72,63,.08);
+    }
+    .stage-filter-action {
+      border: 0;
+      background: transparent;
+      color: var(--forest);
+      font: inherit;
+      font-size: var(--text-sm);
+      font-weight: 700;
+      padding: 4px 0;
+      cursor: pointer;
+    }
+    .stage-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.6);
+      border: 1px solid rgba(39,72,63,.06);
+      cursor: pointer;
+    }
+    .stage-option:hover {
+      background: rgba(180,123,63,.09);
+    }
+    .stage-option input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--forest);
+      margin: 0;
+      flex: 0 0 auto;
+    }
+    .stage-option span {
+      color: var(--ink);
+      font-size: var(--text-md);
+      line-height: 1.5;
+      font-weight: 600;
+    }
+    .filter-status {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: var(--text-sm);
+      line-height: 1.75;
+      font-weight: 500;
+    }
+    .toggle-field {
+      display: grid;
+      gap: 8px;
+      align-content: end;
+    }
+    .favorite-filter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 68px;
+      padding: 0 24px;
+      border-radius: 28px;
+      border: 1px solid rgba(39,72,63,.12);
+      background: linear-gradient(180deg, rgba(255, 252, 246, 0.96), rgba(248, 238, 224, 0.92));
+      color: var(--forest-deep);
+      font: inherit;
+      font-weight: 800;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 14px 32px rgba(35, 26, 17, 0.08);
+      transition: transform .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+    .favorite-filter.active {
+      background: linear-gradient(135deg, rgba(39,72,63,.14), rgba(180,123,63,.18));
+      border-color: rgba(180,123,63,.32);
+    }
+    .favorite-filter:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 20px 40px rgba(35, 26, 17, 0.12);
+    }
+    .favorite-filter .star {
+      color: var(--forest);
+      font-size: 26px;
+      line-height: 1;
+    }
+    .stage-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .stage-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(255, 250, 242, 0.82);
+      border: 1px solid rgba(39, 72, 63, 0.12);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+    .stage-chip:hover {
+      transform: translateY(-1px);
+      border-color: rgba(180,123,63,.28);
+      box-shadow: 0 12px 24px rgba(35, 26, 17, 0.08);
+    }
+    .stage-chip span { color: var(--ink); }
+    .stage-chip strong {
+      display: inline-flex;
+      min-width: 28px;
+      justify-content: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(31,79,64,.1);
+      color: var(--forest);
+      font-family: var(--serif);
+    }
+    .stage-stack {
+      display: grid;
+      gap: 20px;
+    }
+    .stage-panel { padding: 24px; }
+    .stage-panel {
+      background:
+        linear-gradient(180deg, rgba(255,252,246,.96), rgba(249,242,232,.92));
+      position: relative;
+      overflow: hidden;
+    }
+    .stage-panel::after {
+      content: "";
+      position: absolute;
+      right: -40px;
+      bottom: -40px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, color-mix(in srgb, var(--stage-soft) 68%, transparent), transparent 68%);
+      pointer-events: none;
+      opacity: .55;
+    }
+    .stage-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 6px;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--stage-tone) 70%, white), var(--stage-tone));
+      opacity: .92;
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .section-kicker {
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: var(--text-sm);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .section-head h2 {
+      margin: 0;
+      color: var(--stage-tone);
+      font-size: 34px;
+      font-family: var(--serif);
+      line-height: 1.02;
+      font-weight: 700;
+    }
+    .section-deck {
+      margin-top: 10px;
+      color: color-mix(in srgb, var(--stage-tone) 82%, #3d3327);
+      font-size: 14px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+    .count-pill {
+      display: inline-flex;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--stage-soft) 82%, white), color-mix(in srgb, var(--stage-tone) 18%, white));
+      color: var(--stage-tone);
+      font-weight: 800;
+    }
+    .chapter-intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(260px, .6fr);
+      gap: 18px;
+      margin-bottom: 20px;
+      padding: 18px 0 22px;
+      border-top: 1px solid rgba(28,22,15,.08);
+      border-bottom: 1px solid rgba(28,22,15,.08);
+    }
+    .chapter-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: var(--text-md);
+      line-height: 1.9;
+      max-width: 58ch;
+      font-weight: 500;
+    }
+    .chapter-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .chapter-stats > div {
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,.62), rgba(247,240,230,.54));
+      border: 1px solid rgba(39,72,63,.08);
+    }
+    .chapter-stats span {
+      display: block;
+      color: var(--muted);
+      font-size: var(--text-xs);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .chapter-stats strong {
+      display: block;
+      color: var(--stage-tone);
+      font-family: var(--serif);
+      font-size: 26px;
+      line-height: 1.05;
+      font-weight: 700;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+    .stock-card {
+      background: linear-gradient(180deg, rgba(255,252,246,.99), rgba(251,244,235,.95));
+      border: 1px solid rgba(39,72,63,.08);
+      border-radius: 26px;
+      padding: 22px;
+      box-shadow: 0 18px 32px rgba(35, 26, 17, 0.055);
+      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease, background .22s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .stock-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--stage-tone), color-mix(in srgb, var(--stage-soft) 65%, white));
+      opacity: .9;
+    }
+    .stock-card::after {
+      content: "";
+      position: absolute;
+      right: -28px;
+      top: -28px;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, color-mix(in srgb, var(--stage-soft) 68%, white), transparent 68%);
+      opacity: .55;
+      pointer-events: none;
+    }
+    .stock-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 26px 46px rgba(35, 26, 17, 0.11);
+      border-color: rgba(180,123,63,.22);
+    }
+    .stock-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 14px;
+    }
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: end;
+    }
+    .stock-head h3 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      line-height: 1.02;
+      letter-spacing: -.02em;
+      font-family: var(--serif);
+      font-weight: 700;
+    }
+    .stage-badge {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--stage-soft) 84%, white), color-mix(in srgb, var(--stage-tone) 12%, white));
+      color: var(--stage-tone);
+      border: 1px solid color-mix(in srgb, var(--stage-tone) 18%, transparent);
+      font-size: var(--text-xs);
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .stage-detail {
+      margin: 0;
+      color: var(--muted);
+      font-size: var(--text-md);
+      line-height: 1.75;
+      max-width: 32ch;
+      font-weight: 500;
+    }
+    .research-summary {
+      margin: 0 0 16px;
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,.54), rgba(248,240,230,.5));
+      border: 1px solid rgba(39,72,63,.06);
+    }
+    .summary-label {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: var(--text-xs);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+    .summary-copy {
+      margin: 0;
+      color: var(--forest-deep);
+      font-size: var(--text-md);
+      line-height: 1.8;
+      font-weight: 600;
+    }
+    .confidence {
+      white-space: nowrap;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(39,72,63,.1), rgba(199,109,66,.14));
+      color: var(--forest-deep);
+      font-weight: 800;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+    }
+    .favorite-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(39,72,63,.12);
+      background: rgba(255,255,255,.6);
+      color: var(--forest-deep);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .2s ease, background .2s ease, border-color .2s ease;
+    }
+    .favorite-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(180,123,63,.12);
+    }
+    .favorite-btn.active {
+      background: linear-gradient(135deg, rgba(199,109,66,.18), rgba(180,123,63,.22));
+      border-color: rgba(180,123,63,.34);
+    }
+    .favorite-icon {
+      color: var(--gold);
+      font-size: 15px;
+      line-height: 1;
+    }
+    .detail-grid {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .detail-grid > div {
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.46);
+      border: 1px solid rgba(39,72,63,.06);
+    }
+    .detail-grid span {
+      display: block;
+      color: var(--muted);
+      font-size: var(--text-sm);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .detail-grid strong {
+      display: block;
+      font-size: var(--text-md);
+      line-height: 1.75;
+      word-break: break-word;
+      font-family: var(--sans);
+      font-weight: 600;
+    }
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+    .links a {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(39,72,63,.07);
+      border: 1px solid rgba(39,72,63,.1);
+    }
+    .links a:hover {
+      transform: translateY(-1px);
+      background: rgba(180,123,63,.12);
+    }
+    .muted { color: var(--muted); font-weight: 700; }
+    .favorite-spotlight {
+      display: block;
+      padding: 24px;
+      margin-bottom: 18px;
+      background:
+        radial-gradient(circle at 88% 14%, rgba(39,72,63,.11), transparent 24%),
+        linear-gradient(180deg, rgba(255,252,246,.99), rgba(247,238,225,.94));
+    }
+    .favorite-spotlight::before {
+      content: "";
+      display: block;
+      width: 96px;
+      height: 2px;
+      margin-bottom: 18px;
+      background: linear-gradient(90deg, var(--clay), rgba(39,72,63,.28));
+    }
+    .spotlight-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .spotlight-head h2 {
+      margin: 0;
+      color: var(--forest-deep);
+      font-size: 30px;
+      line-height: 1.08;
+      font-family: var(--serif);
+      font-weight: 700;
+    }
+    .spotlight-copy {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: var(--text-md);
+      line-height: 1.8;
+      font-weight: 500;
+    }
+    .spotlight-empty {
+      padding: 20px;
+      border-radius: 22px;
+      border: 1px dashed rgba(39,72,63,.18);
+      color: var(--muted);
+      background: rgba(255,255,255,.42);
+      line-height: 1.8;
+    }
+    .site-footer {
+      padding: 18px 6px 0;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: var(--text-sm);
+      line-height: 1.8;
+      font-weight: 500;
+    }
+    @media (max-width: 860px) {
+      .brand-row {
+        flex-direction: column;
+        align-items: start;
+      }
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+      .brand-copy {
+        text-align: left;
+      }
+      .stock-head {
+        flex-direction: row;
+        align-items: flex-start;
+      }
+      .section-head {
+        flex-direction: column;
+        align-items: start;
+      }
+      .chapter-intro {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 720px) {
+      .shell {
+        padding: 14px 12px 28px;
+      }
+      .hero {
+        padding: 20px 16px;
+        border-radius: 22px;
+      }
+      .panel {
+        border-radius: 22px;
+      }
+      .site-nav {
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .nav-pill {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 14px;
+      }
+      .brand-row {
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      h1 {
+        margin: 10px 0 10px;
+        font-size: clamp(30px, 10vw, 42px);
+      }
+      .hero-copy,
+      .hero-note,
+      .nav-copy,
+      .chapter-copy,
+      .spotlight-copy {
+        font-size: 15px;
+        line-height: 1.82;
+      }
+      .hero-meta,
+      .chapter-stats,
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+      .meta-card,
+      .stock-card,
+      .favorite-spotlight,
+      .nav-panel,
+      .stage-panel {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      .meta-card strong {
+        font-size: 22px;
+      }
+      .meta-card strong.meta-date {
+        font-size: 22px;
+      }
+      .nav-panel h2,
+      .spotlight-head h2 {
+        font-size: 22px;
+      }
+      .stage-chip {
+        width: auto;
+        justify-content: space-between;
+      }
+      .favorite-filter {
+        width: 100%;
+        min-height: 58px;
+        font-size: 18px;
+      }
+      .section-head h2 {
+        font-size: 26px;
+      }
+      .count-pill {
+        padding: 8px 12px;
+      }
+      .stock-head h3 {
+        font-size: 24px;
+      }
+      .stage-detail,
+      .brief-line strong {
+        font-size: 15px;
+        line-height: 1.75;
+      }
+      .brief-line {
+        padding: 10px 12px;
+      }
+      .links {
+        gap: 8px;
+      }
+      .links a {
+        flex: 1 1 100%;
+        justify-content: center;
+        padding: 12px 14px;
+      }
+      .spotlight-head {
+        gap: 10px;
+      }
+      .site-footer {
+        padding: 12px 2px 0;
+      }
+    }
+    /* V3 overview redesign overrides */
+    .shell {
+      max-width: 1360px;
+      padding: 14px 12px 34px;
+    }
+    .hero {
+      padding: 18px 16px;
+      margin-bottom: 14px;
+      border-radius: 24px;
+      box-shadow: 0 20px 48px rgba(35, 26, 17, 0.12);
+    }
+    .brand-row {
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .brand-copy {
+      font-size: 12px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .hero-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+    .hero-main {
+      max-width: none;
+    }
+    h1 {
+      max-width: none;
+      margin: 8px 0 10px;
+      font-size: clamp(32px, 9vw, 58px);
+      line-height: .98;
+    }
+    .hero-copy {
+      max-width: none;
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.82;
+    }
+    .hero-meta {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .meta-card {
+      padding: 14px 16px;
+      border-radius: 20px;
+    }
+    .meta-card-split {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .meta-card-split .meta-block + .meta-block {
+      margin-top: 0;
+    }
+    .nav-panel {
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .nav-head {
+      margin-bottom: 10px;
+    }
+    .nav-panel h2 {
+      font-size: 22px;
+    }
+    .nav-copy {
+      max-width: none;
+      font-size: 14px;
+      line-height: 1.76;
+    }
+    .filter-toolbar {
+      display: grid;
+      gap: 12px;
+      margin-top: 0;
+    }
+    .filter-toolbar-main {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      align-items: end;
+    }
+    .filter-toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .filter-drawer-trigger,
+    .filter-drawer-close {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 0 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(39,72,63,.12);
+      background: rgba(255,252,246,.9);
+      color: var(--forest-deep);
+      font: inherit;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      cursor: pointer;
+      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
+      box-shadow: 0 10px 24px rgba(35, 26, 17, 0.06);
+    }
+    .filter-drawer-trigger:hover,
+    .filter-drawer-close:hover {
+      transform: translateY(-1px);
+      border-color: rgba(180,123,63,.26);
+      background: rgba(255,250,242,.98);
+    }
+    .search-field {
+      grid-column: 1 / -1;
+    }
+    .field label,
+    .toggle-field label {
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+    .field input,
+    .stage-filter-toggle {
+      min-height: 52px;
+      padding: 12px 14px;
+      border-radius: 15px;
+    }
+    .favorite-filter {
+      min-height: 52px;
+      padding: 0 18px;
+      font-size: 15px;
+      border-radius: 16px;
+      box-shadow: 0 10px 24px rgba(35, 26, 17, 0.06);
+    }
+    .favorite-filter .star {
+      font-size: 18px;
+    }
+    .active-filter-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      min-height: 32px;
+    }
+    .active-filter-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(39,72,63,.08);
+      color: var(--forest-deep);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+    .active-filter-empty {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+      font-weight: 600;
+    }
+    .filter-status {
+      margin-top: 10px;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    .filter-drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 16, 12, 0.42);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .24s ease;
+      z-index: 58;
+    }
+    .filter-drawer {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      width: min(540px, calc(100vw - 32px));
+      padding: 18px;
+      border-radius: 28px;
+      border: 1px solid rgba(39,72,63,.12);
+      background: linear-gradient(180deg, rgba(255,252,246,.98), rgba(247,239,227,.96));
+      box-shadow: 0 30px 64px rgba(21, 17, 13, 0.22);
+      opacity: 0;
+      transform: translateX(26px);
+      pointer-events: none;
+      transition: transform .28s ease, opacity .22s ease;
+      z-index: 59;
+      overflow: hidden;
+    }
+    body.filter-drawer-open {
+      overflow: hidden;
+    }
+    body.filter-drawer-open .filter-drawer-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    body.filter-drawer-open .filter-drawer {
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+    }
+    .filter-drawer-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .filter-drawer-head h3 {
+      margin: 4px 0 0;
+      color: var(--forest-deep);
+      font-size: 28px;
+      line-height: 1.05;
+      font-family: var(--serif);
+      font-weight: 700;
+    }
+    .filter-drawer-copy {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.72;
+      font-weight: 500;
+      max-width: 34ch;
+    }
+    .filter-drawer-close {
+      min-height: 40px;
+      padding: 0 14px;
+      font-size: 13px;
+      flex: 0 0 auto;
+    }
+    .filter-drawer-body {
+      display: grid;
+      flex: 1 1 auto;
+      gap: 12px;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior-y: contain;
+      -webkit-overflow-scrolling: touch;
+      padding-right: 4px;
+    }
+    .filter-drawer-section {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(39,72,63,.08);
+      background: rgba(255,255,255,.56);
+    }
+    .filter-drawer-section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .filter-drawer-section-title {
+      margin: 4px 0 0;
+      color: var(--forest);
+      font-size: 20px;
+      line-height: 1.1;
+      font-family: var(--serif);
+      font-weight: 700;
+    }
+    .filter-drawer-section-note {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.66;
+      font-weight: 500;
+    }
+    .filter-drawer-section-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .filter-option-grid {
+      display: grid;
+      gap: 8px;
+    }
+    .stage-nav-wrap {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(28, 22, 15, 0.08);
+    }
+    .stage-nav {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: max-content;
+      gap: 10px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .stage-nav::-webkit-scrollbar {
+      display: none;
+    }
+    .stage-chip {
+      min-width: max-content;
+      padding: 10px 12px;
+      gap: 8px;
+      scroll-snap-align: start;
+    }
+    .stage-chip em {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: rgba(39, 72, 63, 0.08);
+      color: var(--forest-deep);
+      font-style: normal;
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: .06em;
+    }
+    .stage-chip span {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .favorite-spotlight {
+      padding: 18px 16px;
+      margin-bottom: 14px;
+    }
+    .spotlight-head {
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .spotlight-head h2 {
+      font-size: 24px;
+    }
+    .spotlight-copy {
+      font-size: 14px;
+      line-height: 1.76;
+    }
+    .stage-stack {
+      gap: 14px;
+    }
+    .stage-panel {
+      padding: 18px 16px;
+    }
+    .section-title-wrap {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .section-stage-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--stage-soft) 80%, white), color-mix(in srgb, var(--stage-tone) 20%, white));
+      color: var(--stage-tone);
+      font-family: var(--serif);
+      font-size: 20px;
+      font-weight: 700;
+      flex: 0 0 auto;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+    }
+    .section-head {
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+    .section-head h2 {
+      font-size: 26px;
+      line-height: 1;
+    }
+    .section-deck {
+      margin-top: 8px;
+      font-size: 12px;
+      letter-spacing: .08em;
+    }
+    .count-pill {
+      padding: 8px 11px;
+      font-size: 13px;
+    }
+    .chapter-intro {
+      display: block;
+      margin-bottom: 14px;
+      padding: 12px 0 14px;
+    }
+    .chapter-copy {
+      max-width: none;
+      font-size: 14px;
+      line-height: 1.82;
+    }
+    .card-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .stock-card {
+      padding: 0;
+      border-radius: 22px;
+      box-shadow: 0 10px 20px rgba(35, 26, 17, 0.04);
+    }
+    .stock-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 28px rgba(35, 26, 17, 0.08);
+    }
+    .stock-shell {
+      display: grid;
+      gap: 10px;
+      padding: 16px;
+    }
+    .stock-head {
+      flex-direction: row;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0;
+    }
+    .stock-identity {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+    .stock-topline {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .stock-head h3 {
+      font-size: 24px;
+      margin: 0;
+      line-height: 1.04;
+    }
+    .stock-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .stage-badge {
+      margin-bottom: 0;
+      padding: 5px 9px;
+      font-size: 11px;
+    }
+    .stage-detail {
+      max-width: none;
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--muted);
+    }
+    .meta-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(39,72,63,.08);
+      color: var(--forest-deep);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .nature-pill {
+      color: #65543d;
+      background: rgba(233, 218, 193, 0.46);
+      border-color: rgba(180,123,63,.12);
+    }
+    .confidence-pill.high {
+      background: rgba(164, 72, 35, 0.16);
+      color: #8f3318;
+      border-color: rgba(164,72,35,.16);
+    }
+    .confidence-pill.medium_high {
+      background: rgba(180, 123, 63, 0.18);
+      color: #8a5a21;
+      border-color: rgba(180,123,63,.18);
+    }
+    .confidence-pill.medium {
+      background: rgba(39, 72, 63, 0.1);
+      color: var(--forest);
+      border-color: rgba(39,72,63,.12);
+    }
+    .confidence-pill.medium_low,
+    .confidence-pill.low,
+    .confidence-pill.unknown {
+      background: rgba(111, 99, 88, 0.12);
+      color: #6f6358;
+      border-color: rgba(111,99,88,.12);
+    }
+    .favorite-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      min-height: 34px;
+      padding: 0;
+      border-radius: 999px;
+    }
+    .brief-stack {
+      display: grid;
+      gap: 8px;
+    }
+    .brief-line {
+      display: grid;
+      gap: 4px;
+      padding: 11px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.48);
+      border: 1px solid rgba(39,72,63,.06);
+    }
+    .brief-line span {
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+    .brief-line strong {
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      font-size: 15px;
+      line-height: 1.6;
+      font-weight: 700;
+    }
+    .detail-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .detail-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(39,72,63,.06);
+      color: var(--forest);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .detail-chip-muted {
+      background: rgba(111,99,88,.08);
+      color: var(--muted);
+    }
+    .links {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      padding-top: 0;
+      border-top: 0;
+    }
+    .links a {
+      justify-content: center;
+      min-height: 42px;
+      padding: 10px 12px;
+      border-radius: 14px;
+    }
+    .site-footer {
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    @media (min-width: 861px) {
+      .shell {
+        padding: 24px 20px 40px;
+      }
+      .hero {
+        padding: 28px;
+        margin-bottom: 18px;
+      }
+      .hero-grid {
+        grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+        gap: 18px;
+        align-items: end;
+      }
+      .nav-panel {
+        padding: 20px;
+      }
+      .filter-toolbar-main {
+        grid-template-columns: minmax(0, 1.6fr) auto;
+        gap: 12px;
+      }
+      .stage-nav {
+        display: flex;
+        flex-wrap: wrap;
+        overflow: visible;
+      }
+      .favorite-filter {
+        width: auto;
+      }
+      .card-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .stock-shell {
+        gap: 12px;
+      }
+      .stock-head h3 {
+        font-size: 26px;
+      }
+      .brief-stack {
+        grid-template-columns: 1.15fr .95fr;
+      }
+    }
+    @media (min-width: 1180px) {
+      .card-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 860px) {
+      .filter-drawer {
+        left: 12px;
+        right: 12px;
+        top: auto;
+        bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+        width: auto;
+        max-height: min(78svh, 760px);
+        transform: translateY(calc(100% + 24px));
+      }
+      body.filter-drawer-open .filter-drawer {
+        transform: none;
+      }
+    }
+    @keyframes rise-in {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .hero, .nav-panel, .stage-panel {
+      animation: rise-in .55s ease both;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="brand-row">
+        <div class="eyebrow">波段觀測站 / V3</div>
+        <div class="brand-copy">手機優先索引站<br>先定位階段，再進個股頁</div>
+      </div>
+      <div class="hero-grid">
+        <div class="hero-main">
+          <h1>台股波段 V3 總覽</h1>
+          <p class="hero-copy">這一頁是交易索引頁，不是完整報告。先用階段、把握度、股性與搜尋縮小範圍，再直接進入單一個股 V3 儀表板。</p>
+        </div>
+        <div class="hero-meta">
+          <article class="meta-card">
+            <div class="meta-block">
+              <span>最近更新</span>
+              <strong class="meta-date">2026-04-24</strong>
+            </div>
+          </article>
+          <article class="meta-card meta-card-split">
+            <div class="meta-block">
+              <span>正式 V3</span>
+              <strong class="meta-total">42 檔</strong>
+            </div>
+            <div class="meta-block">
+              <span>目前最多</span>
+              <strong>高位震盪洗盤 · 30 檔</strong>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel nav-panel">
+      <div class="nav-head">
+        <div>
+          <h2>搜尋與篩選</h2>
+          <div class="nav-copy">首頁只保留精簡工具列。先搜尋，再視需要展開完整條件面板，最後直接進入單一個股 V3 儀表板。</div>
+        </div>
+      </div>
+      <div class="filter-toolbar">
+        <div class="filter-toolbar-main">
+        <div class="field search-field">
+          <label for="stock-search">搜尋個股</label>
+          <input id="stock-search" type="search" placeholder="輸入代號、名稱、狀態或操作建議">
+        </div>
+        <div class="filter-toolbar-actions">
+          <button class="filter-drawer-trigger" id="filter-drawer-open" type="button" aria-expanded="false" aria-controls="filter-drawer">展開篩選</button>
+          <button class="favorite-filter" id="favorite-filter" type="button" aria-pressed="false">
+            <span class="star">★</span>
+            <span>只看收藏</span>
+          </button>
+        </div>
+        </div>
+        <div class="active-filter-strip" id="active-filter-summary">
+          <span class="active-filter-empty">目前未套用條件。</span>
+        </div>
+      </div>
+      <div class="filter-status" id="filter-status">目前顯示全部標的。</div>
+      <div class="stage-nav-wrap">
+        <div class="stage-nav"><a class='stage-chip' href='#stage-B' data-stage-jump='B'><em>B</em><span>預熱</span><strong>1</strong></a><a class='stage-chip' href='#stage-E' data-stage-jump='E'><em>E</em><span>高檔整理</span><strong>30</strong></a><a class='stage-chip' href='#stage-F' data-stage-jump='F'><em>F</em><span>主升二波</span><strong>2</strong></a><a class='stage-chip' href='#stage-G' data-stage-jump='G'><em>G</em><span>延伸噴出</span><strong>2</strong></a><a class='stage-chip' href='#stage-H' data-stage-jump='H'><em>H</em><span>派發鈍化</span><strong>1</strong></a><a class='stage-chip' href='#stage-I' data-stage-jump='I'><em>I</em><span>破位轉弱</span><strong>6</strong></a></div>
+      </div>
+    </section>
+
+    <div class="filter-drawer-backdrop" id="filter-drawer-backdrop"></div>
+    <aside class="filter-drawer" id="filter-drawer" aria-hidden="true">
+      <div class="filter-drawer-head">
+        <div>
+          <p class="section-kicker">條件面板</p>
+          <h3>完整篩選</h3>
+          <p class="filter-drawer-copy">桌機與手機共用同一套篩選面板。股性改為完整選項區，不再被窄欄下拉選單截斷。</p>
+        </div>
+        <button class="filter-drawer-close" id="filter-drawer-close" type="button">關閉</button>
+      </div>
+      <div class="filter-drawer-body">
+        <section class="filter-drawer-section">
+          <div class="filter-drawer-section-head">
+            <div>
+              <p class="section-kicker">條件一</p>
+              <div class="filter-drawer-section-title">階段</div>
+              <p class="filter-drawer-section-note">用主階段先切分整體分布。</p>
+            </div>
+            <div class="filter-drawer-section-actions">
+              <button class="stage-filter-action" id="stage-filter-select-all" type="button">全選</button>
+              <button class="stage-filter-action" id="stage-filter-clear" type="button">清除</button>
+            </div>
+          </div>
+          <div class="filter-option-grid">
+            <label class="stage-option"><input type="checkbox" value="B" data-stage-option><span>B. 題材預熱</span></label><label class="stage-option"><input type="checkbox" value="E" data-stage-option><span>E. 高位震盪洗盤</span></label><label class="stage-option"><input type="checkbox" value="F" data-stage-option><span>F. 主升二波</span></label><label class="stage-option"><input type="checkbox" value="G" data-stage-option><span>G. 延伸噴出</span></label><label class="stage-option"><input type="checkbox" value="H" data-stage-option><span>H. 派發 / 鈍化</span></label><label class="stage-option"><input type="checkbox" value="I" data-stage-option><span>I. 破位轉弱</span></label>
+          </div>
+        </section>
+        <section class="filter-drawer-section">
+          <div class="filter-drawer-section-head">
+            <div>
+              <p class="section-kicker">條件二</p>
+              <div class="filter-drawer-section-title">把握度</div>
+              <p class="filter-drawer-section-note">用信心層級縮小閱讀名單。</p>
+            </div>
+            <div class="filter-drawer-section-actions">
+              <button class="stage-filter-action" id="confidence-filter-select-all" type="button">全選</button>
+              <button class="stage-filter-action" id="confidence-filter-clear" type="button">清除</button>
+            </div>
+          </div>
+          <div class="filter-option-grid">
+            <label class="stage-option"><input type="checkbox" value="medium_high" data-confidence-option><span>中高</span></label><label class="stage-option"><input type="checkbox" value="medium" data-confidence-option><span>中</span></label><label class="stage-option"><input type="checkbox" value="medium_low" data-confidence-option><span>中低</span></label>
+          </div>
+        </section>
+        <section class="filter-drawer-section">
+          <div class="filter-drawer-section-head">
+            <div>
+              <p class="section-kicker">條件三</p>
+              <div class="filter-drawer-section-title">股性</div>
+              <p class="filter-drawer-section-note">完整顯示全部股性分類，避免桌機窄欄下拉截斷。</p>
+            </div>
+            <div class="filter-drawer-section-actions">
+              <button class="stage-filter-action" id="nature-filter-select-all" type="button">全選</button>
+              <button class="stage-filter-action" id="nature-filter-clear" type="button">清除</button>
+            </div>
+          </div>
+          <div class="filter-option-grid">
+            <label class="stage-option"><input type="checkbox" value="景氣修復 / 題材重評" data-nature-option><span>景氣修復 / 題材重評</span></label><label class="stage-option"><input type="checkbox" value="成長趨勢 / 修復" data-nature-option><span>成長趨勢 / 修復</span></label><label class="stage-option"><input type="checkbox" value="權值平台" data-nature-option><span>權值平台</span></label><label class="stage-option"><input type="checkbox" value="半導體循環" data-nature-option><span>半導體循環</span></label><label class="stage-option"><input type="checkbox" value="網通設備" data-nature-option><span>網通設備</span></label><label class="stage-option"><input type="checkbox" value="光電" data-nature-option><span>光電</span></label><label class="stage-option"><input type="checkbox" value="汽車零組件" data-nature-option><span>汽車零組件</span></label><label class="stage-option"><input type="checkbox" value="傳產循環" data-nature-option><span>傳產循環</span></label>
+          </div>
+        </section>
+      </div>
+    </aside>
+
+    <section class="panel favorite-spotlight" id="favorite-spotlight">
+      <div class="spotlight-head">
+        <div>
+          <p class="section-kicker">我的觀察清單</p>
+          <h2>收藏個股</h2>
+          <p class="spotlight-copy">這裡固定整理你真正要追的標的，首頁打開後可以先檢查這一區，再往下看整體分布。</p>
+        </div>
+        <span class="count-pill" id="favorite-spotlight-count">0 檔</span>
+      </div>
+      <div class="spotlight-empty" id="favorite-spotlight-empty">目前還沒有收藏個股。你可以在各張個股卡片按下「收藏」，這裡就會自動建立你的觀察清單。</div>
+      <div class="card-grid" id="favorite-spotlight-grid"></div>
+    </section>
+
+    <section class="stage-stack">
+      
+    <section class="panel stage-panel" id="stage-B" style="--stage-tone: #6d5834; --stage-soft: #efe4c2;">
+      <div class="section-head">
+        <div class="section-title-wrap">
+          <span class="section-stage-mark">B</span>
+          <div>
+            <p class="section-kicker">階段分類</p>
+            <h2>預熱</h2>
+            <div class="section-deck">B. 題材預熱</div>
+          </div>
+        </div>
+        <span class="count-pill">1 檔</span>
+      </div>
+      <div class="chapter-intro compact">
+        <p class="chapter-copy">市場開始提前反應題材與籌碼升溫，適合觀察量價是否轉活、人氣是否聚焦，以及是否準備進入突破段。</p>
+      </div>
+      <div class="card-grid">
+        
+            <article class="stock-card" data-stock="4562 穎漢" data-stage="B" data-stage-label="b. 題材預熱" data-state="事件窗後急漲失敗回測，短線止跌未確認。" data-action="—" data-confidence="medium_low" data-confidence-label="中低" data-nature="景氣修復 / 題材重評" data-nature-detail="景氣修復股或高β自動化股，需看接單、工具機 / 自動化週期與題材重評" data-stock-id="4562 穎漢">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>4562 穎漢</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="4562 穎漢" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #6d5834; --stage-soft: #efe4c2;">B 預熱</span>
+                      <span class="meta-pill confidence-pill confidence-medium_low">中低</span>
+                      <span class="meta-pill nature-pill">景氣修復 / 題材重評</span>
+                    </div>
+                    <p class="stage-detail">B. 題材預熱</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗後急漲失敗回測，短線止跌未確認。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">景氣修復股或高β自動化股，需看接單、工具機 / 自動化週期與題材重評</span>
+                </div>
+                <div class="links">
+                  <a href='4562-v3'>個股儀表板</a>
+                  <a href="analysis/4562_穎漢_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+      </div>
+    </section>
+    
+    <section class="panel stage-panel" id="stage-E" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">
+      <div class="section-head">
+        <div class="section-title-wrap">
+          <span class="section-stage-mark">E</span>
+          <div>
+            <p class="section-kicker">階段分類</p>
+            <h2>高檔整理</h2>
+            <div class="section-deck">E. 高位震盪洗盤</div>
+          </div>
+        </div>
+        <span class="count-pill">30 檔</span>
+      </div>
+      <div class="chapter-intro compact">
+        <p class="chapter-copy">高檔震盪是強勢股重新分配籌碼的地帶，關鍵在於是健康洗盤還是轉弱前兆。</p>
+      </div>
+      <div class="card-grid">
+        
+            <article class="stock-card" data-stock="1528 恩德" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="急漲後回檔洗盤，短線跌破主成本與均線，月季趨勢背景仍未完全破壞。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="景氣修復 / 題材重評" data-nature-detail="景氣修復股或高β自動化股，需看接單、工具機 / 自動化週期與題材重評" data-stock-id="1528 恩德">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>1528 恩德</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="1528 恩德" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">景氣修復 / 題材重評</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>急漲後回檔洗盤，短線跌破主成本與均線，月季趨勢背景仍未完全破壞。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">景氣修復股或高β自動化股，需看接單、工具機 / 自動化週期與題材重評</span>
+                </div>
+                <div class="links">
+                  <a href='1528-v3'>個股儀表板</a>
+                  <a href="analysis/1528_恩德_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="1597 直得" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="四月急漲後回落至avwap下方，長週期偏多但日週進入洗盤整理。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="景氣修復 / 題材重評" data-nature-detail="景氣修復股或高β自動化股，需看接單、工具機 / 自動化週期與題材重評" data-stock-id="1597 直得">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>1597 直得</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="1597 直得" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">景氣修復 / 題材重評</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>四月急漲後回落至AVWAP下方，長週期偏多但日週進入洗盤整理。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">景氣修復股或高β自動化股，需看接單、工具機 / 自動化週期與題材重評</span>
+                </div>
+                <div class="links">
+                  <a href='1597-v3'>個股儀表板</a>
+                  <a href="analysis/1597_直得_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="1711 永光" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="急漲後跌停，低於avwap與session vwap。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="半導體循環" data-nature-detail="利基材料股或景氣修復股，需分開看傳統色料 / 特化獲利基底與電子化學品 / 半導體材料重評" data-stock-id="1711 永光">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>1711 永光</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="1711 永光" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">半導體循環</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>急漲後跌停，低於AVWAP與session VWAP。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">利基材料股或景氣修復股，需分開看傳統色料 / 特化獲利基底與電子化學品 / 半導體材料重評</span>
+                </div>
+                <div class="links">
+                  <a href='1711-v3'>個股儀表板</a>
+                  <a href="analysis/1711_永光_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="2103 台橡" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="事件窗後回測成本帶，短線轉弱但中週期尚未正式破位。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="傳產循環" data-nature-detail="景氣循環股，需看原料價差與下游客戶庫存" data-stock-id="2103 台橡">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>2103 台橡</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="2103 台橡" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">傳產循環</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗後回測成本帶，短線轉弱但中週期尚未正式破位。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">景氣循環股，需看原料價差與下游客戶庫存</span>
+                </div>
+                <div class="links">
+                  <a href='2103-v3'>個股儀表板</a>
+                  <a href="analysis/2103_台橡_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="2233 宇隆" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="高位震盪洗盤；日內弱收但尚未跌破4/23低點，事件成本帶待收復。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="汽車零組件" data-nature-detail="中型精密金屬加工股或事件驅動股，需分開看車用主體營收、產品 mix 升級與減速機題材重評" data-stock-id="2233 宇隆">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>2233 宇隆</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="2233 宇隆" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">汽車零組件</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>高位震盪洗盤；日內弱收但尚未跌破4/23低點，事件成本帶待收復。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">中型精密金屬加工股或事件驅動股，需分開看車用主體營收、產品 mix 升級與減速機題材重評</span>
+                </div>
+                <div class="links">
+                  <a href='2233-v3'>個股儀表板</a>
+                  <a href="analysis/2233_宇隆_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="2301 光寶科" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="事件窗重評後的高位震盪洗盤；外資偏多但未完全收復突破段成本。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="權值平台" data-nature-detail="設備 / 系統整合股或平台型中大型股，需區分設備接單、產業資本支出與權值性" data-stock-id="2301 光寶科">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>2301 光寶科</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="2301 光寶科" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">權值平台</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗重評後的高位震盪洗盤；外資偏多但未完全收復突破段成本。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">設備 / 系統整合股或平台型中大型股，需區分設備接單、產業資本支出與權值性</span>
+                </div>
+                <div class="links">
+                  <a href='2301-v3'>個股儀表板</a>
+                  <a href="analysis/2301_光寶科_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="2317 鴻海" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="事件窗後放量突破後回測，外資5日仍偏多但短線失守突破段avwap。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="權值平台" data-nature-detail="設備 / 系統整合股或平台型中大型股，需區分設備接單、產業資本支出與權值性" data-stock-id="2317 鴻海">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>2317 鴻海</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="2317 鴻海" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">權值平台</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗後放量突破後回測，外資5日仍偏多但短線失守突破段AVWAP。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">設備 / 系統整合股或平台型中大型股，需區分設備接單、產業資本支出與權值性</span>
+                </div>
+                <div class="links">
+                  <a href='2317-v3'>個股儀表板</a>
+                  <a href="analysis/2317_鴻海_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="2344 華邦電" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="事件窗後反彈至成本帶，長週期未壞但日週線仍偏修正。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="半導體循環" data-nature-detail="成長趨勢股或景氣循環股，需用產品週期、稼動率與資本支出雙軸判讀" data-stock-id="2344 華邦電">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>2344 華邦電</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="2344 華邦電" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">半導體循環</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗後反彈至成本帶，長週期未壞但日週線仍偏修正。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或景氣循環股，需用產品週期、稼動率與資本支出雙軸判讀</span>
+                </div>
+                <div class="links">
+                  <a href='2344-v3'>個股儀表板</a>
+                  <a href="analysis/2344_華邦電_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="2367 燿華" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="高位延伸後急殺，短線跌破事件成本與日內均價，籌碼承接與價格轉弱並存。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="成長趨勢 / 修復" data-nature-detail="成長趨勢股或循環修復股，需看 pcb / 連接器 / 機構件 / 樞紐等細分差異" data-stock-id="2367 燿華">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>2367 燿華</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="2367 燿華" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">成長趨勢 / 修復</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>高位延伸後急殺，短線跌破事件成本與日內均價，籌碼承接與價格轉弱並存。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或循環修復股，需看 PCB / 連接器 / 機構件 / 樞紐等細分差異</span>
+                </div>
+                <div class="links">
+                  <a href='2367-v3'>個股儀表板</a>
+                  <a href="analysis/2367_燿華_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="2382 廣達" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="主升後高位回測主成本，長週期偏多、短線需收復事件錨點。" data-action="—" data-confidence="medium_high" data-confidence-label="中高" data-nature="權值平台" data-nature-detail="成長趨勢股或大型平台股，需看伺服器 / pc / 邊緣運算與企業資本支出切換" data-stock-id="2382 廣達">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>2382 廣達</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="2382 廣達" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium_high">中高</span>
+                      <span class="meta-pill nature-pill">權值平台</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>主升後高位回測主成本，長週期偏多、短線需收復事件錨點。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或大型平台股，需看伺服器 / PC / 邊緣運算與企業資本支出切換</span>
+                </div>
+                <div class="links">
+                  <a href='2382-v3'>個股儀表板</a>
+                  <a href="analysis/2382_廣達_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="2408 南亞科" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="基本面修復題材仍在，但事件窗後股價低於事件avwap且法人續賣，短線先看200~220震盪。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="半導體循環" data-nature-detail="成長趨勢股或景氣循環股，需用產品週期、稼動率與資本支出雙軸判讀" data-stock-id="2408 南亞科">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>2408 南亞科</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="2408 南亞科" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">半導體循環</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>基本面修復題材仍在，但事件窗後股價低於事件AVWAP且法人續賣，短線先看200~220震盪。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或景氣循環股，需用產品週期、稼動率與資本支出雙軸判讀</span>
+                </div>
+                <div class="links">
+                  <a href='2408-v3'>個股儀表板</a>
+                  <a href="analysis/2408_南亞科_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="2449 京元" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="事件窗後反彈修復；收盤站回avwap/ma20，但仍在ma60與303~308壓力下。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="半導體循環" data-nature-detail="成長趨勢股或景氣循環股，需用產品週期、稼動率與資本支出雙軸判讀" data-stock-id="2449 京元">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>2449 京元</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="2449 京元" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">半導體循環</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗後反彈修復；收盤站回AVWAP/MA20，但仍在MA60與303~308壓力下。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或景氣循環股，需用產品週期、稼動率與資本支出雙軸判讀</span>
+                </div>
+                <div class="links">
+                  <a href='2449-v3'>個股儀表板</a>
+                  <a href="analysis/2449_京元_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="2467 志聖" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="事件窗後高位洗盤；長週期多頭未破，短線須站回560.9~562.0才恢復強勢續攻。" data-action="—" data-confidence="medium_high" data-confidence-label="中高" data-nature="權值平台" data-nature-detail="設備 / 系統整合股或平台型中大型股，需區分設備接單、產業資本支出與權值性" data-stock-id="2467 志聖">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>2467 志聖</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="2467 志聖" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium_high">中高</span>
+                      <span class="meta-pill nature-pill">權值平台</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗後高位洗盤；長週期多頭未破，短線須站回560.9~562.0才恢復強勢續攻。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">設備 / 系統整合股或平台型中大型股，需區分設備接單、產業資本支出與權值性</span>
+                </div>
+                <div class="links">
+                  <a href='2467-v3'>個股儀表板</a>
+                  <a href="analysis/2467_志聖_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="3152 璟德" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="事件窗中的高位換手；日線強彈但收盤貼近avwap成本帶。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="網通設備" data-nature-detail="成長趨勢股或事件驅動股，需看網通升級、寬頻基建、衛星與營運商專案節奏" data-stock-id="3152 璟德">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>3152 璟德</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="3152 璟德" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">網通設備</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗中的高位換手；日線強彈但收盤貼近AVWAP成本帶。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或事件驅動股，需看網通升級、寬頻基建、衛星與營運商專案節奏</span>
+                </div>
+                <div class="links">
+                  <a href='3152-v3'>個股儀表板</a>
+                  <a href="analysis/3152_璟德_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="3376 新日興" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="事件窗題材拉升後回測成本帶；長週期未破壞，短線已失守avwap。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="成長趨勢 / 修復" data-nature-detail="成長趨勢股或循環修復股，需看 pcb / 連接器 / 機構件 / 樞紐等細分差異" data-stock-id="3376 新日興">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>3376 新日興</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="3376 新日興" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">成長趨勢 / 修復</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗題材拉升後回測成本帶；長週期未破壞，短線已失守AVWAP。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或循環修復股，需看 PCB / 連接器 / 機構件 / 樞紐等細分差異</span>
+                </div>
+                <div class="links">
+                  <a href='3376-v3'>個股儀表板</a>
+                  <a href="analysis/3376_新日興_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="3563 牧德" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="題材與基本面事件窗仍熱，但收盤低於事件avwap與session vwap，屬高位洗盤後待重新轉強。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="權值平台" data-nature-detail="設備 / 系統整合股或平台型中大型股，需區分設備接單、產業資本支出與權值性" data-stock-id="3563 牧德">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>3563 牧德</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="3563 牧德" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">權值平台</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>題材與基本面事件窗仍熱，但收盤低於事件AVWAP與session VWAP，屬高位洗盤後待重新轉強。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">設備 / 系統整合股或平台型中大型股，需區分設備接單、產業資本支出與權值性</span>
+                </div>
+                <div class="links">
+                  <a href='3563-v3'>個股儀表板</a>
+                  <a href="analysis/3563_牧德_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="3714 富采" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="題材/事件窗拉升後回測，短線跌破事件日avwap但仍守突破段avwap。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="光電" data-nature-detail="題材修復股或景氣循環股，需區分 led / 光學 / 材料 / 感測的細分邏輯" data-stock-id="3714 富采">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>3714 富采</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="3714 富采" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">光電</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>題材/事件窗拉升後回測，短線跌破事件日AVWAP但仍守突破段AVWAP。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">題材修復股或景氣循環股，需區分 LED / 光學 / 材料 / 感測的細分邏輯</span>
+                </div>
+                <div class="links">
+                  <a href='3714-v3'>個股儀表板</a>
+                  <a href="analysis/3714_富采_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="4540 全球傳動" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="急漲後回測，長週期偏多但短線失守 avwap 成本帶。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="景氣修復 / 題材重評" data-nature-detail="景氣修復股或高β自動化股，需看接單、工具機 / 自動化週期與題材重評" data-stock-id="4540 全球傳動">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>4540 全球傳動</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="4540 全球傳動" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">景氣修復 / 題材重評</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>急漲後回測，長週期偏多但短線失守 AVWAP 成本帶。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">景氣修復股或高β自動化股，需看接單、工具機 / 自動化週期與題材重評</span>
+                </div>
+                <div class="links">
+                  <a href='4540-v3'>個股儀表板</a>
+                  <a href="analysis/4540_全球傳動_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="4585 達明" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="事件窗後的反彈成本失守，處於296~315箱體內的回測洗盤。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="景氣修復 / 題材重評" data-nature-detail="景氣修復股或高β自動化股，需看接單、工具機 / 自動化週期與題材重評" data-stock-id="4585 達明">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>4585 達明</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="4585 達明" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">景氣修復 / 題材重評</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗後的反彈成本失守，處於296~315箱體內的回測洗盤。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">景氣修復股或高β自動化股，需看接單、工具機 / 自動化週期與題材重評</span>
+                </div>
+                <div class="links">
+                  <a href='4585-v3'>個股儀表板</a>
+                  <a href="analysis/4585_達明_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="4741 泓瀚" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="事件題材拉升後爆量長上影回落，短線重點轉為支撐防守與反彈確認。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="傳產循環" data-nature-detail="利基材料股或中小型成長股，需看配方技術、終端應用與新產品滲透" data-stock-id="4741 泓瀚">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>4741 泓瀚</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="4741 泓瀚" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">傳產循環</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件題材拉升後爆量長上影回落，短線重點轉為支撐防守與反彈確認。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">利基材料股或中小型成長股，需看配方技術、終端應用與新產品滲透</span>
+                </div>
+                <div class="links">
+                  <a href='4741-v3'>個股儀表板</a>
+                  <a href="analysis/4741_泓瀚_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="4960 誠美材" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="急漲後高檔換手，仍守事件成本但波動升高。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="光電" data-nature-detail="題材修復股或景氣循環股，需區分 led / 光學 / 材料 / 感測的細分邏輯" data-stock-id="4960 誠美材">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>4960 誠美材</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="4960 誠美材" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">光電</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>急漲後高檔換手，仍守事件成本但波動升高。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">題材修復股或景氣循環股，需區分 LED / 光學 / 材料 / 感測的細分邏輯</span>
+                </div>
+                <div class="links">
+                  <a href='4960-v3'>個股儀表板</a>
+                  <a href="analysis/4960_誠美材_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="5243 乙盛-ky" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="急漲後回測成本帶，事件avwap守住邊緣但突破段成本轉壓。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="光電" data-nature-detail="題材修復股或景氣循環股，需區分 led / 光學 / 材料 / 感測的細分邏輯" data-stock-id="5243 乙盛-KY">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>5243 乙盛-KY</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="5243 乙盛-KY" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">光電</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>急漲後回測成本帶，事件AVWAP守住邊緣但突破段成本轉壓。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">題材修復股或景氣循環股，需區分 LED / 光學 / 材料 / 感測的細分邏輯</span>
+                </div>
+                <div class="links">
+                  <a href='5243-v3'>個股儀表板</a>
+                  <a href="analysis/5243_乙盛-KY_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="6166 凌華" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="主升一波後高位洗盤，事件/突破avwap成本帶尚待重新站回。" data-action="—" data-confidence="medium_high" data-confidence-label="中高" data-nature="權值平台" data-nature-detail="成長趨勢股或大型平台股，需看伺服器 / pc / 邊緣運算與企業資本支出切換" data-stock-id="6166 凌華">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>6166 凌華</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="6166 凌華" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium_high">中高</span>
+                      <span class="meta-pill nature-pill">權值平台</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>主升一波後高位洗盤，事件/突破AVWAP成本帶尚待重新站回。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或大型平台股，需看伺服器 / PC / 邊緣運算與企業資本支出切換</span>
+                </div>
+                <div class="links">
+                  <a href='6166-v3'>個股儀表板</a>
+                  <a href="analysis/6166_凌華_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="6209 今國光" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="急漲後跌回64.5~64.8下方，進入高位換手。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="光電" data-nature-detail="題材修復股或景氣循環股，需區分 led / 光學 / 材料 / 感測的細分邏輯" data-stock-id="6209 今國光">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>6209 今國光</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="6209 今國光" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">光電</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>急漲後跌回64.5~64.8下方，進入高位換手。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">題材修復股或景氣循環股，需區分 LED / 光學 / 材料 / 感測的細分邏輯</span>
+                </div>
+                <div class="links">
+                  <a href='6209-v3'>個股儀表板</a>
+                  <a href="analysis/6209_今國光_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="6282 康舒" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="事件窗後回測；失守突破段與月營收avwap，短線偏弱但中期箱體未破。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="成長趨勢 / 修復" data-nature-detail="成長趨勢股或循環修復股，需看 pcb / 連接器 / 機構件 / 樞紐等細分差異" data-stock-id="6282 康舒">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>6282 康舒</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="6282 康舒" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">成長趨勢 / 修復</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗後回測；失守突破段與月營收AVWAP，短線偏弱但中期箱體未破。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或循環修復股，需看 PCB / 連接器 / 機構件 / 樞紐等細分差異</span>
+                </div>
+                <div class="links">
+                  <a href='6282-v3'>個股儀表板</a>
+                  <a href="analysis/6282_康舒_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="6285 啟碁" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="事件題材急漲後進入高位急殺回測，短線多方需先收復ma20與缺口反壓。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="網通設備" data-nature-detail="成長趨勢股或事件驅動股，需看網通升級、寬頻基建、衛星與營運商專案節奏" data-stock-id="6285 啟碁">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>6285 啟碁</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="6285 啟碁" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">網通設備</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件題材急漲後進入高位急殺回測，短線多方需先收復MA20與缺口反壓。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或事件驅動股，需看網通升級、寬頻基建、衛星與營運商專案節奏</span>
+                </div>
+                <div class="links">
+                  <a href='6285-v3'>個股儀表板</a>
+                  <a href="analysis/6285_啟碁_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="6426 統新" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="事件窗題材仍熱，但4/24放量長黑跌破avwap，屬主升後高位回測洗盤。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="網通設備" data-nature-detail="成長趨勢股或事件驅動股，需看網通升級、寬頻基建、衛星與營運商專案節奏" data-stock-id="6426 統新">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>6426 統新</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="6426 統新" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">網通設備</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗題材仍熱，但4/24放量長黑跌破AVWAP，屬主升後高位回測洗盤。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或事件驅動股，需看網通升級、寬頻基建、衛星與營運商專案節奏</span>
+                </div>
+                <div class="links">
+                  <a href='6426-v3'>個股儀表板</a>
+                  <a href="analysis/6426_統新_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="6695 芯鼎" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="事件窗反彈後未重站成本帶，短線進入回測洗盤與假突破風險區。" data-action="—" data-confidence="medium_low" data-confidence-label="中低" data-nature="權值平台" data-nature-detail="設備 / 系統整合股或平台型中大型股，需區分設備接單、產業資本支出與權值性" data-stock-id="6695 芯鼎">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>6695 芯鼎</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="6695 芯鼎" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium_low">中低</span>
+                      <span class="meta-pill nature-pill">權值平台</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗反彈後未重站成本帶，短線進入回測洗盤與假突破風險區。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">設備 / 系統整合股或平台型中大型股，需區分設備接單、產業資本支出與權值性</span>
+                </div>
+                <div class="links">
+                  <a href='6695-v3'>個股儀表板</a>
+                  <a href="analysis/6695_芯鼎_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="8215 明基材" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="事件窗後急漲回落，量縮測試ma20與跳空缺口上緣；短線先看洗盤/整理，未重新站回27.41前不視為主升延續。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="光電" data-nature-detail="題材修復股或景氣循環股，需區分 led / 光學 / 材料 / 感測的細分邏輯" data-stock-id="8215 明基材">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>8215 明基材</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="8215 明基材" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">光電</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗後急漲回落，量縮測試MA20與跳空缺口上緣；短線先看洗盤/整理，未重新站回27.41前不視為主升延續。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">題材修復股或景氣循環股，需區分 LED / 光學 / 材料 / 感測的細分邏輯</span>
+                </div>
+                <div class="links">
+                  <a href='8215-v3'>個股儀表板</a>
+                  <a href="analysis/8215_明基材_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="8374 羅昇" data-stage="E" data-stage-label="e. 高位震盪洗盤" data-state="事件題材仍有溫度，但日線與週線短線轉弱，收盤低於81.2~83.5事件/突破avwap成本帶。" data-action="—" data-confidence="medium_low" data-confidence-label="中低" data-nature="景氣修復 / 題材重評" data-nature-detail="景氣修復股或高β自動化股，需看接單、工具機 / 自動化週期與題材重評" data-stock-id="8374 羅昇">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>8374 羅昇</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="8374 羅昇" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8b5a18; --stage-soft: #f5e2b8;">E 高檔整理</span>
+                      <span class="meta-pill confidence-pill confidence-medium_low">中低</span>
+                      <span class="meta-pill nature-pill">景氣修復 / 題材重評</span>
+                    </div>
+                    <p class="stage-detail">E. 高位震盪洗盤</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件題材仍有溫度，但日線與週線短線轉弱，收盤低於81.2~83.5事件/突破AVWAP成本帶。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">景氣修復股或高β自動化股，需看接單、工具機 / 自動化週期與題材重評</span>
+                </div>
+                <div class="links">
+                  <a href='8374-v3'>個股儀表板</a>
+                  <a href="analysis/8374_羅昇_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+      </div>
+    </section>
+    
+    <section class="panel stage-panel" id="stage-F" style="--stage-tone: #8a4f14; --stage-soft: #f3d7ac;">
+      <div class="section-head">
+        <div class="section-title-wrap">
+          <span class="section-stage-mark">F</span>
+          <div>
+            <p class="section-kicker">階段分類</p>
+            <h2>主升二波</h2>
+            <div class="section-deck">F. 主升二波</div>
+          </div>
+        </div>
+        <span class="count-pill">2 檔</span>
+      </div>
+      <div class="chapter-intro compact">
+        <p class="chapter-copy">整理後若能再次發動，通常代表趨勢延續性強，但節奏也會更快、更考驗紀律。</p>
+      </div>
+      <div class="card-grid">
+        
+            <article class="stock-card" data-stock="2455 全新" data-stage="F" data-stage-label="f. 主升二波" data-state="事件窗題材與基本面修復延伸；法人承接、融資與空方餘額下降，但波動放大。" data-action="—" data-confidence="medium_high" data-confidence-label="中高" data-nature="半導體循環" data-nature-detail="成長趨勢股或景氣循環股，需用產品週期、稼動率與資本支出雙軸判讀" data-stock-id="2455 全新">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>2455 全新</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="2455 全新" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8a4f14; --stage-soft: #f3d7ac;">F 主升二波</span>
+                      <span class="meta-pill confidence-pill confidence-medium_high">中高</span>
+                      <span class="meta-pill nature-pill">半導體循環</span>
+                    </div>
+                    <p class="stage-detail">F. 主升二波</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗題材與基本面修復延伸；法人承接、融資與空方餘額下降，但波動放大。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或景氣循環股，需用產品週期、稼動率與資本支出雙軸判讀</span>
+                </div>
+                <div class="links">
+                  <a href='2455-v3'>個股儀表板</a>
+                  <a href="analysis/2455_全新_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="8027 鈦昇" data-stage="F" data-stage-label="f. 主升二波" data-state="事件窗與先進封裝題材推升的高β二波再攻。" data-action="—" data-confidence="medium_high" data-confidence-label="中高" data-nature="景氣修復 / 題材重評" data-nature-detail="景氣修復股或高β自動化股，需看接單、工具機 / 自動化週期與題材重評" data-stock-id="8027 鈦昇">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>8027 鈦昇</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="8027 鈦昇" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #8a4f14; --stage-soft: #f3d7ac;">F 主升二波</span>
+                      <span class="meta-pill confidence-pill confidence-medium_high">中高</span>
+                      <span class="meta-pill nature-pill">景氣修復 / 題材重評</span>
+                    </div>
+                    <p class="stage-detail">F. 主升二波</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗與先進封裝題材推升的高β二波再攻。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">景氣修復股或高β自動化股，需看接單、工具機 / 自動化週期與題材重評</span>
+                </div>
+                <div class="links">
+                  <a href='8027-v3'>個股儀表板</a>
+                  <a href="analysis/8027_鈦昇_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+      </div>
+    </section>
+    
+    <section class="panel stage-panel" id="stage-G" style="--stage-tone: #a44823; --stage-soft: #f7c9b8;">
+      <div class="section-head">
+        <div class="section-title-wrap">
+          <span class="section-stage-mark">G</span>
+          <div>
+            <p class="section-kicker">階段分類</p>
+            <h2>延伸噴出</h2>
+            <div class="section-deck">G. 延伸噴出</div>
+          </div>
+        </div>
+        <span class="count-pill">2 檔</span>
+      </div>
+      <div class="chapter-intro compact">
+        <p class="chapter-copy">這一段常見情緒與動能放大，機會大但波動也大，應優先管理節奏與出場策略。</p>
+      </div>
+      <div class="card-grid">
+        
+            <article class="stock-card" data-stock="2330 台積電" data-stage="G" data-stage-label="g. 延伸噴出" data-state="事件窗後放量創高，法人回補與多週期趨勢共振；短線已進入高位延伸。" data-action="—" data-confidence="medium_high" data-confidence-label="中高" data-nature="半導體循環" data-nature-detail="成長趨勢股或景氣循環股，需用產品週期、稼動率與資本支出雙軸判讀" data-stock-id="2330 台積電">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>2330 台積電</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="2330 台積電" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #a44823; --stage-soft: #f7c9b8;">G 延伸噴出</span>
+                      <span class="meta-pill confidence-pill confidence-medium_high">中高</span>
+                      <span class="meta-pill nature-pill">半導體循環</span>
+                    </div>
+                    <p class="stage-detail">G. 延伸噴出</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗後放量創高，法人回補與多週期趨勢共振；短線已進入高位延伸。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或景氣循環股，需用產品週期、稼動率與資本支出雙軸判讀</span>
+                </div>
+                <div class="links">
+                  <a href='2330-v3'>個股儀表板</a>
+                  <a href="analysis/2330_台積電_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="6789 采鈺" data-stage="G" data-stage-label="g. 延伸噴出" data-state="題材/事件窗驅動的高位延伸；價量強，籌碼警訊同步升高。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="半導體循環" data-nature-detail="成長趨勢股或景氣循環股，需用產品週期、稼動率與資本支出雙軸判讀" data-stock-id="6789 采鈺">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>6789 采鈺</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="6789 采鈺" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #a44823; --stage-soft: #f7c9b8;">G 延伸噴出</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">半導體循環</span>
+                    </div>
+                    <p class="stage-detail">G. 延伸噴出</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>題材/事件窗驅動的高位延伸；價量強，籌碼警訊同步升高。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或景氣循環股，需用產品週期、稼動率與資本支出雙軸判讀</span>
+                </div>
+                <div class="links">
+                  <a href='6789-v3'>個股儀表板</a>
+                  <a href="analysis/6789_采鈺_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+      </div>
+    </section>
+    
+    <section class="panel stage-panel" id="stage-H" style="--stage-tone: #7f3f37; --stage-soft: #efc9c3;">
+      <div class="section-head">
+        <div class="section-title-wrap">
+          <span class="section-stage-mark">H</span>
+          <div>
+            <p class="section-kicker">階段分類</p>
+            <h2>派發鈍化</h2>
+            <div class="section-deck">H. 派發 / 鈍化</div>
+          </div>
+        </div>
+        <span class="count-pill">1 檔</span>
+      </div>
+      <div class="chapter-intro compact">
+        <p class="chapter-copy">高位鈍化與背離風險升高，這裡比的是保住利潤，不是再追求最後一段。</p>
+      </div>
+      <div class="card-grid">
+        
+            <article class="stock-card" data-stock="1582 信錦" data-stage="H" data-stage-label="h. 派發 / 鈍化" data-state="急漲後失守avwap成本錨的高位修正。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="成長趨勢 / 修復" data-nature-detail="成長趨勢股或循環修復股，需看 pcb / 連接器 / 機構件 / 樞紐等細分差異" data-stock-id="1582 信錦">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>1582 信錦</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="1582 信錦" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #7f3f37; --stage-soft: #efc9c3;">H 派發鈍化</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">成長趨勢 / 修復</span>
+                    </div>
+                    <p class="stage-detail">H. 派發 / 鈍化</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>急漲後失守AVWAP成本錨的高位修正。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或循環修復股，需看 PCB / 連接器 / 機構件 / 樞紐等細分差異</span>
+                </div>
+                <div class="links">
+                  <a href='1582-v3'>個股儀表板</a>
+                  <a href="analysis/1582_信錦_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+      </div>
+    </section>
+    
+    <section class="panel stage-panel" id="stage-I" style="--stage-tone: #6a2a2a; --stage-soft: #eabcbc;">
+      <div class="section-head">
+        <div class="section-title-wrap">
+          <span class="section-stage-mark">I</span>
+          <div>
+            <p class="section-kicker">階段分類</p>
+            <h2>破位轉弱</h2>
+            <div class="section-deck">I. 破位轉弱</div>
+          </div>
+        </div>
+        <span class="count-pill">6 檔</span>
+      </div>
+      <div class="chapter-intro compact">
+        <p class="chapter-copy">結構明顯走壞，應把焦點放在風險控制、等待新底型，而不是強行找反彈。</p>
+      </div>
+      <div class="card-grid">
+        
+            <article class="stock-card" data-stock="2405 輔信" data-stage="I" data-stage-label="i. 破位轉弱" data-state="事件窗後回落，跌破兩組avwap成本，量縮但法人短線偏空。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="權值平台" data-nature-detail="成長趨勢股或大型平台股，需看伺服器 / pc / 邊緣運算與企業資本支出切換" data-stock-id="2405 輔信">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>2405 輔信</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="2405 輔信" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #6a2a2a; --stage-soft: #eabcbc;">I 破位轉弱</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">權值平台</span>
+                    </div>
+                    <p class="stage-detail">I. 破位轉弱</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗後回落，跌破兩組AVWAP成本，量縮但法人短線偏空。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或大型平台股，需看伺服器 / PC / 邊緣運算與企業資本支出切換</span>
+                </div>
+                <div class="links">
+                  <a href='2405-v3'>個股儀表板</a>
+                  <a href="analysis/2405_輔信_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="2419 仲琦" data-stage="I" data-stage-label="i. 破位轉弱" data-state="事件題材發動後急跌回測，短線失守主要成本帶，反彈先看壓力。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="網通設備" data-nature-detail="成長趨勢股或事件驅動股，需看網通升級、寬頻基建、衛星與營運商專案節奏" data-stock-id="2419 仲琦">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>2419 仲琦</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="2419 仲琦" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #6a2a2a; --stage-soft: #eabcbc;">I 破位轉弱</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">網通設備</span>
+                    </div>
+                    <p class="stage-detail">I. 破位轉弱</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件題材發動後急跌回測，短線失守主要成本帶，反彈先看壓力。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或事件驅動股，需看網通升級、寬頻基建、衛星與營運商專案節奏</span>
+                </div>
+                <div class="links">
+                  <a href='2419-v3'>個股儀表板</a>
+                  <a href="analysis/2419_仲琦_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="3062 建漢" data-stage="I" data-stage-label="i. 破位轉弱" data-state="事件題材波急漲後回到起漲平台上緣，短線由多頭延伸轉為破位後支撐測試。" data-action="—" data-confidence="medium_low" data-confidence-label="中低" data-nature="網通設備" data-nature-detail="成長趨勢股或事件驅動股，需看網通升級、寬頻基建、衛星與營運商專案節奏" data-stock-id="3062 建漢">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>3062 建漢</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="3062 建漢" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #6a2a2a; --stage-soft: #eabcbc;">I 破位轉弱</span>
+                      <span class="meta-pill confidence-pill confidence-medium_low">中低</span>
+                      <span class="meta-pill nature-pill">網通設備</span>
+                    </div>
+                    <p class="stage-detail">I. 破位轉弱</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件題材波急漲後回到起漲平台上緣，短線由多頭延伸轉為破位後支撐測試。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或事件驅動股，需看網通升級、寬頻基建、衛星與營運商專案節奏</span>
+                </div>
+                <div class="links">
+                  <a href='3062-v3'>個股儀表板</a>
+                  <a href="analysis/3062_建漢_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="3138 耀登" data-stage="I" data-stage-label="i. 破位轉弱" data-state="事件題材急漲後失守成本帶，短線破位回撤。" data-action="—" data-confidence="medium_high" data-confidence-label="中高" data-nature="網通設備" data-nature-detail="成長趨勢股或事件驅動股，需看網通升級、寬頻基建、衛星與營運商專案節奏" data-stock-id="3138 耀登">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>3138 耀登</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="3138 耀登" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #6a2a2a; --stage-soft: #eabcbc;">I 破位轉弱</span>
+                      <span class="meta-pill confidence-pill confidence-medium_high">中高</span>
+                      <span class="meta-pill nature-pill">網通設備</span>
+                    </div>
+                    <p class="stage-detail">I. 破位轉弱</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件題材急漲後失守成本帶，短線破位回撤。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或事件驅動股，需看網通升級、寬頻基建、衛星與營運商專案節奏</span>
+                </div>
+                <div class="links">
+                  <a href='3138-v3'>個股儀表板</a>
+                  <a href="analysis/3138_耀登_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="4906 正文" data-stage="I" data-stage-label="i. 破位轉弱" data-state="事件窗後高檔失守，日線破位轉弱，短線僅屬反彈觀察。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="網通設備" data-nature-detail="成長趨勢股或事件驅動股，需看網通升級、寬頻基建、衛星與營運商專案節奏" data-stock-id="4906 正文">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>4906 正文</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="4906 正文" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #6a2a2a; --stage-soft: #eabcbc;">I 破位轉弱</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">網通設備</span>
+                    </div>
+                    <p class="stage-detail">I. 破位轉弱</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件窗後高檔失守，日線破位轉弱，短線僅屬反彈觀察。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或事件驅動股，需看網通升級、寬頻基建、衛星與營運商專案節奏</span>
+                </div>
+                <div class="links">
+                  <a href='4906-v3'>個股儀表板</a>
+                  <a href="analysis/4906_正文_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="stock-card" data-stock="6770 力積電" data-stage="I" data-stage-label="i. 破位轉弱" data-state="事件avwap下方的破位修復；量縮止跌但法人籌碼仍偏空。" data-action="—" data-confidence="medium" data-confidence-label="中" data-nature="半導體循環" data-nature-detail="成長趨勢股或景氣循環股，需用產品週期、稼動率與資本支出雙軸判讀" data-stock-id="6770 力積電">
+              <div class="stock-shell">
+                <div class="stock-head">
+                  <div class="stock-identity">
+                    <div class="stock-topline">
+                      <h3>6770 力積電</h3>
+                      <button class="favorite-btn" type="button" data-favorite-toggle data-stock-id="6770 力積電" aria-pressed="false" title="加入收藏">
+                        <span class="favorite-icon">★</span>
+                      </button>
+                    </div>
+                    <div class="stock-pills">
+                      <span class="stage-badge" style="--stage-tone: #6a2a2a; --stage-soft: #eabcbc;">I 破位轉弱</span>
+                      <span class="meta-pill confidence-pill confidence-medium">中</span>
+                      <span class="meta-pill nature-pill">半導體循環</span>
+                    </div>
+                    <p class="stage-detail">I. 破位轉弱</p>
+                  </div>
+                </div>
+                <div class="brief-stack">
+                  <div class="brief-line">
+                    <span>目前判斷</span>
+                    <strong>事件AVWAP下方的破位修復；量縮止跌但法人籌碼仍偏空。</strong>
+                  </div>
+                  <div class="brief-line">
+                    <span>操作焦點</span>
+                    <strong>—</strong>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-chip">更新 2026-04-24</span>
+                  <span class="detail-chip detail-chip-muted">成長趨勢股或景氣循環股，需用產品週期、稼動率與資本支出雙軸判讀</span>
+                </div>
+                <div class="links">
+                  <a href='6770-v3'>個股儀表板</a>
+                  <a href="analysis/6770_力積電_analysis.html">文字分析</a>
+                </div>
+              </div>
+            </article>
+            
+      </div>
+    </section>
+    
+    </section>
+
+    <footer class="site-footer">
+      <div>波段觀測站由共用版波段分析流程自動更新，適合手機與桌機閱讀。</div>
+      <div>首頁依當前階段分組；深入閱讀可進入個股儀表板與文字分析。</div>
+    </footer>
+  </main>
+  <script>
+    const searchInput = document.getElementById('stock-search');
+    const stageOptions = Array.from(document.querySelectorAll('[data-stage-option]'));
+    const confidenceOptions = Array.from(document.querySelectorAll('[data-confidence-option]'));
+    const natureOptions = Array.from(document.querySelectorAll('[data-nature-option]'));
+    const stageFilterSelectAll = document.getElementById('stage-filter-select-all');
+    const stageFilterClear = document.getElementById('stage-filter-clear');
+    const confidenceFilterSelectAll = document.getElementById('confidence-filter-select-all');
+    const confidenceFilterClear = document.getElementById('confidence-filter-clear');
+    const natureFilterSelectAll = document.getElementById('nature-filter-select-all');
+    const natureFilterClear = document.getElementById('nature-filter-clear');
+    const favoriteFilter = document.getElementById('favorite-filter');
+    const statusText = document.getElementById('filter-status');
+    const panels = Array.from(document.querySelectorAll('.stage-panel'));
+    const allCards = Array.from(document.querySelectorAll('.stock-card'));
+    const favoriteStorageKey = 'swing-observer-favorites';
+    const favoriteSpotlight = document.getElementById('favorite-spotlight');
+    const favoriteSpotlightGrid = document.getElementById('favorite-spotlight-grid');
+    const favoriteSpotlightEmpty = document.getElementById('favorite-spotlight-empty');
+    const favoriteSpotlightCount = document.getElementById('favorite-spotlight-count');
+    const activeFilterSummary = document.getElementById('active-filter-summary');
+    const filterDrawer = document.getElementById('filter-drawer');
+    const filterDrawerOpen = document.getElementById('filter-drawer-open');
+    const filterDrawerClose = document.getElementById('filter-drawer-close');
+    const filterDrawerBackdrop = document.getElementById('filter-drawer-backdrop');
+
+    function getFavoriteButtons() {
+      return Array.from(document.querySelectorAll('[data-favorite-toggle]'));
+    }
+
+    function loadFavorites() {
+      try {
+        return new Set(JSON.parse(localStorage.getItem(favoriteStorageKey) || '[]'));
+      } catch (error) {
+        return new Set();
+      }
+    }
+
+    let favorites = loadFavorites();
+
+    function saveFavorites() {
+      localStorage.setItem(favoriteStorageKey, JSON.stringify(Array.from(favorites)));
+    }
+
+    function syncFavoriteButtons() {
+      getFavoriteButtons().forEach((button) => {
+        const stockId = button.dataset.stockId || '';
+        const isActive = favorites.has(stockId);
+        button.classList.toggle('active', isActive);
+        button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        button.setAttribute('title', isActive ? '移除收藏' : '加入收藏');
+      });
+    }
+
+    function syncFavoriteFilterButtons() {
+      const active = favoriteFilter?.classList.contains('active');
+      [favoriteFilter].forEach((button) => {
+        if (!button) return;
+        button.classList.toggle('active', !!active);
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+    }
+
+    function getSelectedValues(options) {
+      return options.filter((option) => option.checked).map((option) => option.value);
+    }
+
+    function getNormalizedSelectedValues(options) {
+      const selected = getSelectedValues(options);
+      if (!options.length || selected.length === options.length) {
+        return [];
+      }
+      return selected;
+    }
+
+    function getSelectedLabels(options) {
+      return options
+        .filter((option) => option.checked)
+        .map((option) => option.parentElement?.textContent?.trim() || option.value);
+    }
+
+    function renderActiveFilterSummary() {
+      if (!activeFilterSummary) return;
+      const pills = [];
+      const query = (searchInput?.value || '').trim();
+      const selectedStages = getNormalizedSelectedValues(stageOptions);
+      const selectedConfidence = getNormalizedSelectedValues(confidenceOptions);
+      const selectedNature = getNormalizedSelectedValues(natureOptions);
+      const favoritesOnly = favoriteFilter?.classList.contains('active');
+
+      if (query) pills.push(`搜尋：${query}`);
+      if (selectedStages.length) pills.push(...getSelectedLabels(stageOptions).map((label) => `階段：${label}`));
+      if (selectedConfidence.length) pills.push(...getSelectedLabels(confidenceOptions).map((label) => `把握度：${label}`));
+      if (selectedNature.length) pills.push(...getSelectedLabels(natureOptions).map((label) => `股性：${label}`));
+      if (favoritesOnly) pills.push('只看收藏');
+
+      if (!pills.length) {
+        activeFilterSummary.innerHTML = '<span class="active-filter-empty">目前未套用條件。</span>';
+        return;
+      }
+
+      activeFilterSummary.innerHTML = pills
+        .map((label) => `<span class="active-filter-pill">${label}</span>`)
+        .join('');
+    }
+
+    function openFilterDrawer() {
+      document.body.classList.add('filter-drawer-open');
+      filterDrawer?.setAttribute('aria-hidden', 'false');
+      filterDrawerOpen?.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeFilterDrawer() {
+      document.body.classList.remove('filter-drawer-open');
+      filterDrawer?.setAttribute('aria-hidden', 'true');
+      filterDrawerOpen?.setAttribute('aria-expanded', 'false');
+    }
+
+    function renderFavoriteSpotlight() {
+      if (!favoriteSpotlight || !favoriteSpotlightGrid || !favoriteSpotlightEmpty || !favoriteSpotlightCount) return;
+      const favoriteCards = allCards
+        .filter((card) => favorites.has(card.dataset.stockId || ''))
+        .map((card) => card.cloneNode(true));
+
+      favoriteSpotlightGrid.innerHTML = '';
+      favoriteCards.forEach((card) => favoriteSpotlightGrid.appendChild(card));
+
+      const hasFavorites = favoriteCards.length > 0;
+      favoriteSpotlightEmpty.style.display = hasFavorites ? 'none' : '';
+      favoriteSpotlightGrid.style.display = hasFavorites ? '' : 'none';
+      favoriteSpotlightCount.textContent = `${favoriteCards.length} 檔`;
+
+      favoriteSpotlightGrid.querySelectorAll('[data-favorite-toggle]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const stockId = button.dataset.stockId || '';
+          if (!stockId) return;
+          if (favorites.has(stockId)) {
+            favorites.delete(stockId);
+          } else {
+            favorites.add(stockId);
+          }
+          saveFavorites();
+          syncFavoriteButtons();
+          renderFavoriteSpotlight();
+          applyFilters();
+        });
+      });
+      syncFavoriteButtons();
+    }
+
+    function applyFilters() {
+      const query = (searchInput?.value || '').trim().toLowerCase();
+      const selectedStages = getNormalizedSelectedValues(stageOptions);
+      const selectedConfidence = getNormalizedSelectedValues(confidenceOptions);
+      const selectedNature = getNormalizedSelectedValues(natureOptions);
+      const favoritesOnly = favoriteFilter?.classList.contains('active');
+      let visibleCount = 0;
+
+      panels.forEach((panel) => {
+        const cards = Array.from(panel.querySelectorAll('.stock-card'));
+        let panelVisibleCount = 0;
+
+        cards.forEach((card) => {
+          const haystack = [
+            card.dataset.stock || '',
+            card.dataset.stage || '',
+            card.dataset.stageLabel || '',
+            card.dataset.state || '',
+            card.dataset.action || '',
+            card.dataset.confidenceLabel || '',
+            card.dataset.nature || '',
+            card.dataset.natureDetail || '',
+          ].join(' ');
+          const matchesQuery = !query || haystack.includes(query);
+          const matchesStage = !selectedStages.length || selectedStages.includes(card.dataset.stage || '');
+          const matchesConfidence = !selectedConfidence.length || selectedConfidence.includes(card.dataset.confidence || '');
+          const matchesNature = !selectedNature.length || selectedNature.includes(card.dataset.nature || '');
+          const stockId = card.dataset.stockId || '';
+          const matchesFavorite = !favoritesOnly || favorites.has(stockId);
+          const show = matchesQuery && matchesStage && matchesConfidence && matchesNature && matchesFavorite;
+          card.style.display = show ? '' : 'none';
+          if (show) {
+            panelVisibleCount += 1;
+            visibleCount += 1;
+          }
+        });
+
+        panel.style.display = panelVisibleCount > 0 ? '' : 'none';
+      });
+
+      if (!query && !selectedStages.length && !selectedConfidence.length && !selectedNature.length) {
+        statusText.textContent = favoritesOnly ? `目前顯示收藏中的 ${visibleCount} 檔。` : '目前顯示全部標的。';
+      } else {
+        const parts = [];
+        if (query) parts.push(`關鍵字「${query}」`);
+        if (selectedStages.length) parts.push(`階段 ${getSelectedLabels(stageOptions).join('、')}`);
+        if (selectedConfidence.length) parts.push(`把握度 ${getSelectedLabels(confidenceOptions).join('、')}`);
+        if (selectedNature.length) parts.push(`股性 ${getSelectedLabels(natureOptions).join('、')}`);
+        if (favoritesOnly) parts.push('只看收藏');
+        statusText.textContent = `目前顯示 ${visibleCount} 檔，條件：${parts.join('、')}。`;
+      }
+      renderActiveFilterSummary();
+    }
+
+    searchInput?.addEventListener('input', applyFilters);
+    [stageOptions, confidenceOptions, natureOptions].forEach((options) => {
+      options.forEach((option) => {
+        option.addEventListener('change', () => {
+          applyFilters();
+        });
+      });
+    });
+    stageFilterSelectAll?.addEventListener('click', () => {
+      stageOptions.forEach((option) => {
+        option.checked = true;
+      });
+      applyFilters();
+    });
+    stageFilterClear?.addEventListener('click', () => {
+      stageOptions.forEach((option) => {
+        option.checked = false;
+      });
+      applyFilters();
+    });
+    confidenceFilterSelectAll?.addEventListener('click', () => {
+      confidenceOptions.forEach((option) => {
+        option.checked = true;
+      });
+      applyFilters();
+    });
+    confidenceFilterClear?.addEventListener('click', () => {
+      confidenceOptions.forEach((option) => {
+        option.checked = false;
+      });
+      applyFilters();
+    });
+    natureFilterSelectAll?.addEventListener('click', () => {
+      natureOptions.forEach((option) => {
+        option.checked = true;
+      });
+      applyFilters();
+    });
+    natureFilterClear?.addEventListener('click', () => {
+      natureOptions.forEach((option) => {
+        option.checked = false;
+      });
+      applyFilters();
+    });
+    [favoriteFilter].forEach((button) => {
+      button?.addEventListener('click', () => {
+        favoriteFilter?.classList.toggle('active');
+        syncFavoriteFilterButtons();
+        applyFilters();
+      });
+    });
+    filterDrawerOpen?.addEventListener('click', openFilterDrawer);
+    filterDrawerClose?.addEventListener('click', closeFilterDrawer);
+    filterDrawerBackdrop?.addEventListener('click', closeFilterDrawer);
+    document.querySelectorAll('[data-stage-jump]').forEach((button) => {
+      button.addEventListener('click', closeFilterDrawer);
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeFilterDrawer();
+      }
+    });
+
+    getFavoriteButtons().forEach((button) => {
+      button.addEventListener('click', () => {
+        const stockId = button.dataset.stockId || '';
+        if (!stockId) return;
+        if (favorites.has(stockId)) {
+          favorites.delete(stockId);
+        } else {
+          favorites.add(stockId);
+        }
+        saveFavorites();
+        syncFavoriteButtons();
+        renderFavoriteSpotlight();
+        applyFilters();
+      });
+    });
+
+    syncFavoriteButtons();
+    syncFavoriteFilterButtons();
+    renderActiveFilterSummary();
+    renderFavoriteSpotlight();
+    applyFilters();
+  </script>
+</body>
+</html>
