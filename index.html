@@ -492,6 +492,70 @@
       background:
         linear-gradient(180deg, rgba(255,252,246,.96), rgba(248,237,229,.92));
     }
+    .stopped-dropdown {
+      padding: 0;
+    }
+    .stopped-summary {
+      display: block;
+      list-style: none;
+      cursor: pointer;
+      padding: 24px;
+      position: relative;
+      z-index: 1;
+    }
+    .stopped-summary::-webkit-details-marker {
+      display: none;
+    }
+    .stopped-summary-head {
+      margin-bottom: 0;
+    }
+    .stopped-summary-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .stopped-summary-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(106,47,37,.16);
+      background: rgba(255, 252, 246, .72);
+      color: var(--stage-tone);
+      font-size: var(--text-sm);
+      font-weight: 900;
+      line-height: 1;
+    }
+    .stopped-summary-toggle .toggle-close {
+      display: none;
+    }
+    .stopped-dropdown[open] .stopped-summary-toggle .toggle-open {
+      display: none;
+    }
+    .stopped-dropdown[open] .stopped-summary-toggle .toggle-close {
+      display: inline;
+    }
+    .stopped-summary-chevron {
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg);
+      margin-top: -3px;
+      transition: transform .2s ease, margin .2s ease;
+    }
+    .stopped-dropdown[open] .stopped-summary-chevron {
+      transform: rotate(225deg);
+      margin-top: 3px;
+    }
+    .stopped-dropdown-body {
+      padding: 0 24px 24px;
+      position: relative;
+      z-index: 1;
+    }
     .section-head {
       display: flex;
       justify-content: space-between;
@@ -4424,8 +4488,9 @@
     </section>
     
       
-    <section class="panel stage-panel stopped-panel" id="stopped-updates" style="--stage-tone: #6a2f25; --stage-soft: #ead3ca;">
-      <div class="section-head">
+    <details class="panel stage-panel stopped-panel stopped-dropdown" id="stopped-updates" style="--stage-tone: #6a2f25; --stage-soft: #ead3ca;">
+      <summary class="stopped-summary">
+      <div class="section-head stopped-summary-head">
         <div class="section-title-wrap">
           <span class="section-stage-mark">停</span>
           <div>
@@ -4434,8 +4499,17 @@
             <div class="section-deck">以下個股已停止後續自動第 1~6 步更新，保留既有儀表板與文字分析。</div>
           </div>
         </div>
-        <span class="count-pill">5 檔</span>
+        <div class="stopped-summary-actions">
+          <span class="count-pill">5 檔</span>
+          <span class="stopped-summary-toggle" aria-hidden="true">
+            <span class="toggle-open">展開</span>
+            <span class="toggle-close">收合</span>
+            <span class="stopped-summary-chevron"></span>
+          </span>
+        </div>
       </div>
+      </summary>
+      <div class="stopped-dropdown-body">
       <div class="chapter-intro compact">
         <p class="chapter-copy">這一區不納入 A-I 階段分類與階段統計；若要恢復更新，需先從停止清單移除後再進正式流程。</p>
       </div>
@@ -4662,7 +4736,8 @@
             </article>
             
       </div>
-    </section>
+      </div>
+    </details>
     
     </section>
 
@@ -4833,6 +4908,7 @@
       const selectedSignals = getSelectedValues(signalOptions);
       const selectedNature = getNormalizedSelectedValues(natureOptions);
       const favoritesOnly = favoriteFilter?.classList.contains('active');
+      const hasActiveFilters = !!query || !!selectedStages.length || !!selectedConfidence.length || !!selectedSignals.length || !!selectedNature.length || !!favoritesOnly;
       let visibleCount = 0;
 
       panels.forEach((panel) => {
@@ -4870,6 +4946,13 @@
         });
 
         panel.style.display = panelVisibleCount > 0 ? '' : 'none';
+        if (panel.classList.contains('stopped-dropdown')) {
+          if (panelVisibleCount > 0 && hasActiveFilters) {
+            panel.open = true;
+          } else if (!hasActiveFilters) {
+            panel.open = false;
+          }
+        }
       });
 
       if (!query && !selectedStages.length && !selectedConfidence.length && !selectedSignals.length && !selectedNature.length) {
