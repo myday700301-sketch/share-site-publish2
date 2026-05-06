@@ -4950,6 +4950,7 @@
     const filterDrawerClose = document.getElementById('filter-drawer-close');
     const filterDrawerBackdrop = document.getElementById('filter-drawer-backdrop');
     const backToTop = document.getElementById('back-to-top');
+    let filterScrollTimer = 0;
 
     function getFavoriteButtons() {
       return Array.from(document.querySelectorAll('[data-favorite-toggle]'));
@@ -5039,14 +5040,38 @@
       filterDrawerOpen?.setAttribute('aria-expanded', 'true');
     }
 
-    function closeFilterDrawer() {
+    function closeFilterDrawer(options = {}) {
       document.body.classList.remove('filter-drawer-open');
       filterDrawer?.setAttribute('aria-hidden', 'true');
       filterDrawerOpen?.setAttribute('aria-expanded', 'false');
+      if (options.scrollToResult) {
+        scrollToFirstFilteredResult();
+      }
     }
 
     function syncBackToTop() {
       backToTop?.classList.toggle('visible', window.scrollY > 520);
+    }
+
+    function firstVisibleFilteredCard() {
+      for (const panel of panels) {
+        if (panel.style.display === 'none') continue;
+        const card = Array.from(panel.querySelectorAll('.stock-card')).find((item) => item.style.display !== 'none');
+        if (card) return card;
+      }
+      return null;
+    }
+
+    function scrollToFirstFilteredResult() {
+      const target = firstVisibleFilteredCard();
+      if (!target) return;
+      const top = Math.max(0, window.scrollY + target.getBoundingClientRect().top - 18);
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+
+    function requestFilteredResultScroll() {
+      window.clearTimeout(filterScrollTimer);
+      filterScrollTimer = window.setTimeout(scrollToFirstFilteredResult, 80);
     }
 
     function renderFavoriteSpotlight() {
@@ -5075,13 +5100,13 @@
           saveFavorites();
           syncFavoriteButtons();
           renderFavoriteSpotlight();
-          applyFilters();
+          applyFilters({ scrollToResult: true });
         });
       });
       syncFavoriteButtons();
     }
 
-    function applyFilters() {
+    function applyFilters(options = {}) {
       const query = (searchInput?.value || '').trim().toLowerCase();
       const selectedStages = getNormalizedSelectedValues(stageOptions);
       const selectedConfidence = getNormalizedSelectedValues(confidenceOptions);
@@ -5148,13 +5173,16 @@
         statusText.textContent = `目前顯示 ${visibleCount} 檔，條件：${parts.join('、')}。`;
       }
       renderActiveFilterSummary();
+      if (options.scrollToResult && hasActiveFilters && visibleCount > 0) {
+        requestFilteredResultScroll();
+      }
     }
 
-    searchInput?.addEventListener('input', applyFilters);
+    searchInput?.addEventListener('input', () => applyFilters({ scrollToResult: true }));
     [stageOptions, confidenceOptions, signalOptions, natureOptions].forEach((options) => {
       options.forEach((option) => {
         option.addEventListener('change', () => {
-          applyFilters();
+          applyFilters({ scrollToResult: true });
         });
       });
     });
@@ -5162,66 +5190,66 @@
       stageOptions.forEach((option) => {
         option.checked = true;
       });
-      applyFilters();
+      applyFilters({ scrollToResult: true });
     });
     stageFilterClear?.addEventListener('click', () => {
       stageOptions.forEach((option) => {
         option.checked = false;
       });
-      applyFilters();
+      applyFilters({ scrollToResult: true });
     });
     confidenceFilterSelectAll?.addEventListener('click', () => {
       confidenceOptions.forEach((option) => {
         option.checked = true;
       });
-      applyFilters();
+      applyFilters({ scrollToResult: true });
     });
     confidenceFilterClear?.addEventListener('click', () => {
       confidenceOptions.forEach((option) => {
         option.checked = false;
       });
-      applyFilters();
+      applyFilters({ scrollToResult: true });
     });
     signalFilterSelectAll?.addEventListener('click', () => {
       signalOptions.forEach((option) => {
         option.checked = true;
       });
-      applyFilters();
+      applyFilters({ scrollToResult: true });
     });
     signalFilterClear?.addEventListener('click', () => {
       signalOptions.forEach((option) => {
         option.checked = false;
       });
-      applyFilters();
+      applyFilters({ scrollToResult: true });
     });
     natureFilterSelectAll?.addEventListener('click', () => {
       natureOptions.forEach((option) => {
         option.checked = true;
       });
-      applyFilters();
+      applyFilters({ scrollToResult: true });
     });
     natureFilterClear?.addEventListener('click', () => {
       natureOptions.forEach((option) => {
         option.checked = false;
       });
-      applyFilters();
+      applyFilters({ scrollToResult: true });
     });
     [favoriteFilter].forEach((button) => {
       button?.addEventListener('click', () => {
         favoriteFilter?.classList.toggle('active');
         syncFavoriteFilterButtons();
-        applyFilters();
+        applyFilters({ scrollToResult: true });
       });
     });
     filterDrawerOpen?.addEventListener('click', openFilterDrawer);
-    filterDrawerClose?.addEventListener('click', closeFilterDrawer);
-    filterDrawerBackdrop?.addEventListener('click', closeFilterDrawer);
+    filterDrawerClose?.addEventListener('click', () => closeFilterDrawer({ scrollToResult: true }));
+    filterDrawerBackdrop?.addEventListener('click', () => closeFilterDrawer({ scrollToResult: true }));
     backToTop?.addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
     window.addEventListener('scroll', syncBackToTop, { passive: true });
     document.querySelectorAll('[data-stage-jump]').forEach((button) => {
-      button.addEventListener('click', closeFilterDrawer);
+      button.addEventListener('click', () => closeFilterDrawer());
     });
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
@@ -5241,7 +5269,7 @@
         saveFavorites();
         syncFavoriteButtons();
         renderFavoriteSpotlight();
-        applyFilters();
+        applyFilters({ scrollToResult: true });
       });
     });
 
