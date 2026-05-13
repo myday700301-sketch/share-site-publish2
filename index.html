@@ -1393,13 +1393,42 @@
     .active-filter-pill {
       display: inline-flex;
       align-items: center;
-      padding: 7px 10px;
+      position: relative;
+      padding: 8px 24px 8px 11px;
       border-radius: 999px;
       background: rgba(39,72,63,.08);
       color: var(--forest-deep);
       font-size: 12px;
       font-weight: 700;
       line-height: 1.25;
+    }
+    .active-filter-remove {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 17px;
+      height: 17px;
+      padding: 0;
+      border: 1px solid rgba(255, 250, 242, 0.92);
+      border-radius: 999px;
+      background: var(--forest-deep);
+      color: #fffaf2;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1;
+      box-shadow: 0 4px 10px rgba(35, 26, 17, 0.16);
+      cursor: pointer;
+    }
+    .active-filter-remove:hover {
+      transform: translateY(-1px);
+      background: #8f442f;
+    }
+    .active-filter-remove:focus-visible {
+      outline: 3px solid rgba(39, 72, 63, 0.22);
+      outline-offset: 2px;
     }
     .active-filter-empty {
       color: var(--muted);
@@ -5367,31 +5396,83 @@
         .map((option) => option.parentElement?.textContent?.trim() || option.value);
     }
 
+    function getSelectedFilterItems(options, type, prefix, normalize = true) {
+      const selected = options.filter((option) => option.checked);
+      if (normalize && (!options.length || selected.length === options.length)) {
+        return [];
+      }
+      return selected.map((option) => ({
+        type,
+        value: option.value,
+        label: `${prefix}：${option.parentElement?.textContent?.trim() || option.value}`,
+      }));
+    }
+
     function renderActiveFilterSummary() {
       if (!activeFilterSummary) return;
       const pills = [];
       const query = (searchInput?.value || '').trim();
-      const selectedStages = getNormalizedSelectedValues(stageOptions);
-      const selectedConfidence = getNormalizedSelectedValues(confidenceOptions);
-      const selectedSignals = getSelectedValues(signalOptions);
-      const selectedNature = getNormalizedSelectedValues(natureOptions);
       const favoritesOnly = favoriteFilter?.classList.contains('active');
 
-      if (query) pills.push(`搜尋：${query}`);
-      if (selectedStages.length) pills.push(...getSelectedLabels(stageOptions).map((label) => `階段：${label}`));
-      if (selectedSignals.length) pills.push(...getSelectedLabels(signalOptions).map((label) => `訊號：${label}`));
-      if (selectedConfidence.length) pills.push(...getSelectedLabels(confidenceOptions).map((label) => `把握度：${label}`));
-      if (selectedNature.length) pills.push(...getSelectedLabels(natureOptions).map((label) => `股性：${label}`));
-      if (favoritesOnly) pills.push('只看收藏');
+      if (query) pills.push({ type: 'search', value: '', label: `搜尋：${query}` });
+      pills.push(...getSelectedFilterItems(stageOptions, 'stage', '階段'));
+      pills.push(...getSelectedFilterItems(signalOptions, 'signal', '訊號', false));
+      pills.push(...getSelectedFilterItems(confidenceOptions, 'confidence', '把握度'));
+      pills.push(...getSelectedFilterItems(natureOptions, 'nature', '股性'));
+      if (favoritesOnly) pills.push({ type: 'favorite', value: '', label: '只看收藏' });
 
       if (!pills.length) {
         activeFilterSummary.innerHTML = '<span class="active-filter-empty">目前未套用條件。</span>';
         return;
       }
 
-      activeFilterSummary.innerHTML = pills
-        .map((label) => `<span class="active-filter-pill">${label}</span>`)
-        .join('');
+      activeFilterSummary.innerHTML = '';
+      pills.forEach((pill) => {
+        const item = document.createElement('span');
+        item.className = 'active-filter-pill';
+
+        const label = document.createElement('span');
+        label.textContent = pill.label;
+        item.appendChild(label);
+
+        const remove = document.createElement('button');
+        remove.className = 'active-filter-remove';
+        remove.type = 'button';
+        remove.textContent = '×';
+        remove.dataset.filterType = pill.type;
+        remove.dataset.filterValue = pill.value;
+        remove.setAttribute('aria-label', `取消條件：${pill.label}`);
+        remove.setAttribute('title', `取消條件：${pill.label}`);
+        item.appendChild(remove);
+
+        activeFilterSummary.appendChild(item);
+      });
+    }
+
+    function uncheckFilterOption(options, value) {
+      options.forEach((option) => {
+        if (option.value === value) {
+          option.checked = false;
+        }
+      });
+    }
+
+    function removeActiveFilter(type, value) {
+      if (type === 'search') {
+        if (searchInput) searchInput.value = '';
+      } else if (type === 'stage') {
+        uncheckFilterOption(stageOptions, value);
+      } else if (type === 'signal') {
+        uncheckFilterOption(signalOptions, value);
+      } else if (type === 'confidence') {
+        uncheckFilterOption(confidenceOptions, value);
+      } else if (type === 'nature') {
+        uncheckFilterOption(natureOptions, value);
+      } else if (type === 'favorite') {
+        favoriteFilter?.classList.remove('active');
+        syncFavoriteFilterButtons();
+      }
+      applyFilters({ scrollToResult: true });
     }
 
     function openFilterDrawer() {
@@ -5539,6 +5620,11 @@
     }
 
     searchInput?.addEventListener('input', () => applyFilters({ scrollToResult: true }));
+    activeFilterSummary?.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-filter-type]');
+      if (!button || !activeFilterSummary.contains(button)) return;
+      removeActiveFilter(button.dataset.filterType || '', button.dataset.filterValue || '');
+    });
     [stageOptions, confidenceOptions, signalOptions, natureOptions].forEach((options) => {
       options.forEach((option) => {
         option.addEventListener('change', () => {
