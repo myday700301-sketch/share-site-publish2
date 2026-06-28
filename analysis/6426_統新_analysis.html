@@ -81,152 +81,142 @@
       <p><a href="../markdowns/6426_統新.md">查看原始 Markdown 檔</a></p>
       <pre># 6426 統新波段整理
 
-更新時間：2026-06-25
+更新時間：2026-06-26
 使用資料：
 - `/Users/fan/trading_data/03_回測資料/個股資料/6426_統新/01_報表`
 - `/Users/fan/trading_data/03_回測資料/個股資料/6426_統新/02_技術圖`
 - `/Users/fan/trading_data/03_回測資料/個股資料/6426_統新/fubon_csv`
 - `/Users/fan/trading_data/03_回測資料/個股資料/6426_統新/04_提示詞/6426_統新_GPT54Pro_結構化JSON提示詞_v1.md`
-- `/Users/fan/trading_data/03_回測資料/個股資料/6426_統新/05_AI分析/03_驗證後JSON/2026-06-25_6426統新_自動監看匯入.json`
+- `/Users/fan/trading_data/03_回測資料/個股資料/6426_統新/05_AI分析/03_驗證後JSON/2026-06-26_6426統新_自動監看匯入.json`
 
 ## 置頂結論
-收盤214.0守在日MA5附近但低於session VWAP 215.6506、逐筆VWAP 215.2909、日MA20/60與月營收AVWAP 259.7285；短線仍是反彈修復測試，不是主升確認。
-主階段為 短線拉回修復觀察期，靠近 週月線中期多頭殘留但事件錨失守；核心理由是 05日線score=-3且低於MA20/60，03事件AVWAP距離-17.61%，01法人1d/5d偏賣，11逐筆偏賣且資料partial；但05週/月線score=4、20之120d相對TAIEX偏強、16無限制，故不直接判為破位空頭。
+193.0 收盤長黑貼近低點，跌落日線 MA5/10/20/60 與雙 VWAP 成本帶，正測試 Donchian20 下緣 189.5 附近的防守有效性。
+主階段為 日線急跌回測／20日區間下緣防守，靠近 週月多方架構內的短線修正；月線成交量因未完成週期不可作確認放量判斷；核心理由是 05 顯示日線 trend_score=-3 且 near_20_period_breakdown=true，11 顯示收盤低於逐筆 VWAP 且賣方近似量占 75.289%；但週線 trend_score=3、月線 trend_score=4，形成 daily_pullback_inside_weekly_uptrend 衝突。
 
 ## 已知事實
-- source_status: 00 usable；verified_latest_bar=2026-06-25 O216.0/H219.5/L211.5/C214.0/V785，foundation原列已被Fubon分K校正。
-- source_status: 01 usable；latest_close=214.0、change_pct=1.18、amplitude_pct=3.78、turnover_100m=1.69、turnover_rate_pct=2.04、volume_ratio_5d=1.07。
-- source_status: 02 usable；2026-03月營收MoM=77.2996%、YoY=70.0414%、YTD YoY=56.0700%，2025Q4 EPS=-0.78、gross_margin=29.91%，event_window.active=false，confidence_supplement.available=false。
-- source_status: 03 usable；session_vwap=215.6506，月營收出表AVWAP=259.7285，latest_close距AVWAP=-17.61%；volume_curve_profile 20d ready=true/sample_count=20，正式預設20d。
-- source_status: 04 usable；錨點候選含月營收AVWAP 259.7285與2026-06-25 session VWAP 215.6506。
-- source_status: 05 usable；日線trend_direction=downtrend_or_pullback/score=-3，週線與月線=uptrend_or_rebound/score=4，aggregate regime=short_to_mid_term_bullish_bias，且daily taint=false。
-- source_status: 06 partial；Goodinfo替代報表存在但本包不需Goodinfo技術截圖，正式技術不使用圖像讀值。
-- source_status: 07 usable；EOD context與01一致，法人1d=-165.68張、5d=-419.41張，margin_usage_ratio=34.2%。
-- source_status: 08/09/10 usable_as_format_only；08為專屬提示詞與框架補丁，09為schema，10為骨架，不作未驗證行情數值來源。
-- source_status: 11回測設定 usable_for_rules_only；official_backtest_status=not_available，signal catalog可作訊號定義，不可當正式回測。
-- source_status: 11逐筆 partial；regular delta volume=777、vwap=215.2909、close_vs_vwap_pct=-0.5996、sell_like_volume_pct=73.2304，但data_quality.status=partial_or_unverified且volume_mismatch。
-- source_status: 12 partial_but_usable_for_calibration；股性分類信心low，事件與風控權重上修、基本面與籌碼權重下修。
-- source_status: 13 partial_local_context_only；S1_event_avwap_reclaim與S3_session_vwap_reclaim於2026-06-24未觸發，walk_forward_summary.status=not_run。
-- source_status: 14 usable_as_application_rules；要求外部事件/proxy/交易限制實際反映到scenario/core_scores/position/watchlist。
-- source_status: 16 usable；restriction_level=none，未查到注意、處置、變更交易、分盤或停止交易，confidence=high。
-- source_status: 19 usable_with_strict_cap；local_reproducible_backtest_completed=true、usable_for_gpt_weight_calibration=true，但formal_true_backtest_completed=false，benchmark usable_for_weight_calibration=false。
-- source_status: 20 usable_with_caps；corporate_action formal_adjusted_series_completed=true，TAIEX與TW peer computed，US proxy configured_without_local_same_period_series，ETF context=null。
-- source_status: 19 usable_with_market_source_guard；data_scope.price_adjustment_status=official_corporate_actions_checked_no_actions，foundation_v1.formal_adjusted_series_completed=true，但data_scope.requested_market=tpex、market=twse，需在正式回測解讀保留市場來源診斷。
+- source_sovereignty: 00 usable, 01 usable, 02 usable但confidence_supplement=false, 03 usable, 04 usable, 05 usable, 06 usable as alternative report, 07 partial cross-check, 09/10 schema only, 11 limited intraday; 12/13/14/16/19/20 not uploaded.
+- 00.verified_latest_bar + 05.daily_ohlcv_verification.verified_latest_bar: 2026-06-26 O=210.0 H=211.0 L=193.0 C=193.0 volume_lot=1410.0, verification_status=verified_corrected, original foundation row was O/H/L/C=193.0.
+- 00.validation: ok=true, issues=[], warning official_daily_cache_row_missing, verified_row_count=729, correction_count=21, tainted_by_unverified_daily_bar=false.
+- 01.market_snapshot: close=193.0, change=-21.0, change_pct=-9.81%, amplitude_pct=8.41%, volume_lot=1410.0, turnover_100m=2.79, turnover_rate_pct=3.66, amount_ratio=1.48, volume_ratio_5d=1.61.
+- 01.institutional_flow: total_institutional_net_1d=+10.0, 3d=-148.49, 5d=-260.2; foreign_net_1d=+11.0, 3d=-148.48, 5d=-258.3, foreign_hold_ratio=8.63.
+- 01.margin/day_trade: borrow_sell_delta=+3.0, borrow_sell_balance=1016.0, day_trade_volume_lot=500.0, day_trade_ratio_pct=35.47, day_trade_total_pnl_10k=-85.95.
+- 02.month_revenue: latest_month=2026-03, revenue=65670.0, MoM=77.2996%, YoY=70.0414%, YTD YoY=56.0700%, report_date=2026-04-17; previous_month MoM=-28.1633%, YoY=7.2630%.
+- 02.financial_report: 2025Q4 EPS=-0.78, gross_margin_pct=29.91, operating_margin_pct=-5.03, net_income=-29986.0; convertible_bond.has_cb=false; event_window.active=false, next_date=2026-08-14.
+- 02.confidence_supplement.available=false with reason no 6426 dedicated supplement found; major_messages/news are auto-collected and require manual verification.
+- 03/04 anchors: primary AVWAP 月營收出表 2026-04-17=246.4529, latest_close=193.0, distance=-21.69%; session_vwap=202.2264; 04 lists both as candidate anchors and does not choose a unique anchor.
+- 05.daily trend: trend_direction=downtrend_or_pullback, trend_score=-3; close below MA5=210.5, MA10=205.6, MA20=223.9, MA60=226.2 but above MA120=175.4825 and MA240=125.55.
+- 05.daily structure: latest candle long_bearish_close_near_low, change_pct=-9.8131, close_location=0.0; near_20_period_breakdown=true, breakout20/55 label=no_prior_range_break, true_gap_down=true.
+- 05.daily momentum/volume: RSI14=34.6749, MACD histogram=-2.0441, minus_di=34.6895 &gt; plus_di=21.4133, ADX=33.8958; volume_regime=normal_volume, volume_ratio_20=1.0892.
+- 05.weekly: trend_direction=uptrend_or_rebound, trend_score=3, but close below weekly MA5=218.7/MA10=231.9/MA20=199.125; weekly latest candle upper_shadow_supply and volume_regime=contracting_volume.
+- 05.monthly: trend_direction=uptrend_or_rebound, trend_score=4, close above monthly MA10=145.67 and MA20=110.865 but below MA5=202.2; period_context.is_potentially_partial_period=true, volume_regime=partial_period_volume_not_comparable.
+- 03.volume_curve_profile: formal 20d window sufficient, sample_count=20, latest_session total_volume=1383.0, cumulative_ratio 13:25=0.9949; 60d window partial sample_count=40 and ready=false.
+- 11.intraday_summary: data_quality.status=full_day_usable, canonical VWAP=196.9906 by regular_session_cumulative_volume_delta, close_vs_vwap_pct=-2.0258, sell_like_volume_pct=75.289, lower_quartile_volume_pct=76.2283, large_trade_volume_pct=30.8526; raw_size_sum is unsafe for VWAP.
 
 ## 需連網確認
-- missing_or_to_verify: 01/07未提供day_trade_ratio、借券賣出、外資借券餘額，不能用當沖或借券推升/壓抑做正式結論。
-- missing_or_to_verify: 02/20未抓到明確法說公告；下一個常見視窗為2026-08-14，需追蹤是否有正式IR/法說與新版財報。
-- missing_or_to_verify: 02 confidence_supplement.available=false，本輪不得用外部補強報告提高事件信心。
-- missing_or_to_verify: 11逐筆摘要volume_integrity_status=volume_mismatch且can_treat_as_full_day=false，只能低信心輔助VWAP與成交壓力。
-- missing_or_to_verify: 19 formal_true_backtest_completed=false，OOS勝率、expectancy、profit_factor、max_drawdown不得作正式高信心或正式回測宣稱。
-- missing_or_to_verify: 20 benchmark/peer已computed但beta與correlation=null；只能做相對強弱，不得升級trend confidence。
-- missing_or_to_verify: 20 US proxy同期間序列不足；CSCO/JNPR/LITE/COHR只能作題材背景，不能作medium_high/high信心來源。
-- missing_or_to_verify: 19 data_scope.requested_market=tpex但market=twse；雖stock_ohlcv完整足夠作local signal backtest，仍不得把本地結果宣稱正式交易所市場完整審計。
-- 01/07 day_trade_state.* 為null
-- 01/07 borrow_sell_delta與foreign_borrow_delta為null
-- 19 backtest_scope.formal_true_backtest_completed=false，勝率/PF/MDD/expectancy不得作正式高信心依據
-- 20 proxy_map_and_series.relative_metrics.beta/correlation=null
-- 02 confidence_supplement.available=false
-- 19 data_scope.requested_market=tpex但market=twse，需保留市場來源診斷
+- Volume conflict: EOD/01/05 latest volume_lot=1410.0 while 03.latest_session total_volume=1383.0 and 11 weighted_volume_lot=1384.0; do not auto-correct across methods.
+- Historical volume conflict: 00.verified_daily_bars 2026-06-22 volume_lot=97.0 while 06 Goodinfo alternative table shows 970; recent volume averages/ratios should be medium or low confidence until reconciled.
+- VWAP conflict: 03 session_vwap=202.2264 from retained candles differs from 11 canonical trade-detail VWAP=196.9906; 11 is allowed only to calibrate key levels/scenario/watchlist/backtest notes and cannot override formal technical structure.
+- 05.fubon_readiness.volume_curve_profile says formal_20d_ready=false, while 03.volume_curve_profile.20d is sufficient; use 03 as dedicated volume-curve file and retain conflict trace.
+- 07 technical daily indicators differ slightly from 05 local_verified_primary indicators; formal trend uses 05/00 and treats 07 as EOD context cross-check.
+- Quarterly/yearly trend_interpretation usable_for_formal_trend=false; these timeframes cannot be interpreted as neutral/consolidation.
+- 19 backtest and 20 proxy/official verification were not uploaded: no winrate, PF, MDD, beta or correlation can be used; scenario probabilities remain null and confidence is downgraded.
+- Broker chip top buyers/sellers are empty and news/major message items require manual verification; no real holder identity or broker conclusion is asserted.
+- 19.formal_true_backtest_completed_missing
+- 20.beta_correlation_missing
+- broker_chip.top_buyers_sellers_empty
+- official_daily_cache_row_missing_warning
+- Goodinfo_original_screenshot_not_required_and_not_used
 
 ## 推論
-- local_computed_quant: 收盤214.0低於03 session VWAP 215.6506與11逐筆VWAP 215.2909，代表短線成本帶尚未收復；但仍守住日MA5=214與高於MA10=207.1。
-- local_computed_quant: 日線低於MA20=228.275與MA60=225.575，且MACD histogram=-1.362026、minus_di&gt;plus_di，短線仍是拉回/修復而非主升。
-- local_computed_quant: 週線/月線仍為uptrend_or_rebound，但週/月/季量能屬partial_period_volume_not_comparable，不得宣稱長週期已確認放量。
-- official_disclosure: 月營收YoY與MoM改善但2025Q4 EPS=-0.78且event_window.active=false，事件題材只能小幅支撐，不足以獨立提高target confidence。
-- web_event: 20將media_or_rss新聞列為事件假說，不能等同官方重大訊息；僅可作scenario_1m題材監控。
-- web_proxy: 20顯示20d相對TAIEX偏弱、120d相對TAIEX偏強；因此1週續攻機率不升高，1月保留修復後轉強選項。
-- inference: 綜合05短線轉弱、03/04事件錨失守、01法人偏空、11逐筆偏賣、16無交易限制與20 proxy缺口，主階段定為短線拉回修復觀察期，confidence=medium。
+- Regime inference: daily downtrend_or_pullback conflicts with weekly/monthly uptrend_or_rebound, so primary_stage is daily sharp pullback at the lower edge inside a still-positive longer-term structure, not a confirmed new up-leg.
+- Risk inference: close at 193.0 is near daily Donchian20 lower 189.5 and below both VWAP references; combined with 11 sell-like volume 75.289%, this marks immediate downside pressure unless 196.99/202.23 is reclaimed.
+- Entry inference: no confirmed breakout20/55 and no confirmed large-volume expansion; valid long setup requires reclaiming 196.99/202.23 first, then 205.6/210.5, rather than buying solely because price is low.
+- Target inference: event AVWAP 246.4529 is broken by -21.69% and should not be used as near-term upside target until short-term cost bands are repaired; first resistance/target are compressed to VWAP/MA bands.
+- Backtest inference: absence of 19/20 and volume conflicts prevent raising confidence in scenarios, target model, and fixed/specialized profile review.
 
 ## 圖中時點校正
-- 圖中技術資料停在 2026-06-25，最新 EOD / 事件資料為 2026-06-25。
-- formal：已以本次上傳附件完成資料主權盤點與交叉核對；00/05顯示最新日線列已由Fubon分K校正，03/04提供AVWAP與session VWAP，16官方限制查核為high且none，19可作本地權重校正但formal_true_backtest_completed=false，20可作外部結構化補強但US proxy未computed且beta/correlation為null。
-- 市場與技術主資料日為2026-06-25；11/12/13/19 as_of為2026-06-24或單日2026-06-25旁路校正；02/20事件窗最新官方月營收與財報出表日為2026-04-17，事件窗active=false。
-- 以防守型觀察為主；214.0~215.7收復前不加碼，224.5~228.3為第一壓力，259.7事件AVWAP收復前不得外推高目標。
+- 圖中技術資料停在 2026-06-26，最新 EOD / 事件資料為 2026-06-26。
+- 已讀取本次附件 00,01,02,03,04,05,06,07,09,10,11；未見 12,13,14,16,19,20 上傳。正式事實以 00/05 日線與技術驗證、03 技術結構、01/06/07 市場與籌碼、02 事件基本面、11 逐筆摘要分層；09/10 只作 schema/骨架約束，不作事實來源。
+- 價格與技術基準日為 2026-06-26；分K、session VWAP 與逐筆摘要同日；月營收與財報事件日期為 2026-04-17，event_window.active=false；月線/季線/年線為可能未完成週期時不得用成交量判定確認放量。
+- 不因單日急跌直接追低；觀察 189.5 是否失守與 196.99/202.23 是否收復。19/20 缺席下不給勝率式結論。
 
 ## 本輪新增資料重點
-- 主成本核心區整理為 214~215.7。
-- 第一壓力整理為 219.5~228.3，第一主目標為 228.3~240.3。
-- 波段失效區整理為 207.1~211.5。
-- 目標模型錨點以 月營收出表AVWAP 259.7285；session VWAP 215.6506 為主。
+- 主成本核心區整理為 196.99~202.23；205.6~210.5。
+- 第一壓力整理為 196.5~202.23；205.6~211，第一主目標為 202.23~205.6；210.5~211。
+- 波段失效區整理為 189.5~193。
+- 目標模型錨點以 月營收出表AVWAP 246.4529；session VWAP 202.2264 為主。
 
 ## 迭代後的主判斷
-- 當前最可能狀態：收盤214.0守在日MA5附近但低於session VWAP 215.6506、逐筆VWAP 215.2909、日MA20/60與月營收AVWAP 259.7285；短線仍是反彈修復測試，不是主升確認。
-- 當前階段：短線拉回修復觀察期；靠近 週月線中期多頭殘留但事件錨失守
+- 當前最可能狀態：193.0 收盤長黑貼近低點，跌落日線 MA5/10/20/60 與雙 VWAP 成本帶，正測試 Donchian20 下緣 189.5 附近的防守有效性。
+- 當前階段：日線急跌回測／20日區間下緣防守；靠近 週月多方架構內的短線修正；月線成交量因未完成週期不可作確認放量判斷
 - 進場訊號是否成立：部分成立
-- 出場訊號是否成立：部分成立
-- 主成本核心區：214~215.7
-- 波段加碼區：224.5~228.3
-- 防守失效區：207.1~211.5
-- 上方第一壓力：219.5~228.3
-- 上方主目標帶：259.7~280.3
-- 下方關鍵支撐：189.5~200.2
-- 目標價模型錨點是否有效：primary_event_anchor_lost; session_cost_not_reclaimed; high_target_frozen
-- 第一短目標：200.2~207.1
-- 第一主目標：228.3~240.3
-- 1.272 延伸：291~294
-- 1.618 延伸：312~318
-- 把握度：medium
-- 未來 1 週主情境：低位修復震盪
-- 未來 1 月主情境：修復型箱體，事件錨收復前不升主升
+- 出場訊號是否成立：成立
+- 主成本核心區：196.99~202.23；205.6~210.5
+- 波段加碼區：189.5~193
+- 防守失效區：189.5~193
+- 上方第一壓力：196.5~202.23；205.6~211
+- 上方主目標帶：210.5~223.9
+- 下方關鍵支撐：189.5~193；175.48~175.61；171~175.48
+- 目標價模型錨點是否有效：primary_event_avwap_broken_short_term_target_downgraded_to_vwap_ma_repair
+- 第一短目標：189.5~193；175.48~175.61
+- 第一主目標：202.23~205.6；210.5~211
+- 1.272 延伸：資料不足
+- 1.618 延伸：資料不足
+- 把握度：medium_low
+- 未來 1 週主情境：低位震盪防守 189.5，若站回 196.99/202.23 才看弱勢反彈。
+- 未來 1 月主情境：週月多方仍未完全破壞，但在收復 205.6-223.9 前以回檔整理與風險控管優先。
 - `T=70`
 - `F=60`
 - `C=60`
 - `K=75`
-- `X=75`
+- `X=65`
 - `P=75`
-- `S=68`
+- `S=58`
 - `M=75`
 - `R=45`
 
 機率列表：
-- 低位修復震盪：`42%`
-- 續攻收復壓力：`22%`
-- 續弱回測：`26%`
-- 破位加速：`10%`
 
 ## 階段判斷
-- 目前最接近：短線拉回修復觀察期
-- 升級條件：收盤或60m連續站上214.0~215.7，且不再跌回211.5。；進一步收復224.5~228.3並維持量能不低於近5日均量，才可上修為修復轉強。；收復259.7事件AVWAP，且20 TW peer/TAIEX同步轉強，才可討論1月主升重啟。；突破291~294且守290，才啟用312~318延伸框架；US proxy未computed前信心不得升medium_high/high。
-- 降級條件：跌破211.5且未能回到215.7，1週情境下修至續弱回測。；收盤跌破207.1或週MA20 200.2失守，修復假設降級。；法人5日續賣且逐筆VWAP下方放大賣方主動性，降低部位與續攻機率。；20d相對TAIEX持續弱於大盤且TW peer不同步，1月轉強機率下修。
-- 失效條件：收盤跌破189.5日Donchian20下緣。；官方事件新增不利且營收修復不能延續。；16交易限制若轉為注意/處置/分盤，立即降低追價與部位。
-目前仍以 短線拉回修復觀察期 為主，結構敘述為 收盤214.0守在日MA5附近但低於session VWAP 215.6506、逐筆VWAP 215.2909、日MA20/60與月營收AVWAP 259.7285；短線仍是反彈修復測試，不是主升確認。
+- 目前最接近：日線急跌回測與 Donchian20 下緣防守
+- 升級條件：先重新站回 196.99 逐筆 VWAP 與 202.23 session VWAP，並維持至收盤。；進一步收復 MA10=205.6 與 MA5=210.5，才可把一週情境由低位防守升級為修復反彈。；收復 MA20=223.9 且 volume_ratio_20 明確放大時，才可重新評估波段上攻；不得用 60d partial volume_curve 升信心。
+- 降級條件：日收或有效跌破 Donchian20 prior_low=189.5。；反彈無法站回 196.99/202.23 且 11 類賣方成交占比仍偏高。；法人 3/5 日累計賣超延續，或借券賣出餘額/增量再擴大。
+- 失效條件：189.5 跌破後不能收回 193.0。；跌向 175.5 附近時仍無量價止跌或仍低於逐筆/session VWAP。；05 技術驗證若後續出現 taint 或 validation failed，現有趨勢結論不得沿用。
+目前仍以 日線急跌回測與 Donchian20 下緣防守 為主，結構敘述為 193.0 收盤長黑貼近低點，跌落日線 MA5/10/20/60 與雙 VWAP 成本帶，正測試 Donchian20 下緣 189.5 附近的防守有效性。
 
 ## 關鍵價位更新
-- 第一支撐：`189.5~200.2`
-- 第二支撐：`207.1~211.5`
-- 近壓：`219.5~228.3`
-- 次壓：`228.3~240.3`
-- 強壓：`312~318`
-- 前高壓力：`200.2~207.1`
-- 日收盤跌破 `207.1~211.5`：視為短波段防守失效
+- 第一支撐：`189.5~193`
+- 第二支撐：`175.48~175.61；171~175.48`
+- 近壓：`196.5~202.23；205.6~211`
+- 次壓：`202.23~205.6；210.5~211`
+- 強壓：`資料不足`
+- 前高壓力：`189.5~193；175.48~175.61`
+- 日收盤跌破 `189.5~193`：視為短波段防守失效
 
 ## 波段操作計畫
-- 1~4 週操作：低位修復震盪
-- 1~3 月操作：修復型箱體，事件錨收復前不升主升
-- 不交易條件：以防守型觀察為主；214.0~215.7收復前不加碼，224.5~228.3為第一壓力，259.7事件AVWAP收復前不得外推高目標。
-- 持有條件：已有部位者，以211.5~207.1為短線防線；跌破211.5但能快速收回215.7可續觀察，收盤跌破207.1則降風險。
-- 持有條件：加碼僅在站回214.0~215.7且推進224.5~228.3時才考慮；未收復224.5~228.3前不把反彈視為主升。
-- 持有條件：收復259.7事件AVWAP前，主目標只採低信心，不做高部位追價。
-- 持有條件：若16交易限制從none轉為注意/處置/分盤，立即下修可承擔部位與追價容忍。
-- 持有條件：逐筆VWAP與sell-like只能作輔助；不得因單日逐筆資料放大部位。
-- 減碼觀察：219.5~228.3
-- 減碼觀察：240.3~259.7
-- 減碼觀察：280.3~294
-- 持股防守價：211.5~215.7
-- 持股防守價：207.1~211.5
-- 持股防守價：189.5~200.2
+- 1~4 週操作：低位震盪防守 189.5，若站回 196.99/202.23 才看弱勢反彈。
+- 1~3 月操作：週月多方仍未完全破壞，但在收復 205.6-223.9 前以回檔整理與風險控管優先。
+- 不交易條件：不因單日急跌直接追低；觀察 189.5 是否失守與 196.99/202.23 是否收復。19/20 缺席下不給勝率式結論。
+- 持有條件：守住 189.5 且重新站回 196.99/202.23，才可維持修復觀察。
+- 持有條件：站回 205.6/210.5 後，才可把部位由防守觀察轉為短線修復持有。
+- 持有條件：若量能後續確認放大，必須區分 20d 已達放量與盤中推估放量，不得用 60d partial 升信心。
+- 減碼觀察：196.99~202.23
+- 減碼觀察：205.6~211
+- 減碼觀察：210.5~223.9
+- 持股防守價：189.5~193
+- 持股防守價：175.48~175.61
+- 持股防守價：171~175.48
 
 ## 主要風險與反證
-- 事件AVWAP失守、日線低於MA20/60、法人5日賣超與逐筆賣方主動性偏高。
-- 短線成本失守：部分成立；觸發區 207.1~211.5
-- 事件AVWAP反壓確認：成立；觸發區 259.7~260
-- 法人與逐筆賣壓：成立；觸發區 資料不足
-- 量縮反彈延伸不足：部分成立；觸發區 219.5~228.3
+- 長黑收低、跌落成本帶與短中均線，且逐筆賣壓占優。
+- 長黑跌落短中均線：成立；觸發區 205.6~223.9
+- Donchian20下緣失守預警：部分成立；觸發區 189.5~193
+- 逐筆VWAP下收與賣壓占優：成立；觸發區 193~196.99
+- 事件AVWAP失守：成立；觸發區 202.23~246.45
 
 ## 總結
 6426 統新 這版已經從自由文字輸出切到 json_v1，結構化程度足以直接接 dashboard。
-這份匯入版最重要的兩個觀察點仍是 219.5~228.3 是否站穩，以及 214~215.7 是否守住。</pre>
+這份匯入版最重要的兩個觀察點仍是 196.5~202.23；205.6~211 是否站穩，以及 196.99~202.23；205.6~210.5 是否守住。</pre>
     </section>
   </main>
 </body>
