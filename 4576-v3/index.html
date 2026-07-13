@@ -1,0 +1,3282 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>4576 大銀微系統 Dashboard V3</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap');
+    :root {
+      --bg: #f3ede2;
+      --panel: rgba(255,255,255,0.94);
+      --panel-strong: rgba(255,255,255,0.98);
+      --text: #1f2a36;
+      --muted: #647284;
+      --line: rgba(24,32,28,0.14);
+      --line-strong: rgba(24,32,28,0.22);
+      --accent: #294c73;
+      --accent-soft: rgba(41,76,115,0.10);
+      --accent-strong: #1d3957;
+      --mix: #9a6431;
+      --mix-soft: rgba(154,100,49,0.12);
+      --green: #255f4b;
+      --green-soft: rgba(37,95,75,0.10);
+      --amber: #7e5c13;
+      --amber-soft: rgba(126,92,19,0.12);
+      --red: #953f31;
+      --red-soft: rgba(149,63,49,0.10);
+      --shadow: 0 14px 34px rgba(39, 31, 20, 0.08);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        linear-gradient(rgba(24,32,28,0.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(24,32,28,0.024) 1px, transparent 1px),
+        radial-gradient(circle at top left, rgba(157,74,44,0.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(37,95,75,0.08), transparent 28%),
+        linear-gradient(180deg, #f8f3ea 0%, #eee5d3 100%);
+      background-size: 100% 34px, 34px 100%, auto, auto, auto;
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      font-size: 15.5px;
+      line-height: 1.78;
+    }
+    .page {
+      max-width: 1560px;
+      margin: 0 auto;
+      padding: 24px 18px 64px;
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.88fr;
+      gap: 18px;
+      padding: 28px;
+      border-radius: 28px;
+      background:
+        linear-gradient(155deg, rgba(255,255,255,0.98), rgba(245,239,228,0.92)),
+        linear-gradient(180deg, rgba(157,74,44,0.08), transparent);
+      border: 1.5px solid var(--line);
+      border-top: 4px solid var(--accent);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent 0%, rgba(47,106,85,0.05) 44%, transparent 100%);
+      pointer-events: none;
+    }
+    .hero-main, .hero-side {
+      position: relative;
+      z-index: 1;
+    }
+    .hero h1 {
+      margin: 0;
+      font-family: "Noto Serif TC", serif;
+      font-size: clamp(36px, 5vw, 62px);
+      line-height: 1.08;
+      letter-spacing: 0.01em;
+    }
+    .hero-subtitle {
+      margin: 14px 0 0;
+      font-size: 20px;
+      line-height: 1.9;
+      max-width: 780px;
+      font-weight: 700;
+    }
+    .hero-note {
+      margin-top: 14px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      background: rgba(24,32,28,0.045);
+      border: 1px solid rgba(24,32,28,0.10);
+    }
+    .hero-note p {
+      margin: 0;
+      line-height: 1.8;
+    }
+    .latest-signal-card {
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1.5px solid rgba(24,32,28,0.12);
+      padding: 14px 16px;
+      background: linear-gradient(135deg, rgba(41,76,115,0.08), rgba(255,255,255,0.92));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.86);
+    }
+    .latest-signal-entry {
+      border-color: rgba(37,95,75,0.20);
+      background: linear-gradient(135deg, rgba(37,95,75,0.10), rgba(255,255,255,0.93));
+    }
+    .latest-signal-risk {
+      border-color: rgba(149,63,49,0.22);
+      background: linear-gradient(135deg, rgba(149,63,49,0.10), rgba(255,255,255,0.93));
+    }
+    .latest-signal-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .latest-signal-kicker {
+      margin: 0;
+      color: var(--accent-strong);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+    .latest-signal-text {
+      margin: 0;
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.75;
+      font-weight: 750;
+    }
+    .hero-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .hero-side {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .hero-current-card {
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      border: 1.5px solid rgba(24,32,28,0.10);
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(245,239,228,0.92));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+    .hero-current-label {
+      margin: 0 0 8px;
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .hero-current-value {
+      margin: 0;
+      font-family: "Noto Serif TC", serif;
+      font-size: clamp(34px, 4vw, 46px);
+      line-height: 1.06;
+      color: var(--accent-strong);
+    }
+    .hero-current-note {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .action-tile {
+      border-radius: 16px;
+      border: 1.5px solid rgba(24,32,28,0.10);
+      border-left-width: 6px;
+      padding: 15px 16px 14px;
+      background: rgba(255,255,255,0.94);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+    }
+    .action-cost {
+      background: linear-gradient(180deg, rgba(47,106,85,0.10), rgba(255,255,255,0.96));
+      border-left-color: var(--green);
+    }
+    .action-risk {
+      background: linear-gradient(180deg, rgba(159,70,55,0.10), rgba(255,255,255,0.96));
+      border-left-color: var(--red);
+    }
+    .action-resist {
+      background: linear-gradient(180deg, rgba(141,103,22,0.12), rgba(255,255,255,0.96));
+      border-left-color: var(--amber);
+    }
+    .action-kicker {
+      margin: 0 0 6px;
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .action-range {
+      margin: 0;
+      font-family: "Noto Serif TC", serif;
+      font-size: 34px;
+      line-height: 1.06;
+      font-weight: 700;
+      color: var(--accent-strong);
+    }
+    .action-range-above {
+      color: var(--red);
+    }
+    .action-range-below {
+      color: var(--green);
+    }
+    .action-range-mixed {
+      color: var(--mix);
+    }
+    .action-note {
+      margin: 8px 0 0;
+      color: var(--accent-strong);
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.65;
+    }
+    .action-trigger {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.7;
+    }
+    .condition-stack {
+      display: grid;
+      gap: 7px;
+      margin-top: 10px;
+    }
+    .condition-line {
+      display: grid;
+      grid-template-columns: max-content minmax(0, 1fr);
+      align-items: start;
+      gap: 9px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(24,32,28,0.10);
+      background: rgba(255,255,255,0.74);
+    }
+    .condition-label {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      font-size: 11px;
+      line-height: 1.2;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .condition-text {
+      min-width: 0;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.6;
+      font-weight: 750;
+    }
+    .condition-success {
+      border-color: rgba(37,95,75,0.20);
+      background: rgba(37,95,75,0.075);
+    }
+    .condition-success .condition-label {
+      color: var(--green);
+    }
+    .condition-warning {
+      border-color: rgba(126,92,19,0.22);
+      background: rgba(126,92,19,0.085);
+    }
+    .condition-warning .condition-label {
+      color: var(--amber);
+    }
+    .condition-danger {
+      border-color: rgba(149,63,49,0.24);
+      background: rgba(149,63,49,0.085);
+    }
+    .condition-danger .condition-label {
+      color: var(--red);
+    }
+    .condition-relief {
+      border-color: rgba(41,76,115,0.20);
+      background: rgba(41,76,115,0.075);
+    }
+    .condition-relief .condition-label {
+      color: var(--accent-strong);
+    }
+    .action-condition {
+      margin-top: 10px;
+    }
+    .summary-condition {
+      margin-top: 10px;
+    }
+    .metric-card, .callout, .route-card, .profile-card, .snapshot-card, .score-card, .scenario-card, .watch-card, .classification-card, .tri-card, .price-tile {
+      border-radius: var(--radius-md);
+      border: 1.5px solid rgba(24,32,28,0.10);
+      background: var(--panel);
+      padding: 16px;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset;
+    }
+    .metric-label {
+      margin: 0 0 8px;
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .metric-value {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.4;
+      font-weight: 700;
+      color: var(--accent-strong);
+    }
+    .metric-good, .metric-warn, .metric-plain, .metric-bad { color: var(--accent-strong); }
+    .metric-above, .metric-up { color: var(--red); }
+    .metric-below, .metric-down { color: var(--green); }
+    .metric-mixed { color: var(--mix); }
+    .anchor-board {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .sticky-nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: block;
+      margin: 16px 0 18px;
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(243,237,226,0.94);
+      backdrop-filter: blur(14px);
+      border: 1.5px solid var(--line);
+    }
+    .sticky-nav > summary::-webkit-details-marker {
+      display: none;
+    }
+    .sticky-nav > summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+    .sticky-nav > summary::after {
+      content: "展開";
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .sticky-nav[open] > summary::after {
+      content: "收合";
+    }
+    .sticky-nav-links {
+      display: none;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .sticky-nav[open] .sticky-nav-links {
+      display: flex;
+    }
+    .sticky-nav a {
+      text-decoration: none;
+      color: var(--text);
+      background: rgba(255,255,255,0.94);
+      border: 1px solid rgba(24,32,28,0.10);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .mobile-nav-fab {
+      display: none;
+    }
+    .mobile-nav-fab > summary::-webkit-details-marker {
+      display: none;
+    }
+    .mobile-nav-fab > summary {
+      list-style: none;
+    }
+    .mobile-nav-sheet {
+      display: none;
+    }
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+    .chapter-drawer {
+      margin: 18px 0 0;
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: var(--panel-strong);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .chapter-drawer > summary::-webkit-details-marker {
+      display: none;
+    }
+    .chapter-drawer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 22px;
+      cursor: pointer;
+      list-style: none;
+      background: linear-gradient(180deg, rgba(243,236,223,0.96), rgba(255,255,255,0.86));
+    }
+    .chapter-drawer-head::after {
+      content: "展開";
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.10em;
+    }
+    .chapter-drawer[open] > .chapter-drawer-head {
+      border-bottom: 1px solid var(--line);
+    }
+    .chapter-drawer[open] > .chapter-drawer-head::after {
+      content: "收合";
+    }
+    .chapter-drawer-head h2 {
+      margin: 0;
+      font-family: "Noto Serif TC", serif;
+      font-size: 29px;
+      line-height: 1.2;
+      color: var(--accent-strong);
+    }
+    .chapter-drawer-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 750;
+      text-align: right;
+    }
+    .chapter-drawer-body {
+      display: grid;
+      gap: 16px;
+      padding: 18px;
+    }
+    .chapter-group {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,0.54);
+      overflow: hidden;
+    }
+    .chapter-group-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .chapter-group-head h3 {
+      margin: 0;
+      color: var(--accent-strong);
+      font-size: 18px;
+      font-weight: 900;
+    }
+    .chapter-group-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-align: right;
+    }
+    .chapter-group-stack {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+    }
+    .chapter-group-stack .section {
+      box-shadow: none;
+    }
+    .section {
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: var(--panel-strong);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 14px;
+      padding: 18px 22px 15px;
+      cursor: pointer;
+      list-style: none;
+      position: relative;
+      background: linear-gradient(180deg, rgba(243,236,223,0.96), rgba(255,255,255,0.86));
+    }
+    .section-head::-webkit-details-marker,
+    .fold-panel > summary::-webkit-details-marker {
+      display: none;
+    }
+    .section[open] > .section-head {
+      border-bottom: 1px solid var(--line);
+    }
+    .section-head::after {
+      content: "展開";
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .section[open] > .section-head::after {
+      content: "收合";
+    }
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+    .section-index {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: rgba(28,36,31,0.06);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .section-head h2 {
+      margin: 0;
+      font-family: "Noto Serif TC", serif;
+      font-size: 29px;
+      line-height: 1.2;
+      color: var(--accent-strong);
+      min-width: 0;
+    }
+    .section-body {
+      padding: 22px;
+    }
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: flex-end;
+      max-width: 100%;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      border: 1px solid rgba(41,76,115,0.14);
+      background: rgba(41,76,115,0.07);
+      font-weight: 700;
+      color: var(--accent-strong);
+    }
+    .badge-good { background: rgba(41,76,115,0.09); color: var(--accent-strong); }
+    .badge-warn { background: rgba(41,76,115,0.09); color: var(--accent-strong); }
+    .badge-bad { background: rgba(41,76,115,0.09); color: var(--accent-strong); }
+    .badge-conf-high {
+      background: #24486d;
+      color: #f8fbff;
+      border-color: rgba(36,72,109,0.30);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.12) inset;
+    }
+    .badge-conf-medium-high {
+      background: #3c6797;
+      color: #f8fbff;
+      border-color: rgba(60,103,151,0.30);
+    }
+    .badge-conf-medium {
+      background: rgba(41,76,115,0.12);
+      color: var(--accent-strong);
+      border-color: rgba(41,76,115,0.18);
+    }
+    .badge-conf-medium-low {
+      background: rgba(111,124,141,0.10);
+      color: #5f6d7d;
+      border-color: rgba(111,124,141,0.16);
+    }
+    .badge-conf-low {
+      background: rgba(111,124,141,0.08);
+      color: #748191;
+      border-color: rgba(111,124,141,0.14);
+    }
+    .badge-cost,
+    .badge-support {
+      background: rgba(41,76,115,0.09);
+      color: var(--accent-strong);
+    }
+    .badge-risk {
+      background: rgba(41,76,115,0.09);
+      color: var(--accent-strong);
+    }
+    .badge-resist {
+      background: rgba(41,76,115,0.09);
+      color: var(--accent-strong);
+    }
+    .badge-target {
+      background: rgba(41,76,115,0.09);
+      color: var(--accent-strong);
+    }
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 16px;
+    }
+    .decision-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .decision-card {
+      border-radius: 16px;
+      border: 1.5px solid rgba(24,32,28,0.10);
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,244,236,0.90));
+      padding: 16px;
+    }
+    .decision-card h3 {
+      margin: 0 0 10px;
+      color: var(--accent-strong);
+      font-size: 18px;
+    }
+    .decision-card-wide {
+      grid-column: 1 / -1;
+    }
+    .reading-card {
+      background: linear-gradient(180deg, rgba(41,76,115,0.07), rgba(255,255,255,0.92));
+    }
+    .reading-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 10px;
+    }
+    .reading-list li {
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      line-height: 1.72;
+    }
+    .reading-label {
+      color: var(--accent-strong);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .decision-status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .decision-status-card {
+      border-radius: 14px;
+      border: 1.5px solid rgba(24,32,28,0.08);
+      background: rgba(255,255,255,0.92);
+      padding: 14px;
+    }
+    .decision-status-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .decision-status-top h4 {
+      margin: 0;
+      color: var(--accent-strong);
+      font-size: 17px;
+      line-height: 1.35;
+    }
+    .overview-main {
+      padding: 18px 20px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(157,74,44,0.08), rgba(255,255,255,0.84));
+      border: 1.5px solid rgba(157,74,44,0.14);
+    }
+    .lead-text {
+      margin: 0 0 12px;
+      font-size: 24px;
+      line-height: 1.65;
+      font-weight: 700;
+      color: var(--accent-strong);
+    }
+    .overview-side {
+      display: block;
+    }
+    .callout-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .callout {
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,244,236,0.90));
+    }
+    .callout h4, .route-card h3, .profile-card h4, .snapshot-card h4, .score-card h4, .scenario-card h4, .watch-card h4, .classification-card h4, .tri-card h4, .price-tile h4, .fold-head h4 {
+      margin: 0 0 10px;
+      color: var(--accent-strong);
+    }
+    .price-tile h4,
+    .signal-item-top h4,
+    .snapshot-top h4,
+    .score-top h4,
+    .scenario-top h4,
+    .watch-top h4,
+    .fold-head h4,
+    .pin-title {
+      word-break: keep-all;
+      overflow-wrap: normal;
+      line-break: strict;
+    }
+    .price-group + .price-group {
+      margin-top: 18px;
+    }
+    .group-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(28,36,31,0.08);
+    }
+    .group-head h3, .subhead h3 {
+      margin: 0;
+      font-size: 18px;
+      color: var(--accent-strong);
+    }
+    .pin-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .pin-card {
+      padding: 16px 16px 14px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(24,32,28,0.10);
+      border-left-width: 6px;
+      background: rgba(255,255,255,0.92);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+    .pin-cost {
+      background: linear-gradient(180deg, rgba(47,106,85,0.10), rgba(255,255,255,0.96));
+      border-color: rgba(47,106,85,0.16);
+      border-left-color: var(--green);
+    }
+    .pin-risk {
+      background: linear-gradient(180deg, rgba(159,70,55,0.10), rgba(255,255,255,0.96));
+      border-color: rgba(159,70,55,0.16);
+      border-left-color: var(--red);
+    }
+    .pin-resist {
+      background: linear-gradient(180deg, rgba(141,103,22,0.12), rgba(255,255,255,0.96));
+      border-color: rgba(141,103,22,0.18);
+      border-left-color: var(--amber);
+    }
+    .pin-target {
+      background: linear-gradient(180deg, rgba(164,79,46,0.10), rgba(255,255,255,0.96));
+      border-color: rgba(164,79,46,0.16);
+      border-left-color: var(--accent);
+    }
+    .pin-title {
+      margin: 0 0 8px;
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .pin-range {
+      margin: 0 0 8px;
+      font-family: "Noto Serif TC", serif;
+      font-size: 28px;
+      line-height: 1.08;
+      color: var(--accent-strong);
+      font-weight: 700;
+    }
+    .pin-range-above {
+      color: var(--red);
+    }
+    .pin-range-below {
+      color: var(--green);
+    }
+    .pin-range-mixed {
+      color: var(--mix);
+    }
+    .pin-subtitle {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+    .price-map-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.48fr);
+      gap: 16px;
+      align-items: start;
+    }
+    .price-map-side {
+      display: grid;
+      gap: 12px;
+    }
+    .price-ladder {
+      position: relative;
+      display: grid;
+      gap: 12px;
+      padding-left: 22px;
+    }
+    .price-ladder::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      top: 12px;
+      bottom: 12px;
+      width: 2px;
+      background: linear-gradient(180deg, rgba(41,76,115,0.22), rgba(41,76,115,0.08));
+    }
+    .ladder-item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 18px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+    }
+    .ladder-rail-mark {
+      position: relative;
+      min-height: 100%;
+    }
+    .ladder-dot {
+      position: absolute;
+      top: 18px;
+      left: -1px;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 3px solid rgba(255,255,255,0.96);
+      background: var(--accent);
+      box-shadow: 0 0 0 1px rgba(24,32,28,0.08);
+    }
+    .ladder-content {
+      border-radius: 16px;
+      border: 1.5px solid rgba(24,32,28,0.10);
+      border-left-width: 6px;
+      padding: 15px 16px 14px;
+      background: rgba(255,255,255,0.94);
+    }
+    .ladder-cost .ladder-content {
+      background: linear-gradient(180deg, rgba(47,106,85,0.10), rgba(255,255,255,0.96));
+      border-left-color: var(--green);
+    }
+    .ladder-support .ladder-content {
+      background: linear-gradient(180deg, rgba(47,106,85,0.07), rgba(255,255,255,0.96));
+      border-left-color: var(--green);
+    }
+    .ladder-risk .ladder-content {
+      background: linear-gradient(180deg, rgba(159,70,55,0.10), rgba(255,255,255,0.96));
+      border-left-color: var(--red);
+    }
+    .ladder-resist .ladder-content {
+      background: linear-gradient(180deg, rgba(141,103,22,0.12), rgba(255,255,255,0.96));
+      border-left-color: var(--amber);
+    }
+    .ladder-target .ladder-content {
+      background: linear-gradient(180deg, rgba(164,79,46,0.10), rgba(255,255,255,0.96));
+      border-left-color: var(--accent);
+    }
+    .ladder-current .ladder-content {
+      background: linear-gradient(180deg, rgba(41,76,115,0.12), rgba(255,255,255,0.98));
+      border-left-color: var(--accent-strong);
+      box-shadow: 0 8px 22px rgba(41,76,115,0.10);
+    }
+    .ladder-current .ladder-dot {
+      background: var(--accent-strong);
+      transform: scale(1.08);
+    }
+    .ladder-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .ladder-top h4 {
+      margin: 0;
+      color: var(--accent-strong);
+      font-size: 17px;
+      line-height: 1.35;
+    }
+    .ladder-range {
+      margin: 8px 0 0;
+      font-family: "Noto Serif TC", serif;
+      font-size: 34px;
+      line-height: 1.06;
+      font-weight: 700;
+      color: var(--accent-strong);
+    }
+    .ladder-range-above {
+      color: var(--red);
+    }
+    .ladder-range-below {
+      color: var(--green);
+    }
+    .ladder-range-mixed {
+      color: var(--mix);
+    }
+    .ladder-note {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.75;
+    }
+    .price-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .price-tile {
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,247,240,0.90));
+      border-width: 2px;
+      border-left-width: 6px;
+    }
+    .price-cost {
+      border-color: rgba(47,106,85,0.18);
+      border-left-color: var(--green);
+      background: linear-gradient(180deg, rgba(47,106,85,0.07), rgba(255,255,255,0.96));
+    }
+    .price-support {
+      border-color: rgba(47,106,85,0.14);
+      border-left-color: var(--green);
+      background: linear-gradient(180deg, rgba(47,106,85,0.05), rgba(255,255,255,0.96));
+    }
+    .price-risk {
+      border-color: rgba(159,70,55,0.18);
+      border-left-color: var(--red);
+      background: linear-gradient(180deg, rgba(159,70,55,0.06), rgba(255,255,255,0.96));
+    }
+    .price-resist {
+      border-color: rgba(141,103,22,0.18);
+      border-left-color: var(--amber);
+      background: linear-gradient(180deg, rgba(141,103,22,0.07), rgba(255,255,255,0.96));
+    }
+    .price-target {
+      border-color: rgba(164,79,46,0.18);
+      border-left-color: var(--accent);
+      background: linear-gradient(180deg, rgba(164,79,46,0.06), rgba(255,255,255,0.96));
+    }
+    .price-top, .signal-top, .snapshot-top, .score-top, .scenario-top, .watch-top, .review-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .price-top h4,
+    .signal-item-top h4,
+    .snapshot-top h4,
+    .score-top h4,
+    .scenario-top h4,
+    .watch-top h4,
+    .fold-head h4 {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .price-range {
+      margin: 0 0 10px;
+      font-family: "Noto Serif TC", serif;
+      font-size: 34px;
+      line-height: 1.05;
+      color: var(--accent-strong);
+    }
+    .price-range-above {
+      color: var(--red);
+    }
+    .price-range-below {
+      color: var(--green);
+    }
+    .price-range-mixed {
+      color: var(--mix);
+    }
+    .price-trigger {
+      margin: 0 0 12px;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+    .inline-price {
+      font-weight: 700;
+      color: var(--accent-strong);
+    }
+    .inline-price-above {
+      color: var(--red);
+    }
+    .inline-price-below {
+      color: var(--green);
+    }
+    .inline-price-mixed {
+      color: var(--mix);
+    }
+    .price-anchor h5, .route-card h4, .fold-body h5 {
+      margin: 12px 0 8px;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .strategy-volume-note {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 16px;
+      padding: 16px 18px;
+      border: 1.5px solid rgba(47,106,85,0.16);
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(47,106,85,0.09), rgba(141,103,22,0.08), rgba(255,255,255,0.94));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.78);
+    }
+    .strategy-volume-note .section-kicker {
+      margin: 0 0 6px;
+      color: var(--green);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+    .strategy-volume-note strong {
+      display: block;
+      color: var(--accent-strong);
+      font-size: 16px;
+      line-height: 1.75;
+    }
+    .strategy-volume-note > p {
+      max-width: 340px;
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .route-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .route-entry { background: rgba(47,106,85,0.06); }
+    .route-hold { background: rgba(141,103,22,0.06); }
+    .route-fail { background: rgba(159,70,55,0.06); }
+    .info-grid, .score-grid, .scenario-grid, .watch-grid {
+      display: grid;
+      gap: 14px;
+    }
+    .section-note {
+      margin: -2px 0 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .profile-stack {
+      display: grid;
+      gap: 14px;
+    }
+    .profile-audit-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .profile-subsection-stack {
+      display: grid;
+      gap: 10px;
+    }
+    .fold-panel-compact {
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(247,243,235,0.86));
+    }
+    .fold-panel-compact .fold-head {
+      padding: 12px 14px;
+    }
+    .fold-panel-compact .fold-head h4 {
+      font-size: 16px;
+      line-height: 1.3;
+    }
+    .fold-panel-compact .fold-body {
+      padding: 8px 14px 14px;
+    }
+    .review-list-grid {
+      display: grid;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .evidence-block + .evidence-block {
+      margin-top: 18px;
+    }
+    .classification-card {
+      margin-bottom: 14px;
+      background: rgba(28,36,31,0.04);
+    }
+    .snapshot-value {
+      margin: 0 0 10px;
+      font-size: 22px;
+      line-height: 1.5;
+      font-weight: 700;
+      color: var(--accent-strong);
+    }
+    .snapshot-value.snapshot-up {
+      color: var(--red);
+    }
+    .snapshot-value.snapshot-down {
+      color: var(--green);
+    }
+    .info-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .tri-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .score-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .scenario-focus-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .scenario-spotlight {
+      border-radius: 18px;
+      border: 1.5px solid rgba(24,32,28,0.10);
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247,242,233,0.92));
+      padding: 18px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
+    }
+    .spotlight-kicker {
+      margin: 0 0 6px;
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 800;
+    }
+    .watch-focus-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .watch-focus-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247,242,233,0.92));
+    }
+    .scenario-grid {
+      grid-template-columns: 1fr;
+    }
+    .watch-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .governance-stack {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .fold-panel {
+      border: 1.5px solid rgba(24,32,28,0.10);
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,0.88);
+      overflow: hidden;
+    }
+    .fold-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      cursor: pointer;
+      list-style: none;
+      position: relative;
+    }
+    .fold-head::-webkit-details-marker {
+      display: none;
+    }
+    .fold-head::after {
+      content: "展開";
+      margin-left: auto;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .fold-panel[open] > .fold-head::after {
+      content: "收合";
+    }
+    .fold-panel[open] > .fold-head {
+      border-bottom: 1px solid rgba(28,36,31,0.08);
+    }
+    .fold-body {
+      padding: 14px 16px 16px;
+    }
+    .bullet-list {
+      margin: 0;
+      padding-left: 18px;
+      line-height: 1.75;
+    }
+    .muted {
+      color: var(--muted);
+    }
+    p {
+      margin: 0 0 10px;
+      line-height: 1.78;
+    }
+    .footer-note {
+      margin-top: 18px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    @media (max-width: 1180px) {
+      .hero,
+      .overview-grid,
+      .scenario-focus-grid,
+      .price-map-layout {
+        grid-template-columns: 1fr;
+      }
+      .callout-grid,
+      .decision-status-grid,
+      .route-grid,
+      .pin-grid,
+      .price-grid,
+      .info-grid,
+      .tri-grid,
+      .score-grid,
+      .watch-focus-grid,
+      .decision-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .watch-grid,
+      .anchor-board,
+      .profile-audit-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 760px) {
+      .page {
+        padding: 16px 12px 48px;
+      }
+      .hero {
+        padding: 18px;
+        border-radius: 26px;
+      }
+      .hero-grid,
+      .callout-grid,
+      .decision-status-grid,
+      .route-grid,
+      .pin-grid,
+      .price-grid,
+      .info-grid,
+      .tri-grid,
+      .score-grid,
+      .watch-grid,
+      .watch-focus-grid,
+      .decision-grid {
+        grid-template-columns: 1fr;
+      }
+      .reading-list li {
+        grid-template-columns: 1fr;
+        gap: 2px;
+      }
+      .section-head {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+        padding: 16px 52px 14px 16px;
+      }
+      .chapter-drawer-head {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+        padding: 16px 52px 16px 16px;
+        position: relative;
+      }
+      .section-head::after {
+        position: absolute;
+        top: 18px;
+        right: 16px;
+      }
+      .chapter-drawer-head::after {
+        position: absolute;
+        top: 18px;
+        right: 16px;
+      }
+      .chapter-drawer-head p {
+        text-align: left;
+      }
+      .chapter-drawer-body {
+        padding: 12px;
+      }
+      .chapter-group-head {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .chapter-group-head p {
+        text-align: left;
+      }
+      .section-title {
+        width: 100%;
+      }
+      .strategy-volume-note {
+        display: grid;
+        gap: 8px;
+      }
+      .strategy-volume-note > p {
+        max-width: none;
+      }
+      .section-index {
+        display: none;
+      }
+      .section-head h2 {
+        font-size: 25px;
+        line-height: 1.14;
+      }
+      .badge-row {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .badge {
+        padding: 5px 9px;
+        font-size: 10px;
+      }
+      .price-top,
+      .ladder-top,
+      .latest-signal-top,
+      .decision-status-top,
+      .signal-item-top,
+      .snapshot-top,
+      .score-top,
+      .scenario-top,
+      .watch-top,
+      .fold-head {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .price-top .badge-row,
+      .ladder-top .badge-row,
+      .latest-signal-top .badge-row,
+      .decision-status-top .badge-row,
+      .signal-item-top .badge-row,
+      .snapshot-top .badge-row,
+      .score-top .badge-row,
+      .scenario-top .badge-row,
+      .watch-top .badge-row,
+      .fold-head .badge-row {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .price-tile h4 {
+        margin-bottom: 0;
+        font-size: 18px;
+        line-height: 1.35;
+      }
+      .signal-item-top h4,
+      .snapshot-top h4,
+      .score-top h4,
+      .scenario-top h4,
+      .watch-top h4,
+      .fold-head h4 {
+        font-size: 17px;
+        line-height: 1.35;
+        margin-bottom: 0;
+      }
+      .fold-head {
+        padding: 14px 48px 14px 16px;
+      }
+      .fold-head::after {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        margin-left: 0;
+      }
+      .fold-panel-compact .fold-head {
+        padding: 12px 44px 12px 14px;
+      }
+      .fold-panel-compact .fold-body {
+        padding: 6px 14px 14px;
+      }
+      .section-body {
+        padding: 16px;
+      }
+      .price-range {
+        font-size: 28px;
+      }
+      .action-range,
+      .ladder-range {
+        font-size: 28px;
+      }
+      .condition-line {
+        grid-template-columns: 1fr;
+        gap: 4px;
+        padding: 9px 10px;
+      }
+      .condition-label {
+        min-height: 0;
+      }
+      .sticky-nav {
+        display: none;
+      }
+      .mobile-nav-fab {
+        display: block;
+        position: fixed;
+        right: 14px;
+        bottom: calc(env(safe-area-inset-bottom) + 76px);
+        z-index: 50;
+      }
+      .mobile-nav-fab > summary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 64px;
+        height: 46px;
+        padding: 0 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(24,32,28,0.12);
+        background: rgba(255,255,255,0.94);
+        box-shadow: 0 12px 32px rgba(30,33,25,0.14);
+        color: var(--accent-strong);
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        backdrop-filter: blur(16px);
+      }
+      .mobile-nav-fab[open] > summary {
+        background: var(--accent);
+        color: #f8fbff;
+      }
+      .mobile-nav-sheet {
+        display: none;
+      }
+      .mobile-nav-fab[open] .mobile-nav-sheet {
+        display: block;
+        position: absolute;
+        right: 0;
+        bottom: 58px;
+        width: min(78vw, 280px);
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(24,32,28,0.10);
+        background: rgba(255,255,255,0.96);
+        box-shadow: 0 18px 42px rgba(30,33,25,0.16);
+        backdrop-filter: blur(18px);
+      }
+      .mobile-nav-title {
+        margin: 0 0 10px;
+        font-size: 12px;
+        letter-spacing: 0.10em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 800;
+      }
+      .mobile-nav-links {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .mobile-nav-link {
+        display: block;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(243,237,226,0.84);
+        border: 1px solid rgba(24,32,28,0.08);
+        color: var(--accent-strong);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.35;
+      }
+    }
+    /* Trading terminal preview accepted on 4540; keep JSON-driven content, change only the V3 presentation layer. */
+    :root {
+      --bg: #080d12;
+      --panel: #111922;
+      --panel-strong: #121b25;
+      --text: #e7eef5;
+      --muted: #8fa0b1;
+      --line: #263545;
+      --line-strong: #3a4d61;
+      --accent: #6ab7ff;
+      --accent-soft: rgba(106,183,255,0.12);
+      --accent-strong: #d9ecff;
+      --mix: #f6bd48;
+      --mix-soft: rgba(246,189,72,0.13);
+      --green: #37d399;
+      --green-soft: rgba(55,211,153,0.12);
+      --amber: #f6bd48;
+      --amber-soft: rgba(246,189,72,0.12);
+      --red: #ff5f58;
+      --red-soft: rgba(255,95,88,0.13);
+      --shadow: 0 20px 70px rgba(0,0,0,0.34);
+      --radius-xl: 18px;
+      --radius-lg: 16px;
+      --radius-md: 14px;
+      --type-display: clamp(34px, 4.2vw, 52px);
+      --type-display-sub: clamp(26px, 3vw, 40px);
+      --type-metric: clamp(24px, 2.6vw, 34px);
+      --type-panel-title: 18px;
+      --type-card-title: 21px;
+      --type-subtitle: 15px;
+      --type-label: 12px;
+    }
+    body {
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 0%, rgba(106,183,255,0.18), transparent 32rem),
+        radial-gradient(circle at 82% 10%, rgba(255,95,88,0.12), transparent 26rem),
+        linear-gradient(135deg, #070b10 0%, #0a1017 54%, #071015 100%);
+      background-size: auto;
+      font-size: 15px;
+      line-height: 1.72;
+    }
+    .page {
+      width: min(1880px, calc(100vw - 32px));
+      max-width: none;
+      margin: 0 auto;
+      padding: 0 0 36px;
+    }
+    .terminal-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin: 0 -16px;
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(8,13,18,0.94);
+      backdrop-filter: blur(18px);
+    }
+    .terminal-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .terminal-brand-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(106,183,255,0.35);
+      border-radius: 10px;
+      color: var(--accent);
+      background: var(--accent-soft);
+      font-weight: 900;
+    }
+    .terminal-brand-title {
+      margin: 0;
+      color: var(--text);
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: 0.03em;
+    }
+    .terminal-brand-subtitle {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .terminal-top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+      min-width: 0;
+      justify-content: flex-start;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .terminal-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.035);
+      font-size: 12px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+    .terminal-chip-warn {
+      color: var(--amber);
+      border-color: rgba(246,189,72,0.35);
+      background: var(--amber-soft);
+    }
+    .terminal-chip-risk {
+      color: var(--red);
+      border-color: rgba(255,95,88,0.35);
+      background: var(--red-soft);
+    }
+    .terminal-chip-good {
+      color: var(--green);
+      border-color: rgba(55,211,153,0.35);
+      background: var(--green-soft);
+    }
+    .terminal-chip-info {
+      color: var(--muted);
+      border-color: rgba(149,170,189,0.28);
+      background: rgba(149,170,189,0.08);
+    }
+    .terminal-chip-state {
+      flex: 1 1 520px;
+      min-width: min(100%, 360px);
+      gap: 8px;
+      white-space: normal;
+      line-height: 1.5;
+    }
+    .terminal-chip-state-label {
+      display: inline-flex;
+      align-items: center;
+      min-height: 20px;
+      padding: 0 7px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 950;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+    .terminal-chip-risk .terminal-chip-state-label {
+      color: #240b0b;
+      background: var(--red);
+    }
+    .terminal-chip-good .terminal-chip-state-label {
+      color: #061b14;
+      background: var(--green);
+    }
+    .terminal-chip-warn .terminal-chip-state-label {
+      color: #221604;
+      background: var(--amber);
+    }
+    .terminal-chip-info .terminal-chip-state-label {
+      color: #061017;
+      background: var(--muted);
+    }
+    .terminal-ticker {
+      display: grid;
+      grid-template-columns: minmax(280px, 1.25fr) repeat(5, minmax(118px, 0.52fr));
+      gap: 1px;
+      margin: 0 -16px 16px;
+      padding: 1px;
+      border-bottom: 1px solid var(--line);
+      background: var(--line);
+    }
+    .terminal-ticker-cell {
+      padding: 14px 18px;
+      background: #0d141c;
+    }
+    .terminal-label {
+      margin: 0 0 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+    }
+    .terminal-symbol {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .terminal-symbol-code {
+      font-size: var(--type-display);
+      font-weight: 950;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+    .terminal-symbol-name {
+      color: var(--text);
+      font-size: var(--type-display-sub);
+      font-weight: 950;
+      line-height: 1;
+    }
+    .terminal-quote-value {
+      margin: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: var(--type-metric);
+      font-weight: 950;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+    }
+    .terminal-red, .terminal-above, .terminal-up {
+      color: var(--red);
+    }
+    .terminal-green, .terminal-below, .terminal-down {
+      color: var(--green);
+    }
+    .terminal-amber, .terminal-mixed {
+      color: var(--amber);
+    }
+    .terminal-blue, .terminal-plain {
+      color: var(--accent);
+    }
+    .terminal-stage-value {
+      font-family: var(--font-sans);
+      letter-spacing: -0.055em;
+      line-height: 1.02;
+    }
+    .terminal-stage-bullish {
+      color: var(--red);
+    }
+    .terminal-stage-bearish {
+      color: var(--green);
+    }
+    .terminal-stage-neutral {
+      color: var(--amber);
+    }
+    .terminal-workspace {
+      display: block;
+      margin-bottom: 16px;
+    }
+    .terminal-main-stack,
+    .terminal-side-stack {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+    .terminal-panel,
+    .section,
+    .fold-panel {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.02)), var(--panel);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .terminal-panel-head,
+    .section-head,
+    .fold-head {
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,0.025);
+    }
+    .terminal-panel-head h2,
+    .section-head h2,
+    .chapter-drawer-head h2 {
+      margin: 0;
+      color: var(--text);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      font-size: var(--type-panel-title);
+      font-weight: 950;
+      letter-spacing: 0.05em;
+    }
+    .terminal-panel-body,
+    .section-body,
+    .fold-body {
+      padding: 16px;
+    }
+    .terminal-primary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .terminal-signal-card,
+    .decision-card,
+    .decision-status-card,
+    .callout,
+    .route-card,
+    .profile-card,
+    .snapshot-card,
+    .score-card,
+    .scenario-card,
+    .watch-card,
+    .classification-card,
+    .tri-card,
+    .price-tile,
+    .metric-card,
+    .scenario-spotlight,
+    .strategy-volume-note {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.026);
+      box-shadow: none;
+    }
+    .terminal-signal-card {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      background: var(--panel-strong);
+    }
+    .terminal-kicker {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+    .terminal-signal-card h3 {
+      margin: 0;
+      color: var(--text);
+      font-size: var(--type-card-title);
+      line-height: 1.48;
+      font-weight: 950;
+      letter-spacing: -0.02em;
+    }
+    .terminal-signal-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.75;
+      font-weight: 750;
+    }
+    .terminal-trade-lines {
+      display: grid;
+      gap: 8px;
+    }
+    .terminal-trade-line {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 10px;
+      align-items: baseline;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.035);
+    }
+    .terminal-trade-line span {
+      font-size: 13px;
+      font-weight: 950;
+      letter-spacing: 0.04em;
+    }
+    .terminal-trade-line strong {
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.45;
+      font-weight: 950;
+    }
+    .terminal-level-board {
+      display: grid;
+      gap: 8px;
+    }
+    .terminal-level-row {
+      display: grid;
+      grid-template-columns: minmax(92px, 0.16fr) minmax(240px, max-content) minmax(320px, 1fr) minmax(96px, auto);
+      align-items: center;
+      column-gap: 16px;
+      row-gap: 8px;
+      padding: 10px 12px;
+      border: 1px solid var(--line-soft, rgba(149,170,189,0.18));
+      border-radius: 12px;
+      background: rgba(255,255,255,0.026);
+    }
+    .terminal-level-current {
+      border-color: rgba(106,183,255,0.5);
+      background: linear-gradient(90deg, var(--accent-soft), rgba(255,255,255,0.025));
+    }
+    .terminal-level-tag {
+      min-width: 0;
+      font-size: 13px;
+      font-weight: 950;
+      overflow-wrap: break-word;
+    }
+    .terminal-level-price {
+      min-width: max-content;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 21px;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+      white-space: nowrap;
+    }
+    .terminal-level-note {
+      min-width: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      font-weight: 750;
+      overflow-wrap: anywhere;
+    }
+    .terminal-level-action {
+      justify-self: end;
+      white-space: nowrap;
+      white-space: nowrap;
+      padding: 6px 9px;
+      border-radius: 8px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.05);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .terminal-route-panel .strategy-volume-note {
+      margin-bottom: 12px;
+      background: linear-gradient(90deg, var(--green-soft), rgba(255,255,255,0.025));
+      border-color: rgba(55,211,153,0.28);
+    }
+    .terminal-route-panel .route-card {
+      min-height: 210px;
+      padding: 14px;
+    }
+    .terminal-route-panel .route-entry {
+      border-top: 3px solid var(--green);
+    }
+    .terminal-route-panel .route-hold {
+      border-top: 3px solid var(--accent);
+    }
+    .terminal-route-panel .route-fail {
+      border-top: 3px solid var(--red);
+    }
+    .terminal-monitor-list {
+      display: grid;
+      gap: 10px;
+    }
+    .terminal-monitor-item {
+      padding: 12px;
+      border: 1px solid rgba(149,170,189,0.18);
+      border-left-width: 4px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.026);
+    }
+    .terminal-monitor-red { border-left-color: var(--red); }
+    .terminal-monitor-green { border-left-color: var(--green); }
+    .terminal-monitor-amber { border-left-color: var(--amber); }
+    .terminal-monitor-blue { border-left-color: var(--accent); }
+    .terminal-monitor-item h4 {
+      margin: 0 0 6px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 950;
+    }
+    .terminal-monitor-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      font-weight: 750;
+    }
+    .terminal-depth-list {
+      display: grid;
+      gap: 8px;
+    }
+    .terminal-depth-row {
+      display: grid;
+      grid-template-columns: 76px 1fr 78px;
+      gap: 10px;
+      align-items: center;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-weight: 900;
+    }
+    .terminal-depth-bar {
+      height: 26px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.05);
+    }
+    .terminal-depth-bar span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+    }
+    .terminal-depth-above span,
+    .terminal-depth-red span {
+      background: linear-gradient(90deg, rgba(255,95,88,0.32), var(--red));
+    }
+    .terminal-depth-below span,
+    .terminal-depth-green span {
+      background: linear-gradient(90deg, rgba(55,211,153,0.28), var(--green));
+    }
+    .terminal-depth-mixed span,
+    .terminal-depth-plain span {
+      background: linear-gradient(90deg, rgba(246,189,72,0.28), var(--amber));
+    }
+    .terminal-mini-grid {
+      display: grid;
+      gap: 10px;
+    }
+    .terminal-mini-grid article {
+      padding: 12px;
+      border: 1px solid rgba(149,170,189,0.18);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.025);
+    }
+    .terminal-mini-grid h3 {
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+    }
+    .terminal-mini-grid p {
+      margin: 0;
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+      font-weight: 750;
+    }
+    .sticky-nav {
+      top: 63px;
+      margin: 0 0 16px;
+      padding: 10px;
+      border-color: var(--line);
+      background: rgba(8,13,18,0.9);
+      border-radius: 14px;
+      backdrop-filter: blur(14px);
+    }
+    .sticky-nav > summary {
+      color: var(--text);
+    }
+    .sticky-nav > summary::after {
+      color: var(--muted);
+    }
+    .sticky-nav a {
+      color: var(--text);
+      border-color: var(--line);
+      background: rgba(255,255,255,0.045);
+      font-weight: 800;
+    }
+    .chapter-drawer {
+      box-shadow: none;
+      background: var(--panel-strong);
+    }
+    .chapter-drawer-head {
+      background: linear-gradient(180deg, rgba(29,41,54,0.98), rgba(17,25,34,0.96));
+    }
+    .chapter-group {
+      background: rgba(255,255,255,0.026);
+    }
+    .section {
+      box-shadow: none;
+    }
+    .section-head {
+      align-items: center;
+      cursor: pointer;
+    }
+    .section[open] > .section-head,
+    .fold-panel[open] > .fold-head {
+      border-bottom-color: var(--line);
+    }
+    .section-head::after,
+    .fold-head::after {
+      color: var(--muted);
+      text-transform: none;
+      letter-spacing: 0.04em;
+    }
+    .section-index {
+      background: rgba(106,183,255,0.1);
+      color: var(--accent);
+    }
+    .badge {
+      border-color: var(--line);
+      background: rgba(255,255,255,0.045);
+      color: var(--muted);
+    }
+    .badge-conf-high,
+    .badge-conf-medium-high {
+      background: rgba(106,183,255,0.28);
+      color: var(--text);
+    }
+    .badge-conf-medium {
+      color: var(--accent);
+      border-color: rgba(106,183,255,0.35);
+      background: var(--accent-soft);
+    }
+    .badge-conf-medium-low,
+    .badge-conf-low {
+      color: var(--muted);
+      background: rgba(255,255,255,0.04);
+    }
+    .badge-good,
+    .badge-cost,
+    .badge-support {
+      color: var(--green);
+      border-color: rgba(55,211,153,0.28);
+      background: var(--green-soft);
+    }
+    .badge-warn,
+    .badge-resist,
+    .badge-target {
+      color: var(--amber);
+      border-color: rgba(246,189,72,0.28);
+      background: var(--amber-soft);
+    }
+    .badge-bad,
+    .badge-risk {
+      color: var(--red);
+      border-color: rgba(255,95,88,0.28);
+      background: var(--red-soft);
+    }
+    .decision-card h3,
+    .callout h4,
+    .route-card h3,
+    .route-card h4,
+    .profile-card h4,
+    .snapshot-card h4,
+    .score-card h4,
+    .scenario-card h4,
+    .watch-card h4,
+    .classification-card h4,
+    .tri-card h4,
+    .price-tile h4,
+    .fold-head h4,
+    .metric-value,
+    .decision-status-top h4,
+    .group-head h3,
+    .subhead h3 {
+      color: var(--text);
+    }
+    .chapter-group-head h3,
+    .subhead h3,
+    .decision-card h3,
+    .callout h4,
+    .route-card h3,
+    .profile-card h4,
+    .snapshot-card h4,
+    .score-card h4,
+    .scenario-card h4,
+    .watch-card h4,
+    .classification-card h4,
+    .tri-card h4,
+    .price-tile h4,
+    .fold-head h4,
+    .decision-status-top h4,
+    .group-head h3 {
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      font-size: var(--type-subtitle);
+      line-height: 1.45;
+      font-weight: 900;
+      letter-spacing: 0.03em;
+    }
+    .route-card h3 {
+      font-size: var(--type-card-title);
+      line-height: 1.35;
+    }
+    .route-card h4,
+    .price-anchor h5,
+    .fold-body h5,
+    .strategy-volume-note .section-kicker,
+    .terminal-kicker,
+    .terminal-label,
+    .metric-label,
+    .section-note,
+    .chapter-group-head p,
+    .chapter-drawer-head p,
+    .muted {
+      font-size: var(--type-label);
+      line-height: 1.6;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+    .route-card p,
+    .route-card li,
+    .decision-card p,
+    .callout p,
+    .snapshot-card p,
+    .scenario-card p,
+    .watch-card p,
+    .classification-card p,
+    .tri-card p,
+    .bullet-list li {
+      font-size: 14px;
+      line-height: 1.72;
+      font-weight: 750;
+    }
+    .terminal-level-tag,
+    .terminal-level-action,
+    .terminal-trade-line span {
+      font-size: var(--type-label);
+      letter-spacing: 0.04em;
+    }
+    .terminal-level-price {
+      font-size: 20px;
+    }
+    .terminal-level-note,
+    .terminal-trade-line strong {
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .metric-label,
+    .section-note,
+    .pin-title,
+    .spotlight-kicker,
+    .price-anchor h5,
+    .route-card h4,
+    .fold-body h5,
+    .muted {
+      color: var(--muted);
+    }
+    .condition-line {
+      border-color: rgba(149,170,189,0.18);
+      background: rgba(255,255,255,0.035);
+    }
+    .condition-text {
+      color: var(--text);
+    }
+    .condition-success {
+      border-color: rgba(55,211,153,0.28);
+      background: var(--green-soft);
+    }
+    .condition-warning {
+      border-color: rgba(246,189,72,0.28);
+      background: var(--amber-soft);
+    }
+    .condition-danger {
+      border-color: rgba(255,95,88,0.28);
+      background: var(--red-soft);
+    }
+    .metric-above,
+    .metric-up,
+    .snapshot-value.snapshot-up,
+    .price-range-above,
+    .ladder-range-above,
+    .inline-price-above {
+      color: var(--red);
+    }
+    .metric-below,
+    .metric-down,
+    .snapshot-value.snapshot-down,
+    .price-range-below,
+    .ladder-range-below,
+    .inline-price-below {
+      color: var(--green);
+    }
+    .price-range-mixed,
+    .ladder-range-mixed,
+    .inline-price-mixed {
+      color: var(--amber);
+    }
+    .footer-note {
+      color: var(--muted);
+    }
+    @media (max-width: 1180px) {
+      .terminal-ticker {
+        grid-template-columns: 1fr 1fr;
+      }
+      .terminal-workspace {
+        grid-template-columns: 1fr;
+      }
+      .terminal-primary-grid {
+        grid-template-columns: 1fr;
+      }
+      .terminal-level-row {
+        grid-template-columns: minmax(84px, 1fr) auto;
+      }
+      .terminal-level-tag {
+        grid-column: 1;
+      }
+      .terminal-level-price {
+        grid-column: 2;
+        justify-self: end;
+        text-align: right;
+      }
+      .terminal-level-note {
+        grid-column: 1 / -1;
+      }
+      .terminal-level-action {
+        grid-column: 1 / -1;
+        justify-self: start;
+      }
+    }
+    @media (max-width: 760px) {
+      :root {
+        --type-display: clamp(30px, 10vw, 44px);
+        --type-display-sub: clamp(24px, 8vw, 34px);
+        --type-metric: clamp(24px, 8vw, 32px);
+        --type-panel-title: 17px;
+        --type-card-title: 19px;
+        --type-subtitle: 14px;
+        --type-label: 11.5px;
+      }
+      .page {
+        width: min(100vw - 20px, 760px);
+        padding: 0 0 42px;
+      }
+      .terminal-topbar {
+        position: static;
+        align-items: flex-start;
+        flex-direction: column;
+        margin: 0 0 1px;
+        padding: 10px 12px 12px;
+        overflow: hidden;
+      }
+      .terminal-top-actions {
+        width: 100%;
+        min-width: 0;
+        justify-content: flex-start;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      .terminal-chip {
+        min-width: 0;
+        max-width: 100%;
+        min-height: 0;
+        padding: 6px 9px;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        line-height: 1.35;
+      }
+      .terminal-chip-risk {
+        width: 100%;
+        flex-basis: 100%;
+      }
+      .terminal-quote-value {
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
+      .terminal-ticker {
+        grid-template-columns: 1fr;
+        margin: 0 -10px 14px;
+      }
+      .terminal-symbol {
+        flex-wrap: wrap;
+        align-items: flex-end;
+      }
+      .terminal-level-row {
+        grid-template-columns: minmax(84px, 1fr) auto;
+        column-gap: 10px;
+        row-gap: 9px;
+        padding: 12px;
+      }
+      .terminal-level-price {
+        min-width: 0;
+        max-width: 100%;
+        white-space: normal;
+        word-break: keep-all;
+        line-height: 1.25;
+      }
+      .terminal-level-action {
+        justify-self: start;
+      }
+      .terminal-depth-row {
+        grid-template-columns: 70px 1fr 68px;
+      }
+      .terminal-signal-card h3 {
+        font-size: var(--type-card-title);
+      }
+      .sticky-nav {
+        display: none;
+      }
+      .mobile-nav-fab > summary {
+        color: var(--text);
+        border-color: var(--line);
+        background: rgba(17,25,34,0.94);
+      }
+      .mobile-nav-fab[open] .mobile-nav-sheet {
+        border-color: var(--line);
+        background: rgba(17,25,34,0.96);
+      }
+      .mobile-nav-link {
+        color: var(--text);
+        border-color: var(--line);
+        background: rgba(255,255,255,0.045);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page terminal-page">
+    <header class="terminal-topbar">
+      <div class="terminal-top-actions" aria-label="狀態">
+        <span class="terminal-chip">資料日 2026-07-09</span>
+        <span class="terminal-chip">最近更新 2026-07-10 10:16:34</span>
+        <span class="terminal-chip terminal-chip-warn">把握度 中低</span>
+        <span class="terminal-chip terminal-chip-state terminal-chip-warn"><span class="terminal-chip-state-label">等待確認</span>主錨與事件錨均失守，當日 VWAP（220.5）也位於收盤上方；現階段僅作反彈壓力觀察，目標模型採條件式啟用</span>
+      </div>
+    </header>
+
+    <section class="terminal-ticker" aria-label="即時摘要">
+      <article class="terminal-ticker-cell">
+        <p class="terminal-label">標的</p>
+        <div class="terminal-symbol">
+          <span class="terminal-symbol-code terminal-red">4576</span>
+          <span class="terminal-symbol-name">大銀微系統</span>
+        </div>
+      </article>
+      <article class="terminal-ticker-cell">
+        <p class="terminal-label">現價 / 收盤</p>
+        <p class="terminal-quote-value terminal-red">218</p>
+      </article>
+      <article class="terminal-ticker-cell">
+        <p class="terminal-label">成交量</p>
+        <p class="terminal-quote-value">1,240 張</p>
+      </article>
+      <article class="terminal-ticker-cell">
+        <p class="terminal-label">5日均量</p>
+        <p class="terminal-quote-value">3,498 張</p>
+      </article>
+      <article class="terminal-ticker-cell">
+        <p class="terminal-label">放量門檻</p>
+        <p class="terminal-quote-value terminal-amber">4,197 張</p>
+      </article>
+      <article class="terminal-ticker-cell">
+        <p class="terminal-label">階段</p>
+        <p class="terminal-quote-value terminal-stage-value terminal-stage-bearish">中期上升架構內的短線修正與成本帶保衛</p>
+      </article>
+    </section>
+
+    
+    <section class="terminal-workspace" aria-label="看盤工作區">
+      <section class="terminal-main-stack">
+        <article class="terminal-panel terminal-decision-panel">
+          <div class="terminal-panel-head">
+            <h2>決策總覽</h2>
+          </div>
+          <div class="terminal-panel-body">
+            <div class="terminal-primary-grid">
+              <article class="terminal-signal-card">
+                <p class="terminal-kicker">目前判斷</p>
+                <h3>不追價，等站回 222.5</h3>
+                <div class='terminal-trade-lines'><div class='terminal-trade-line terminal-green'><span>可守</span><strong>220.5</strong></div><div class='terminal-trade-line terminal-amber'><span>加碼</span><strong>放量突破 222.5</strong></div><div class='terminal-trade-line terminal-red'><span>降風險</span><strong>跌破 212.5 或量縮失守</strong></div></div>
+              </article>
+              <article class="terminal-signal-card">
+                <p class="terminal-kicker">操作結論</p>
+                <h3>不追價。未站回221.5至222.5前以觀察或極小部位為主；站回後分兩段確認224.5至225.5與229.0至230.0。失守216先降風險，失守210至212.5執行防守</h3>
+                <p>先用價格帶確認，不用單日訊號直接放大部位。</p>
+              </article>
+            </div>
+          </div>
+        </article>
+
+        <article id="price-map" class="terminal-panel">
+          <div class="terminal-panel-head">
+            <h2>價格梯與交易區</h2>
+            <span class="terminal-chip">比較基準 218</span>
+          </div>
+          <div class="terminal-panel-body">
+            <div class='terminal-level-board'>
+            <div class="terminal-level-row terminal-level-target ">
+              <span class="terminal-level-tag terminal-above">主目標</span>
+              <span class="terminal-level-price terminal-above">240.5~244.5</span>
+              <span class="terminal-level-note">必須先收復229.5主 AVWAP，再以放量（≥ 4,197 張）收盤突破244.5確認；未滿足前不得列為基準目標</span>
+              <span class="terminal-level-action">升級門檻</span>
+            </div>
+            
+            <div class="terminal-level-row terminal-level-cost ">
+              <span class="terminal-level-tag terminal-above">可觀察區</span>
+              <span class="terminal-level-price terminal-above">221.5~225.5；229.0~230.0</span>
+              <span class="terminal-level-note">第一段需至少30至60分鐘守穩；第二段需日線或60分鐘有效站上229.5，且量能不再低於20日量能基準</span>
+              <span class="terminal-level-action">承接確認</span>
+            </div>
+            
+            <div class="terminal-level-row terminal-level-resist ">
+              <span class="terminal-level-tag terminal-above">第一壓力</span>
+              <span class="terminal-level-price terminal-above">220.5~222.5</span>
+              <span class="terminal-level-note">至少5至15分鐘收上222.5且回測不破220.5，才視為第一壓力解除</span>
+              <span class="terminal-level-action">先看這裡</span>
+            </div>
+            
+            <div class="terminal-level-row terminal-level-support ">
+              <span class="terminal-level-tag terminal-mixed">核心成本</span>
+              <span class="terminal-level-price terminal-mixed">216.0~222.5</span>
+              <span class="terminal-level-note">守住216只代表支撐尚在；需收復220.5至221.5並維持，成本帶才由壓力轉為支撐</span>
+              <span class="terminal-level-action">承接確認</span>
+            </div>
+            
+            <div class="terminal-level-row terminal-level-plain terminal-level-current">
+              <span class="terminal-level-tag terminal-mixed">現價 / 收盤</span>
+              <span class="terminal-level-price terminal-mixed">218.0</span>
+              <span class="terminal-level-note">當前比較基準</span>
+              <span class="terminal-level-action">目前位階</span>
+            </div>
+            
+            <div class="terminal-level-row terminal-level-risk ">
+              <span class="terminal-level-tag terminal-below">防守失效區</span>
+              <span class="terminal-level-price terminal-below">209.5~212.5</span>
+              <span class="terminal-level-note">日線收盤跌破209.5，或盤中跌破後反彈無法收回212.5，視為7月初反彈結構失效</span>
+              <span class="terminal-level-action">降風險</span>
+            </div>
+            
+            <div class="terminal-level-row terminal-level-target ">
+              <span class="terminal-level-tag terminal-plain">1.6 延伸</span>
+              <span class="terminal-level-price terminal-plain">資料不足</span>
+              <span class="terminal-level-note">需先有效突破55日高點291且完成外部結構驗證，否則維持停用</span>
+              <span class="terminal-level-action">升級門檻</span>
+            </div>
+            
+            <div class="terminal-level-row terminal-level-target ">
+              <span class="terminal-level-tag terminal-plain">1.3 延伸</span>
+              <span class="terminal-level-price terminal-plain">資料不足</span>
+              <span class="terminal-level-note">僅在放量（≥ 4,197 張）突破244.5、收復事件 AVWAP 且外部代理標的完成驗證後重新計算</span>
+              <span class="terminal-level-action">升級門檻</span>
+            </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="terminal-panel">
+          <div class="terminal-panel-head">
+            <h2>操作策略</h2>
+          </div>
+          <div class="terminal-panel-body terminal-route-panel">
+            
+      
+    <article class="strategy-volume-note">
+      <div>
+        <p class="section-kicker">量能門檻</p>
+        <strong>縮量 ≤ 2,798 張；放量 ≥ 4,197 張；明顯放量 ≥ 5,247 張；5日均量約 3,498 張；20日均量約 2,070 張</strong>
+      </div>
+      <p>操作策略中的放量、縮量與 5/20 日均量條件，以下均依本股門檻標示。</p>
+    </article>
+    
+      <div class="route-grid">
+        <article class="route-card route-entry">
+          <h3>未持股</h3>
+          <p><strong>優先觀察：</strong>先收復221.5至222.5的當日 VWAP（220.5）與5分鐘唐奇安通道上緣，再站穩224.5至225.5；若量能同步改善，才有資格測試229.5主 AVWAP（229.5）</p>
+          <p><strong>保守方案：</strong>216至218止跌且不再破低，可作觀察型小部位試單，但因仍低於當日 VWAP（220.5）、主 AVWAP（229.5）與MA60，不視為趨勢確認</p>
+          <p class="muted">新倉以回測守穩或突破收穩為主，不用高位猜頂追價。</p>
+        </article>
+        <article class="route-card route-hold">
+          <h3>已持股</h3>
+          <p>16顯示無注意、處置或分盤限制，可按一般交易執行；但ATR14為14.25元、約占收盤6.54%，當沖比35.8%、量能收縮且收盤低於雙VWAP與主 AVWAP（229.5）。初始部位應小、分段，不以窄停損追價；正式完整回測尚未完成，不能用歷史績效放大部位</p>
+          <h4>續抱條件</h4>
+          <ul class='bullet-list'><li>216至218守住，且價格至少收復220.5至221.5雙VWAP壓力帶</li><li>站上224.5至225.5後回測不破，量能不再顯著低於20日基準</li><li>收復229.5主 AVWAP 後，才把中期持有條件升級；未收復前只視為反彈交易</li><li>法人3日／5日淨賣超收斂，逐筆賣方近似量不再持續占優</li><li>官方事件、加權指數與同族群相對結構沒有新增負面衝突</li></ul>
+        </article>
+        <article class="route-card route-fail">
+          <h3>風控切換</h3>
+          <p><strong>觸發定義：</strong>高位震盪或整理狀態下，風控看放量是否能續攻；若放量不續攻、跌破短線承接或正式出場成立，先降風險</p>
+          <h4>短線承接 / 失守降風險</h4>
+          <ul class='bullet-list'><li>防守：<span class='inline-price inline-price-mixed'>216.0~218.0</span></li><li>防守：<span class='inline-price inline-price-below'>209.5~212.5</span></li><li>防守：<span class='inline-price inline-price-below'>199.0~204.5</span></li></ul>
+          <h4>上方壓力 / 續攻未過先降曝險</h4>
+          <ul class='bullet-list'><li>壓力：<span class='inline-price inline-price-above'>220.5~222.5</span></li><li>壓力：<span class='inline-price inline-price-above'>224.5~230.0</span></li><li>壓力：<span class='inline-price inline-price-above'>240.5~244.5</span></li></ul>
+          <p class="muted">此狀態不適合用單日高點追價；先看壓力是否被有效放量突破</p>
+        </article>
+      </div>
+    
+          </div>
+        </article>
+      </section>
+
+    </section>
+    
+
+    
+    <details class="chapter-drawer" aria-label="明細章節">
+      <summary class="chapter-drawer-head">
+        <div class="section-title">
+          <span class="section-index">明細</span>
+          <h2>明細章節</h2>
+        </div>
+        <p>決策、背景、驗證與治理資料集中收納。</p>
+      </summary>
+      <div class="chapter-drawer-body">
+        
+    <section class="chapter-group">
+      <div class="chapter-group-head">
+        <h3>決策與執行</h3>
+        <p>保留完整決策依據與三條操作路徑，需要深讀時再展開。</p>
+      </div>
+      <div class="chapter-group-stack">
+        
+    <details id="overview" class="section">
+      <summary class="section-head">
+        <div class="section-title">
+          <span class="section-index">總覽</span>
+          <h2>決策總覽</h2>
+        </div>
+        <div class="badge-row"></div>
+      </summary>
+      <div class="section-body">
+        
+      <div class="decision-grid">
+        <article class="decision-card">
+          <h3>階段定位</h3>
+          <p><strong>主階段：</strong>中期上升架構內的短線修正與成本帶保衛</p>
+          <p><strong>靠近階段：</strong>主錨失守後的量縮整理，等待盤中均價與短中期均線重新轉為支撐</p>
+          <p><strong>目前狀態：</strong>2026-07-09收218元，位於日線MA20（216.0）與20日唐奇安通道中線附近，但低於MA5、MA10、MA60、技術當日 VWAP（220.5） 221.5、突破段 AVWAP（229.5） 229.5及事件 AVWAP 244.5；量能收縮、收盤靠近日低，短線仍在修正</p>
+        </article>
+        
+        <article class="decision-card reading-card">
+          <h3>多週期實務解讀</h3>
+          <ul class="reading-list"><li><span class='reading-label'>大方向</span><span>中期趨勢未破壞，但週內沖高回落增加供給壓力；長週期仍提供底層支撐，但無法抵銷短線錨點失守</span></li><li><span class='reading-label'>短線節奏</span><span>日線屬上升／反彈架構中的短線弱化，不是新突破</span></li><li><span class='reading-label'>操作含義</span><span>不追價。未站回221.5至222.5前以觀察或極小部位為主；站回後分兩段確認224.5至225.5與229.0至230.0。失守216先降風險，失守210至212.5執行防守</span></li><li><span class='reading-label'>量能提醒</span><span>長週期仍偏多，日線與盤中處於修正；週、月量能因期間未完成不可作放量確認</span></li></ul>
+        </article>
+    
+        <article class="decision-card decision-card-wide">
+          <h3>進出場狀態</h3>
+          <div class="decision-status-grid">
+            
+    <article class="decision-status-card">
+      <div class="decision-status-top">
+        <h4>進場訊號</h4>
+        <div class="badge-row"><span class='badge badge-warn'>部分成立</span></div>
+      </div>
+      <p><strong>最佳依據：</strong>先收復221.5至222.5的當日 VWAP（220.5）與5分鐘唐奇安通道上緣，再站穩224.5至225.5；若量能同步改善，才有資格測試229.5主 AVWAP（229.5）</p>
+      
+    <div class="condition-line condition-danger summary-condition">
+      <span class="condition-label">進場失效</span>
+      <span class="condition-text">盤中或日線跌破216，或反彈無法站回221.5</span>
+    </div>
+    
+    </article>
+    
+            
+    <article class="decision-status-card">
+      <div class="decision-status-top">
+        <h4>出場警訊</h4>
+        <div class="badge-row"><span class='badge badge-bad'>成立</span></div>
+      </div>
+      <p><strong>目前警訊：</strong>收盤低於當日 VWAP（220.5）、主 AVWAP（229.5）與事件 AVWAP，5分鐘與1分鐘位置偏弱，法人5日合計淨賣超，反彈仍有上方成本壓力</p>
+      
+    <div class="condition-line condition-danger summary-condition">
+      <span class="condition-label">正式出場</span>
+      <span class="condition-text">日線有效跌破216並無法迅速收回，或再跌破210至212.5且量能放大；其後下方風險區轉向199至204.5</span>
+    </div>
+    
+    </article>
+    
+          </div>
+        </article>
+      </div>
+      <div class="callout-grid">
+        <article class="callout">
+          <h4>目前操作重點</h4>
+          <p>不追價。未站回221.5至222.5前以觀察或極小部位為主；站回後分兩段確認224.5至225.5與229.0至230.0。失守216先降風險，失守210至212.5執行防守</p>
+        </article>
+        <article class="callout">
+          <h4>風險切換條件</h4>
+          <p><strong>警訊：</strong>收盤低於當日 VWAP（220.5）、主 AVWAP（229.5）與事件 AVWAP，5分鐘與1分鐘位置偏弱，法人5日合計淨賣超，反彈仍有上方成本壓力</p>
+          <p><strong>正式條件：</strong>日線有效跌破216並無法迅速收回，或再跌破210至212.5且量能放大；其後下方風險區轉向199至204.5</p>
+        </article>
+      </div>
+    
+      </div>
+    </details>
+    
+    <details id="strategy" class="section">
+      <summary class="section-head">
+        <div class="section-title">
+          <span class="section-index">策略</span>
+          <h2>操作策略</h2>
+        </div>
+        <div class="badge-row"></div>
+      </summary>
+      <div class="section-body">
+        
+      
+    <article class="strategy-volume-note">
+      <div>
+        <p class="section-kicker">量能門檻</p>
+        <strong>縮量 ≤ 2,798 張；放量 ≥ 4,197 張；明顯放量 ≥ 5,247 張；5日均量約 3,498 張；20日均量約 2,070 張</strong>
+      </div>
+      <p>操作策略中的放量、縮量與 5/20 日均量條件，以下均依本股門檻標示。</p>
+    </article>
+    
+      <div class="route-grid">
+        <article class="route-card route-entry">
+          <h3>未持股</h3>
+          <p><strong>優先觀察：</strong>先收復221.5至222.5的當日 VWAP（220.5）與5分鐘唐奇安通道上緣，再站穩224.5至225.5；若量能同步改善，才有資格測試229.5主 AVWAP（229.5）</p>
+          <p><strong>保守方案：</strong>216至218止跌且不再破低，可作觀察型小部位試單，但因仍低於當日 VWAP（220.5）、主 AVWAP（229.5）與MA60，不視為趨勢確認</p>
+          <p class="muted">新倉以回測守穩或突破收穩為主，不用高位猜頂追價。</p>
+        </article>
+        <article class="route-card route-hold">
+          <h3>已持股</h3>
+          <p>16顯示無注意、處置或分盤限制，可按一般交易執行；但ATR14為14.25元、約占收盤6.54%，當沖比35.8%、量能收縮且收盤低於雙VWAP與主 AVWAP（229.5）。初始部位應小、分段，不以窄停損追價；正式完整回測尚未完成，不能用歷史績效放大部位</p>
+          <h4>續抱條件</h4>
+          <ul class='bullet-list'><li>216至218守住，且價格至少收復220.5至221.5雙VWAP壓力帶</li><li>站上224.5至225.5後回測不破，量能不再顯著低於20日基準</li><li>收復229.5主 AVWAP 後，才把中期持有條件升級；未收復前只視為反彈交易</li><li>法人3日／5日淨賣超收斂，逐筆賣方近似量不再持續占優</li><li>官方事件、加權指數與同族群相對結構沒有新增負面衝突</li></ul>
+        </article>
+        <article class="route-card route-fail">
+          <h3>風控切換</h3>
+          <p><strong>觸發定義：</strong>高位震盪或整理狀態下，風控看放量是否能續攻；若放量不續攻、跌破短線承接或正式出場成立，先降風險</p>
+          <h4>短線承接 / 失守降風險</h4>
+          <ul class='bullet-list'><li>防守：<span class='inline-price inline-price-mixed'>216.0~218.0</span></li><li>防守：<span class='inline-price inline-price-below'>209.5~212.5</span></li><li>防守：<span class='inline-price inline-price-below'>199.0~204.5</span></li></ul>
+          <h4>上方壓力 / 續攻未過先降曝險</h4>
+          <ul class='bullet-list'><li>壓力：<span class='inline-price inline-price-above'>220.5~222.5</span></li><li>壓力：<span class='inline-price inline-price-above'>224.5~230.0</span></li><li>壓力：<span class='inline-price inline-price-above'>240.5~244.5</span></li></ul>
+          <p class="muted">此狀態不適合用單日高點追價；先看壓力是否被有效放量突破</p>
+        </article>
+      </div>
+    
+      </div>
+    </details>
+    
+      </div>
+    </section>
+    
+    <section class="chapter-group">
+      <div class="chapter-group-head">
+        <h3>情境與股性</h3>
+        <p>收納未來情境、監控清單、股性與校正資料。</p>
+      </div>
+      <div class="chapter-group-stack">
+        
+    <details id="scenarios" class="section">
+      <summary class="section-head">
+        <div class="section-title">
+          <span class="section-index">情境</span>
+          <h2>情境與監控</h2>
+        </div>
+        <div class="badge-row"></div>
+      </summary>
+      <div class="section-body">
+        
+      <div class="scenario-focus-grid">
+        
+    <article class="scenario-spotlight">
+      <div class="scenario-top">
+        <div>
+          <p class="spotlight-kicker">本週主情境</p>
+          <h4>量縮區間修復</h4>
+        </div>
+        <div class="badge-row"><span class='badge badge-good'>45%</span></div>
+      </div>
+      <p><strong>觸發：</strong>216至218不破，價格反覆測試220.5至221.5；若能站上222.5，向224.5至229.5推進</p>
+      <p><strong>目標：</strong>216.0~229.5</p>
+      <p><strong>失效：</strong>日線跌破216，或反彈持續無法碰觸220.6且法人賣壓擴大</p>
+      <p><strong>驅動：</strong>12的高波動／事件敏感股性提高震盪權重；無交易限制避免額外下修；正式完整回測尚未完成使機率不因績效值上調；20/60日相對加權指數落後，使基準情境偏向整理而非直接續攻。 13截至前一日的事件 AVWAP 與當日 VWAP收復訊號未觸發，與7月9日仍在錨點下方一致，維持整理權重</p>
+      <p class="muted">附件顯示事件窗不活躍；一週內只追蹤官方月營收／重大訊息是否更新，不把2026-05-08媒體法說敘述當新催化</p>
+    </article>
+    
+        
+    <article class="scenario-spotlight">
+      <div class="scenario-top">
+        <div>
+          <p class="spotlight-kicker">本月主情境</p>
+          <h4>箱體重建</h4>
+        </div>
+        <div class="badge-row"><span class='badge badge-good'>45%</span></div>
+      </div>
+      <p><strong>觸發：</strong>價格維持200至244.5大區間，先在216至230重建成本，再等待官方事件或相對強弱改善</p>
+      <p><strong>目標：</strong>200.0~244.5</p>
+      <p><strong>失效：</strong>日線跌破199，或放量（≥ 4,197 張）突破244.5並連續守穩</p>
+      <p><strong>驅動：</strong>股性資料顯示事件敏感與高波動股性；正式完整回測尚未完成而不給績效溢價；20/60日落後加權指數、120日領先，支持『長期結構尚在、近期仍需整理』。無交易限制使箱體交易可執行，但不提高方向信心</p>
+      <p class="muted">官方月營收與財報資料截至2026-04-17；監控下一次官方營收、2026-08-14預定法說／投資人關係是否由公司正式揭露</p>
+    </article>
+    
+      </div>
+      <section class="evidence-block">
+        <div class="subhead"><h3>今天先盯 3 個指標</h3></div>
+        <div class="watch-focus-grid">
+    <article class="watch-card watch-focus-card">
+      <div class="watch-top">
+        <h4>雙VWAP與第一壓力帶</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium'>中</span>
+        </div>
+      </div>
+      <p>觀察是否站上222.5並回測守住220.5；若只瞬間穿越，不視為收復</p>
+    </article>
+    
+    <article class="watch-card watch-focus-card">
+      <div class="watch-top">
+        <h4>229.5主 AVWAP 與量能確認</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium-low'>中低</span>
+        </div>
+      </div>
+      <p>收復229.5時需同時觀察20日量能節奏；推估放量（≥ 4,197 張）不得寫成已確認放量（≥ 4,197 張）</p>
+    </article>
+    
+    <article class="watch-card watch-focus-card">
+      <div class="watch-top">
+        <h4>216至218與210至212.5雙層支撐</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium'>中</span>
+        </div>
+      </div>
+      <p>跌破216後若無法迅速收回，風險轉向210至212.5；收破209.5視為反彈結構失效</p>
+    </article>
+    </div>
+      </section>
+      
+    <details class="fold-panel">
+      <summary class="fold-head">
+        <h4>其他情境</h4>
+        <div class="badge-row"><span class='badge badge-plain'>次要情境</span></div>
+      </summary>
+      <div class="fold-body">
+        <section><div class='subhead'><h3>未來 1 週</h3></div><div class='scenario-grid'>
+    <article class="scenario-card">
+      <div class="scenario-top">
+        <h4>回測次級支撐</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>25%</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>跌破216後在210至212.5止跌，盤中賣方近似量下降並重新站回216</p>
+      <p><strong>目標：</strong>210.0~218.0</p>
+      <p><strong>失效：</strong>日線收破209.5，或反彈無法收回212.5</p>
+      <p><strong>驅動：</strong>收盤靠近日低、低於雙VWAP與主 AVWAP，法人5日偏賣，增加再測支撐機率；但日線仍高於MA20且無交易限制，故未把此情境列為最高</p>
+      <p class="muted">沒有可用的新官方事件窗口支撐快速反轉；監控附件後續是否補入2026-03之後官方營收</p>
+    </article>
+    
+    <article class="scenario-card">
+      <div class="scenario-top">
+        <h4>收復成本帶後反彈</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>25%</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>先收復220.5至221.5，再站上224.5至225.5；若229.5轉為支撐，目標上移至240.5至244.5</p>
+      <p><strong>目標：</strong>224.5~244.5</p>
+      <p><strong>失效：</strong>站上後再跌破220.5，或229.6附近明顯放量（≥ 5,247 張）遇壓</p>
+      <p><strong>驅動：</strong>日、週、月可用週期仍偏多，120日相對加權指數仍領先，提供反彈基礎；但20/60日相對弱勢、法人賣超、主錨失守與正式完整回測資料不足，限制機率與信心。 13前一日收復訊號未觸發，因此反彈情境必須由7月9日之後的新收復行為重新確認</p>
+      <p class="muted">法說／投資人關係內容目前為媒體來源，未有新的官方事件確認；不得以題材敘述上修至強勢情境</p>
+    </article>
+    
+    <article class="scenario-card">
+      <div class="scenario-top">
+        <h4>放量突破20日上緣</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>5%</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>日線放量（≥ 4,197 張）收上244.5，事件 AVWAP 同步轉為支撐，且加權指數／同業相對結構不再走弱</p>
+      <p><strong>目標：</strong>244.5~252.0</p>
+      <p><strong>失效：</strong>突破後收回244.5以下，或量能不足、同族群／外部代理標的仍無確認</p>
+      <p><strong>驅動：</strong>20日突破目前未觸發、當日量縮（≤ 2,798 張）、主錨與事件錨失守；19不得用績效值升級，同族群缺聚合報酬、美股代理標的無序列，因此強勢情境只保留低權重</p>
+      <p class="muted">需有公司官方事件或產業／同業代理標的確認；2026-05-08媒體資訊不足以單獨觸發</p>
+    </article>
+    </div></section><section class='evidence-block'><div class='subhead'><h3>未來 1 月</h3></div><div class='scenario-grid'>
+    <article class="scenario-card">
+      <div class="scenario-top">
+        <h4>收復主錨並回測事件錨</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>25%</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>日線收復229.5並回測不破，再以240.5至244.5作事件錨與20日高點測試</p>
+      <p><strong>目標：</strong>229.0~244.5</p>
+      <p><strong>失效：</strong>收復後再跌破224.5，或法人與相對大盤未改善</p>
+      <p><strong>驅動：</strong>日、週、月趨勢可用方向仍偏多，120日相對加權指數領先；但短中期落後加權指數、同族群缺聚合報酬、美股代理標的缺序列且法說內容未官方逐項確認，故只給中等偏低信心</p>
+      <p class="muted">監控2026-08-14法說／投資人關係日期及之前的官方月營收；若僅有媒體或新聞摘要來源，不上調事件驅動</p>
+    </article>
+    
+    <article class="scenario-card">
+      <div class="scenario-top">
+        <h4>破位進入中期修正</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>20%</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>日線跌破210，再跌破199至204.5，形成7月初反彈與6月底支撐雙失效</p>
+      <p><strong>目標：</strong>191.0~210.0</p>
+      <p><strong>失效：</strong>跌破後快速收回212.5並站上216，且量價與法人轉強</p>
+      <p><strong>驅動：</strong>法人5日偏賣、主錨與事件錨失守、逐筆收盤弱，增加修正風險；但月線仍上行、120日相對加權指數領先且16無限制，故不列為基準</p>
+      <p class="muted">若官方營收／法說轉弱或產業代理標的同步下修，風險機率需上調；目前附件未有此類官方負面確認</p>
+    </article>
+    
+    <article class="scenario-card">
+      <div class="scenario-top">
+        <h4>放量突破並恢復主升</h4>
+        <div class="badge-row">
+          <span class='badge badge-good'>10%</span>
+        </div>
+      </div>
+      <p><strong>觸發：</strong>收復229.5後放量（≥ 4,197 張）突破244.5，再突破前波供給區263；同業與加權指數相對結構需同步改善</p>
+      <p><strong>目標：</strong>244.5~291.0</p>
+      <p><strong>失效：</strong>突破244.5後兩個交易日內跌回其下，或官方事件／同族群／美股代理標的不能支持</p>
+      <p><strong>驅動：</strong>120日相對加權指數領先與長週期多頭保留主升可能；但20/60日落後、20日／55日突破未觸發、正式回測尚未完成、同族群缺聚合報酬、美股代理標的無序列，使此情境機率維持低</p>
+      <p class="muted">需確認2026-08-14法說／投資人關係與最新月營收為公司官方資料，並追蹤產業籃子與ROK/TER/ABB序列是否補齊</p>
+    </article>
+    </div></section>
+      </div>
+    </details>
+    
+      
+    <details class="fold-panel">
+      <summary class="fold-head">
+        <h4>完整監控清單</h4>
+        <div class="badge-row"><span class='badge badge-plain'>完整監控</span></div>
+      </summary>
+      <div class="fold-body">
+        <div class='watch-grid'>
+    <article class="watch-card">
+      <div class="watch-top">
+        <h4>法人、當沖與借券成交結構</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium'>中</span>
+        </div>
+      </div>
+      <p>追蹤三大法人3日／5日淨賣超是否收斂、外資是否由單日回補轉為連續買超，以及賣方近似量是否降至不占優</p>
+    </article>
+    
+    <article class="watch-card">
+      <div class="watch-top">
+        <h4>官方事件與外部相對結構待驗證</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium-low'>中低</span>
+        </div>
+      </div>
+      <p>確認2026-03之後官方月營收、2026-08-14法說／投資人關係、同族群聚合相對報酬與ROK/TER/ABB序列；未補齊前，情境與目標信心不得升至中高或高</p>
+    </article>
+    </div>
+      </div>
+    </details>
+    
+    
+      </div>
+    </details>
+    
+    <details id="profile" class="section">
+      <summary class="section-head">
+        <div class="section-title">
+          <span class="section-index">股性</span>
+          <h2>股性與校正</h2>
+        </div>
+        <div class="badge-row"></div>
+      </summary>
+      <div class="section-body">
+        
+      <div class="profile-stack">
+        
+    <details class="fold-panel">
+      <summary class="fold-head">
+        <h4>固定設定卡</h4>
+        <div class="badge-row"><span class='badge badge-plain'>固定設定</span></div>
+      </summary>
+      <div class="fold-body">
+        
+      <div class="profile-subsection-stack">
+        
+    <details class="fold-panel fold-panel-compact">
+      <summary class="fold-head">
+        <h4>基礎定位</h4>
+        <div class="badge-row"></div>
+      </summary>
+      <div class="fold-body">
+        <ul class='bullet-list'><li>市場定位：線性傳動 / 微型自動化模組</li><li>身分定位：事件題材高波動波段股；短線常受 AVWAP/VWAP 錨點與籌碼壓力切換影響</li><li>核心主線：短線核心線：223.5~230.0 VWAP 成本帶</li><li>交會主線：事件壓力線：247.0 法說/投資人關係 AVWAP</li><li>題材重評主線：延伸確認線：265.0 與 291.0 前高/55日高點</li><li>中長線補充主線：中長線補充敘事與事件觀察主線</li><li>必抓資料：下一輪必抓：主錨收復、事件錨收復、逐筆 VWAP、法人 3/5 日流向、借券餘額、官方限制狀態、20日/60日相對加權指數</li><li>事件 Beta：事件與基本面可作中期驅動，但波動係數／相關係數未正式計算，不能把高振幅直接視為高 beta</li><li>專屬提醒：缺正式 beta/R2、基準覆蓋部分成立、美股代理標的無同期間序列，不可把高波動直接判定為高 beta</li><li>校正原則：</li><li>A 級主線權重大於 C 級敘事</li><li>題材驅動、基本面修復、純籌碼推動必須分開判讀</li><li>分K只能補充背景，不可主導波段結論</li><li>單日爆量、單筆大單、零星盤中異常，不得直接當成主力定論</li></ul>
+      </div>
+    </details>
+    
+        
+      </div>
+    
+      </div>
+    </details>
+    
+        <div class="profile-audit-grid">
+          
+    <details class="fold-panel">
+      <summary class="fold-head">
+        <h4>固定設定卡回測校正</h4>
+        <div class="badge-row"><span class='badge badge-conf-low'>資料不足</span></div>
+      </summary>
+      <div class="fold-body">
+        <p>本包沒有15_AJ股性校正政策；12僅為本地脈絡部分可用且分類信心低，正式完整回測尚未完成，20雖提供電力／自動化設備產業群組與代理標的狀態，但同族群聚合報酬與波動係數／相關係數不足。因此不正式改寫固定profile，只保留暫定股性描述</p><p class='muted'>本輪沒有變動欄位</p>
+      </div>
+    </details>
+    
+          
+    <details class="fold-panel">
+      <summary class="fold-head">
+        <h4>專屬校正框架</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium-low'>延後觀察</span></div>
+      </summary>
+      <div class="fold-body">
+        <p>缺既有成熟框架、15_AJ政策、正式完整回測、同族群聚合報酬與美股代理標的序列；單一資料窗不足以證明結構性框架失效</p><div class='review-list-grid'><section><h5>下一輪必驗證</h5><ul class='bullet-list'><li>雙VWAP與229.5主 AVWAP 是否按順序由壓力轉支撐</li><li>20日量能曲線在突破日是否達到確認門檻，而非推估放量</li><li>20/60/120日相對加權指數及同族群聚合相對報酬是否改善</li><li>官方法說、最新月營收與ROK/TER/ABB序列是否補齊</li><li>19是否升級為正式 true 回測 completed=是</li></ul></section><section><h5>保留規則</h5><ul class='bullet-list'><li>不以2026-07-09單日逐筆資料修改長期股性</li><li>不以媒體／新聞摘要題材改寫事件beta</li><li>不引用19勝率、期望值、獲利因子或最大回撤升級信心</li><li>不把波動係數／相關係數的null改寫為推估值</li></ul></section></div>
+      </div>
+    </details>
+    
+        </div>
+      </div>
+    
+      </div>
+    </details>
+    
+      </div>
+    </section>
+    
+    <section class="chapter-group">
+      <div class="chapter-group-head">
+        <h3>證據與治理</h3>
+        <p>收納市場快照、核心分數、資料完整性與回測缺口。</p>
+      </div>
+      <div class="chapter-group-stack">
+        
+    <details id="evidence" class="section">
+      <summary class="section-head">
+        <div class="section-title">
+          <span class="section-index">證據</span>
+          <h2>證據資料板</h2>
+        </div>
+        <div class="badge-row"></div>
+      </summary>
+      <div class="section-body">
+        
+      <section class="evidence-block">
+        <div class="subhead"><h3>市場快照</h3></div>
+        <div class="info-grid">
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>收盤與日內結構</h4>
+        <div class="badge-row"><span class='badge badge-conf-high'>高</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">2026-07-09開224.0、高225.5、低216.5、收218.0，跌1.13%，振幅4.08%，EOD量1240張</p>
+      <p class="muted">最新K線為長黑且收近低；方向判斷另由05.趨勢判讀校正</p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>量能門檻</h4>
+        <div class="badge-row"><span class='badge badge-conf-high'>高</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">5日均量約 3,498 張；20日均量約 2,070 張；縮量 ≤ 2,798 張；放量 ≥ 4,197 張；明顯放量 ≥ 5,247 張</p>
+      <p class="muted">以最新成交量 1,240 張 / 5日量比 0.35x 反推；盤中請改看同時段量比或預估全日量比</p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>盤中量能曲線</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium-high'>中高</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">10:00 中位累積 43.5%；11:00 中位累積 65.1%；13:25 中位累積 95.9%</p>
+      <p class="muted">EOD成交量 1,240 張；樣本 20 日；狀態足夠；正式盤中判斷須區分已達放量（≥ 4,197 張）與推估放量（≥ 4,197 張）</p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>量能收縮與口徑衝突</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium'>中</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">EOD量1240張；01/07量比5日為0.35、03/05驗證日線量比5日為0.4441，兩套口徑均低於1</p>
+      <p class="muted">20日量能曲線可用，但當日累計量節奏低於20日多數檢查點，不能稱為已確認放量（≥ 4,197 張）</p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>法人與外資</h4>
+        <div class="badge-row"><span class='badge badge-conf-high'>高</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">三大法人1日-87.33張、3日-420.18張、5日-763.22張；外資1日+27.08張但5日-710.12張，外資持股比5.07%</p>
+      <p class="muted">單日外資小幅回補不足以抵銷5日淨賣超；籌碼仍偏弱</p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>當沖、借券與執行風險</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium'>中</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">現股當沖比35.8%，高於5日均33.56%；借券賣出餘額1974張、當日減42張，報表使用率277.38%</p>
+      <p class="muted">高當沖增加盤中噪音；借券使用率僅按附件列示，不自行推估空方持有人或方向</p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>官方事件與基本面</h4>
+        <div class="badge-row"><span class='badge badge-conf-high'>高</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">2026-03月營收月增25.9647%、年增49.5045%；2025Q4 每股盈餘 2.01、毛利率36.51%、營業利益率11.95%；事件窗啟動=否</p>
+      <p class="muted">資料正向但出表日為2026-04-17，對2026-07-09短線只作中期背景，不作即時催化</p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>交易限制與相對大盤</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium'>中</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">官方查核無注意、處置、分盤、變更交易或停牌；標的20日與60日報酬落後加權指數，120日報酬領先加權指數</p>
+      <p class="muted">無限制可避免額外執行折價，但短中期相對弱勢壓低強攻情境；長期領先則保留中期多頭未完全破壞的判斷</p>
+    </article>
+    </div>
+      </section>
+      <section class="evidence-block">
+        <div class="subhead"><h3>多週期判讀</h3></div>
+        <article class="classification-card">
+          <h4>總分類</h4>
+          <p>長週期仍偏多，日線與盤中處於修正；週、月量能因期間未完成不可作放量確認</p>
+        </article>
+        <div class="info-grid">
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>日線</h4>
+        <div class="badge-row"><span class='badge badge-conf-high'>高</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">收218高於MA20、MA120、MA240，低於MA5、MA10、MA60；MACD柱體為正但RSI14約48.88，20日／55日突破均未觸發，最新K線長黑收近低</p>
+      <p class="muted">日線屬上升／反彈架構中的短線弱化，不是新突破</p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>週線</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium'>中</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">週線仍高於MA5、MA20、MA60、MA120但低於MA10；本週K線上影供給明顯、收盤位置約7%，且本週尚未完成</p>
+      <p class="muted">中期趨勢未破壞，但週內沖高回落增加供給壓力</p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>月線</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium'>中</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">月線高於MA5、MA10、MA20，方向仍為上升／反彈；本月K線上影長且期間未完成，成交量不可比較</p>
+      <p class="muted">長週期仍提供底層支撐，但無法抵銷短線錨點失守</p>
+    </article>
+    
+    <article class="snapshot-card">
+      <div class="snapshot-top">
+        <h4>盤中1至60分鐘</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium'>中</span></div>
+      </div>
+      <p class="snapshot-value snapshot-plain">60分鐘/30分鐘/15分鐘 RSI約43至44，5分鐘 RSI 37.16、一月 RSI 25.04；5分鐘與一月收在唐奇安通道下緣，收盤低於技術當日 VWAP 221.5</p>
+      <p class="muted">短線偏弱且接近超賣，但尚未出現站回VWAP與動能翻正的反轉確認</p>
+    </article>
+    </div>
+      </section>
+      <section class="evidence-block">
+        <div class="subhead"><h3>已知事實 / 缺口 / 推論</h3></div>
+        <div class="tri-grid">
+          <article class="tri-card"><h4>已知事實</h4><ul class='bullet-list'><li>[source_status] 00=可用；01=可用；02=部分成立；03=可用；04=可用；05=可用；06=可用；07=可用；09/10=可用 用於 結構 only；11回測設定=部分成立；逐筆=可用 用於 single day structure only；12=部分成立；13=部分成立；14=可用 用於 obligations only；16=可用；19=部分成立；20=可用，信心需設上限</li><li>[官方公告] 06頁首標示為替代公開資料API重建、非Goodinfo原始HTML；latest_field_completeness顯示trade_date=2026-07-09、day_trading/foreign_holding/sbl_balance均filled、core_complete=是。fallback_source_meta含公開市場資料來源快取回補與交易所/櫃買中心官方補充；表格「-」視為未列示或不可取得，不視為0</li><li>[本地量化計算] 00.已驗證 最新日線：2026-07-09開224.0、高225.5、低216.5、收218.0、量1240張；原基礎資料假OHLC列已由富邦盤中價格修正，validation.ok=是、未受污染</li><li>[本地量化計算] 05日線：MA5=224.5、MA10=219.0、MA20=216.0、MA60=225.5、MA120=174.0、MA240=144.0、ATR14=14.3；20日突破與55日突破均無突破／跌破，無可操作真缺口</li><li>[本地量化計算] 03/04錨點：逐日技術當日 VWAP=221.5；突破段 AVWAP=229.5；2026-05-08事件 AVWAP=244.5；收盤均位於其下</li><li>[本地量化計算] 逐筆：regular-session累計量差分=1209張、VWAP=220.5、收盤較VWAP低1.188%、賣方近似量57.7337%、收盤位於日內區間17.651%；試撮列已排除</li><li>[官方公告] 02最新官方月營收為2026-03，營收321496、月增25.9647%、年增49.5045%、累計年增45.4688%；2025Q4 每股盈餘=2.01、毛利率36.51%、營業利益率11.95%</li><li>[本地量化計算] 01/07：三大法人1日-87.33張、3日-420.18張、5日-763.22張；外資1日+27.08張但5日-710.12張；當沖比35.8%、5日均33.56%；借券賣出餘額1974張、當日變動-42張</li><li>[外部事件] 02/20附件內彙整2026-04-13、04-27、05-07、05-08、05-09、05-11等媒體／新聞摘要事件；只作事件假設與待驗證清單，不作公司官方事實</li><li>[官方公告] 16官方查核未發現注意、處置、變更交易、分盤、全額交割或停牌，無交易限制、信心高</li><li>[官方公告] 20確認2026-07-08現金股利0.8元，正式復權序列已完成；19.資料範圍.復權調整狀態亦為已依官方公司行動因子完成復權</li><li>[外部代理標的] 20的加權指數相對資料已計算：標的20日、60日報酬分別落後加權指數約27.4與12.5個百分點，120日則領先約29.8個百分點；beta與correlation均資料不足，不可據此升級趨勢信心</li><li>[外部代理標的] 20同業籃子1514、1597、2359、4540、4562、8996標示已計算，但未提供籃子聚合報酬；4562不在啟動 universe。美股ROK/TER/ABB僅完成設定，無同期間序列</li><li>[本地量化計算] 回測資料：回測範圍可用於權重校正、正式完整回測完成狀態為否；5日與20日參數化 走勢前推驗證均已執行，但依本輪STRICT DOWNGRADE GATE不引用勝率、期望值、獲利因子或最大回撤，只保留訊號存在與信心上限</li><li>[官方公告] 02.convertible_bond.有無可轉債=否；07.分點籌碼買賣分點清單為空，不據此推論券商主力</li><li>[官方公告] 公司行動／相對資料：ETF／淨值脈絡=null且準備度摘要.門檻摘要.ETF情境規則需求=否；本標的適用一般上市普通股規則，不套用ETF/淨值/折溢價框架</li></ul></article>
+          <article class="tri-card"><h4>需補資料</h4><ul class='bullet-list'><li>[待補或待驗證] 03的當日 VWAP 221.5與逐筆VWAP 220.5相差1.1元；兩者計算口徑不同，正式價位以220.5至221.5壓力帶處理，不選擇對結論有利的一值</li><li>[待補或待驗證] 00/01/07 EOD成交量1240張與逐筆regular-session量1209張相差31張；日線量能採1240張，逐筆VWAP採1209張，不交叉替代</li><li>[待補或待驗證] 01/07的5日均量3497.75張與03/05驗證日線的5日均量2792.4張不一致；精確量比不合併，僅保留兩者皆指向量縮（≤ 2,798 張）的共同結論</li><li>[待補或待驗證] 02/20中2026-05-08法說、矽光子、擴產等內容為媒體／新聞摘要，尚缺公司投資人關係或重大訊息逐項官方確認</li><li>[待補或待驗證] 本包官方營收僅到2026-03、財報僅到2025Q4；2026-03之後最新營收與2026Q1完整財報未在附件提供</li><li>[待補或待驗證] 20同業籃子缺聚合相對報酬，ROK/TER/ABB缺同期間序列；無法用同業或美股代理標的升高主升情境</li><li>[待補或待驗證] 正式完整回測未完成；基準覆蓋=88.48%、波動係數／相關係數不可用、產業代理標的完整序列不足，且有限參數網格未經外部審計</li><li>[待補或待驗證] 03/20的60日盤中量能曲線只有41日左右樣本，未達60日門檻；僅20日窗口可正式引用</li><li>[待補或待驗證] 05季度與年度timeframe的可用 用於 正式 趨勢：否，只能列資料不足，不解讀為盤整或中性</li><li>[待補或待驗證] 01/07融資、融券相關欄位資料不足，06表格「-」亦不等於0；本輪不推估融資券餘額或券資比</li></ul></article>
+          <article class="tri-card"><h4>推論</h4><ul class='bullet-list'><li>結論：目前屬中期上升架構內的短線修正與成本帶保衛，不是已確認的新一輪突破</li><li>結論：反彈先視為壓力測試，不能以低量止跌直接判定主力吸籌</li><li>結論：事件分數保留中等，不足以推升短期目標</li><li>結論：部位採小、分段、條件式，整體信心上限為中等偏低</li><li>結論：未收復220.5至221.5與229.5前，不啟用244.5以上延伸目標</li></ul></article>
+        </div>
+      </section>
+      <section class="evidence-block">
+        <div class="subhead"><h3>核心分數</h3></div>
+        <div class="score-grid">
+    <article class="score-card">
+      <div class="score-top">
+        <h4>技術結構</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium-low'>中低</span>
+        </div>
+      </div>
+      <p>日、週、月趨勢未全面翻空，保留結構底；短線主錨、事件錨與雙VWAP失守，故降至中等偏低</p>
+    </article>
+    
+    <article class="score-card">
+      <div class="score-top">
+        <h4>籌碼與成交結構</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-low'>低</span>
+        </div>
+      </div>
+      <p>三大法人5日-763.22張、外資5日-710.12張，收盤低於逐筆VWAP且賣方近似量57.73%，未見資金確認</p>
+    </article>
+    
+    <article class="score-card">
+      <div class="score-top">
+        <h4>事件與基本面</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium'>中</span>
+        </div>
+      </div>
+      <p>2026-03營收與2025Q4獲利數字正向，但事件窗不活躍、最新法說題材未逐項官方確認，僅給中等</p>
+    </article>
+    
+    <article class="score-card">
+      <div class="score-top">
+        <h4>相對大盤與產業代理標的</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium-low'>中低</span>
+        </div>
+      </div>
+      <p>20日與60日落後加權指數、120日領先，顯示長期仍強但近期降溫；同業與美股補強不足，不能升到中高</p>
+    </article>
+    
+    <article class="score-card">
+      <div class="score-top">
+        <h4>流動性與執行風險</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium-low'>中低</span>
+        </div>
+      </div>
+      <p>無注意或處置是正面，但ATR14達14.25元、當沖比35.8%、成交量收縮，追價與窄停損風險仍高</p>
+    </article>
+    
+    <article class="score-card">
+      <div class="score-top">
+        <h4>回測與模型可驗證性</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-low'>低</span>
+        </div>
+      </div>
+      <p>不能用勝率、期望值、獲利因子或最大回撤替當前方向背書；走勢前推驗證已執行但仍是本地有限網格，模型信心維持低</p>
+    </article>
+    
+    <article class="score-card">
+      <div class="score-top">
+        <h4>股性權重校正</h4>
+        <div class="badge-row">
+          <span class='badge badge-conf-medium-low'>中低</span>
+        </div>
+      </div>
+      <p>12建議技術0.3、籌碼0.2、事件0.3、基本面0.1、風險執行0.2；本輪因此更重視錨點、事件新鮮度與執行風險，但因資料品質僅部分成立，分數不升至中高</p>
+    </article>
+    </div>
+      </section>
+    
+      </div>
+    </details>
+    
+    <details id="governance" class="section">
+      <summary class="section-head">
+        <div class="section-title">
+          <span class="section-index">治理</span>
+          <h2>治理資料</h2>
+        </div>
+        <div class="badge-row"></div>
+      </summary>
+      <div class="section-body">
+        
+      <div class="governance-stack">
+        
+    <details class="fold-panel">
+      <summary class="fold-head">
+        <h4>資料完整性</h4>
+        <div class="badge-row"><span class='badge badge-plain'>完整性</span></div>
+      </summary>
+      <div class="fold-body">
+        ("<p>資料主權表：00=可用（驗證通過，最新日線已校正）；01=可用；02=部分成立（官方營收與財報可用，媒體／新聞摘要事件待官方複核，信心補充資料不可用）；03=可用（20日量能曲線可用，60日樣本不足）；04=可用；05=可用（日線/週線/monthly可作正式趨勢，季線/年線=受阻）；06=可用（替代公開資料重建，latest_field_completeness.core_complete=是，不視為Goodinfo原站）；07=可用；09/10=可用 用於 結構 only（只作格式約束，不作事實來源）；11回測設定=部分成立，逐筆=可用 用於 single day structure only；12=部分成立；13=部分成立；14=可用 用於 obligations only；16=usable且官方查核信心高；19=部分成立（是否可用於權重校正=是但正式 true 回測 completed=否）；20=可用，信心需設上限</p><p class='muted'>現況層以2026-07-09的00/01/03/04/05/07/逐筆/16/20為準；12/13/19截至2026-07-08，只作股性、訊號與風控校正。00的已驗證 最新日線取代基礎資料原始218/218/218/218列；06與07交叉核對後核心EOD欄位一致。逐筆regular-session量1209張與EOD量1240張、逐筆VWAP 220.5與03 當日 VWAP 221.5存在口徑差異，正式分析保留為衝突帶而不自行覆蓋</p><ul class='bullet-list'><li>第一層：高可信：00/05驗證後開高低收量與日線技術、06/07核心EOD、官方月營收與財報、官方交易限制交易限制、20官方除息調整</li><li>第二層：中可信：04 AVWAP 候選、03盤中技術與20日量能曲線、01/07籌碼、逐筆成交結構、加權指數相對報酬與同業籃子可用狀態</li><li>第三層：低可信或待驗證：媒體／新聞摘要法說與題材、同業籃子聚合報酬、美股ROK/TER/ABB同期間序列、波動係數／相關係數、60日量能曲線、正式完整回測</li></ul>",)
+      </div>
+    </details>
+    
+        
+    <details class="fold-panel">
+      <summary class="fold-head">
+        <h4>回測與缺口</h4>
+        <div class="badge-row"><span class='badge badge-plain'>治理</span></div>
+      </summary>
+      <div class="fold-body">
+        <p>已讀取11回測設定、逐筆、股性、13原型訊號、14六項啟動 obligations、官方交易限制、長期本地回測與外部補強。回測資料：回測範圍可用於權重校正、正式完整回測完成狀態為否；回測資料：資料範圍復權調整狀態為已依官方公司行動因子完成復權；回測資料：參數化走勢前推驗證摘要的5日與20日狀態均為已跑參數再最佳化滾動樣本外；回測資料：信心補充資料.可用。雖然公司行動／相對資料：公司行動調整：正式復權序列已完成，19仍因基準覆蓋不完整、產業代理標的完整序列不足、有限參數網格與外部審計缺口而不是正式完整回測，故回測資料提供狀態維持否。依本輪STRICT DOWNGRADE 門檻，不引用樣本外勝率、期望值、profit factor或max drawdown數值；僅使用BT1突破量、BT2 MA20收復、BT3高量回測等訊號存在規則，對情境、目標與部位施加保守上限。逐筆只作單日成交結構，不視為回測</p><h5>缺口</h5><ul class='bullet-list'><li>19.正式完整回測完成狀態為否，不能宣稱正式完整回測或用績效數值升高信心</li><li>基準 對齊覆蓋率為88.4298%，可用於權重校正=否；beta與correlation資料不足</li><li>產業代理標的完整同期間序列不足；同族群籃子雖已計算但缺聚合相對報酬，4562不在啟動 universe</li><li>美股代理標的 ROK/TER/ABB無同期間序列，無法驗證海外題材共振</li><li>02/20法說與題材多為媒體／新聞摘要，缺公司官方逐項確認</li><li>03 當日 VWAP與逐筆VWAP、EOD量與逐筆regular-session量存在口徑衝突</li><li>03/20的60日量能曲線未達60日樣本門檻</li><li>13僅為本地脈絡部分可用，原型走勢前推驗證未完成，不能替代19或正式審計</li><li>02.信心補充資料.未提供，未提供4576專屬補強段落，事件與基本面信心不額外上調</li></ul><h5>下一輪假設</h5><ul class='bullet-list'><li>驗證雙VWAP收復後，224.5至225.5與229.5是否能依序由壓力轉支撐；未放量（≥ 4,197 張）不得啟用244.5目標</li><li>驗證216至218失守後，210至212.5是否形成第二層支撐；跌破209.5則7月初反彈結構失效</li><li>補齊官方法說／最新月營收、加權指數與同族群聚合相對報酬及ROK/TER/ABB序列，再判斷中期主升情境能否上修</li></ul>
+      </div>
+    </details>
+    
+        
+    <details class="fold-panel">
+      <summary class="fold-head">
+        <h4>框架檢視細節</h4>
+        <div class="badge-row"><span class='badge badge-conf-medium-low'>延後觀察</span></div>
+      </summary>
+      <div class="fold-body">
+        <p><strong>本輪結論：</strong>暫不修改專屬框架，只在本次正式欄位套用條件式錨點、相對大盤與風控校正</p><p><strong>判斷理由：</strong>缺既有成熟框架、15_AJ政策、正式完整回測、同族群聚合報酬與美股代理標的序列；單一資料窗不足以證明結構性框架失效</p><h5>下一輪成功判準</h5><ul class='bullet-list'><li>至少兩次獨立交易窗驗證雙VWAP與主 AVWAP 切換規則</li><li>同族群與加權指數相對結構可重現，且官方事件資料完整</li><li>正式回測或外部審計支持新增規則，而非只靠單次行情</li></ul><h5>下一輪失敗判準</h5><ul class='bullet-list'><li>收復錨點後反覆假突破且量能規則無辨識力</li><li>相對加權指數與同族群資訊對情境沒有穩定校正效果</li><li>官方事件與市場反應長期偏離，需重估事件權重</li></ul>
+      </div>
+    </details>
+    
+      </div>
+    
+      </div>
+    </details>
+    
+      </div>
+    </section>
+    
+      </div>
+    </details>
+    
+
+    <p class="footer-note">這是 V3 單股原型頁，主真源仍為驗證後 JSON；固定設定卡由最新專屬提示詞補齊。這版不覆蓋 V2，也尚未接入全部個股批次。</p>
+  </main>
+  <script>
+    (() => {
+      const mobileNav = document.querySelector('.mobile-nav-fab');
+      if (!mobileNav) return;
+      mobileNav.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+          mobileNav.removeAttribute('open');
+        });
+      });
+      document.addEventListener('click', (event) => {
+        if (!mobileNav.hasAttribute('open')) return;
+        if (mobileNav.contains(event.target)) return;
+        mobileNav.removeAttribute('open');
+      });
+    })();
+  </script>
+</body>
+</html>
